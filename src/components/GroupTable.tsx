@@ -1,6 +1,7 @@
 "use client";
 
 import { type Team } from "@/data/schedule";
+import { motion } from "framer-motion";
 
 interface GroupTableProps {
   groupName: string;
@@ -9,13 +10,18 @@ interface GroupTableProps {
 
 export default function GroupTable({ groupName, teams }: GroupTableProps) {
   return (
-    <div className="glass-card overflow-hidden">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-2xl overflow-hidden"
+      style={{ boxShadow: "0 2px 12px rgba(15,27,58,0.05)" }}
+    >
       {/* Group header */}
-      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-gold/10">
-        <span className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-gold/15 text-gold text-sm font-extrabold">
-          {groupName}
-        </span>
-        <span className="text-cream/70 text-sm font-semibold">
+      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[#0F1B3A]/5">
+        <span
+          className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-extrabold text-[#C9A24B]"
+          style={{ backgroundColor: "rgba(201,162,75,0.1)" }}
+        >
           Group {groupName}
         </span>
       </div>
@@ -23,42 +29,55 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
       {/* Table */}
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-cream/30 text-[10px] uppercase tracking-wider">
-            <th className="text-left py-2 pl-4 pr-2 font-medium">Team</th>
-            <th className="w-9 text-center py-2 font-medium">W</th>
-            <th className="w-9 text-center py-2 font-medium">D</th>
-            <th className="w-9 text-center py-2 font-medium">L</th>
-            <th className="w-10 text-center py-2 pr-4 font-medium">Pts</th>
+          <tr className="text-[10px] uppercase tracking-wider" style={{ color: "rgba(15,27,58,0.3)" }}>
+            <th className="text-left py-2.5 pl-4 pr-2 font-semibold">Team</th>
+            <th className="w-9 text-center py-2.5 font-semibold">W</th>
+            <th className="w-9 text-center py-2.5 font-semibold">D</th>
+            <th className="w-9 text-center py-2.5 font-semibold">L</th>
+            <th className="w-10 text-center py-2.5 pr-4 font-semibold">Pts</th>
           </tr>
         </thead>
         <tbody>
           {teams.map((team, idx) => (
             <tr
               key={team.code}
-              className={`
-                border-t border-cream/5 transition-colors
-                ${idx < 2 ? "bg-gold/[0.03]" : ""}
-              `}
+              style={{
+                backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F5F0E8",
+              }}
             >
-              <td className="py-2.5 pl-4 pr-2">
-                <div className="flex items-center gap-2">
-                  <span className="text-cream/30 text-[10px] font-bold w-3 text-center">
+              <td className="py-3 pl-4 pr-2">
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="text-[10px] font-bold w-4 text-center tabular-nums"
+                    style={{ color: "rgba(15,27,58,0.25)" }}
+                  >
                     {idx + 1}
                   </span>
                   <span className="text-lg leading-none">{team.flag_emoji}</span>
-                  <span className="font-medium text-cream/90 text-sm truncate">
+                  <span className="font-medium text-[#0F1B3A] text-sm truncate">
                     {team.name}
                   </span>
                 </div>
               </td>
-              <td className="text-center text-cream/40 tabular-nums">0</td>
-              <td className="text-center text-cream/40 tabular-nums">0</td>
-              <td className="text-center text-cream/40 tabular-nums">0</td>
-              <td className="text-center text-gold font-bold tabular-nums pr-4">0</td>
+              <td className="text-center tabular-nums" style={{ color: "rgba(15,27,58,0.35)" }}>
+                0
+              </td>
+              <td className="text-center tabular-nums" style={{ color: "rgba(15,27,58,0.35)" }}>
+                0
+              </td>
+              <td className="text-center tabular-nums" style={{ color: "rgba(15,27,58,0.35)" }}>
+                0
+              </td>
+              <td
+                className="text-center font-bold tabular-nums pr-4"
+                style={{ color: "#C9A24B" }}
+              >
+                0
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
-    </div>
+    </motion.div>
   );
 }

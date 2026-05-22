@@ -35,7 +35,7 @@ export default function RafflePage() {
           <Gift className="text-gold" size={24} />
           <h1 className="text-xl font-extrabold text-shimmer">Raffle</h1>
         </div>
-        <p className="text-cream/40 text-xs text-center">
+        <p className="text-navy/40 text-xs text-center">
           Enter for a chance to win amazing prizes
         </p>
       </div>
@@ -55,8 +55,8 @@ export default function RafflePage() {
 
               {/* Description card */}
               {raffle.description && (
-                <div className="glass-card-light p-4 mb-4">
-                  <p className="text-cream/60 text-sm leading-relaxed">
+                <div className="card-light p-4 mb-4">
+                  <p className="text-navy/60 text-sm leading-relaxed">
                     {raffle.description}
                   </p>
                 </div>
@@ -80,19 +80,19 @@ export default function RafflePage() {
             <h2 className="text-xl font-extrabold text-gold mb-2">
               No Active Raffle Right Now
             </h2>
-            <p className="text-cream/50 text-sm max-w-xs">
+            <p className="text-navy/50 text-sm max-w-xs">
               Check back during match days for your chance to win prizes at the fanzone!
             </p>
           </div>
         )}
 
         {/* Download Yalla Bites CTA */}
-        <div className="glass-card p-5 text-center">
+        <div className="card p-5 text-center">
           <Sparkles className="text-gold mx-auto mb-2" size={22} />
-          <p className="text-sm font-bold mb-1">
+          <p className="text-sm font-bold text-navy mb-1">
             Download Yalla Bites to increase your chances!
           </p>
-          <p className="text-cream/40 text-xs mb-4">
+          <p className="text-navy/40 text-xs mb-4">
             Yalla Bites users get bonus raffle entries on match days.
           </p>
           <div className="flex items-center justify-center gap-3">
@@ -100,7 +100,7 @@ export default function RafflePage() {
               href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gold/15 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
+              className="bg-gold/10 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
             >
               <Download size={14} />
               App Store
@@ -109,7 +109,7 @@ export default function RafflePage() {
               href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gold/15 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
+              className="bg-gold/10 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
             >
               <Download size={14} />
               Google Play
@@ -120,19 +120,19 @@ export default function RafflePage() {
         {/* Past Raffle Winners */}
         {pastRaffles.length > 0 && (
           <div>
-            <h2 className="text-xs font-bold text-cream/30 uppercase tracking-[0.15em] mb-3">
+            <h2 className="text-xs font-bold text-navy/30 uppercase tracking-[0.15em] mb-3">
               Past Raffles
             </h2>
             <div className="space-y-3">
               {pastRaffles.map((raffle) => (
-                <div key={raffle.id} className="glass-card-light p-4">
+                <div key={raffle.id} className="card p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <h3 className="text-sm font-bold">{raffle.name}</h3>
+                    <h3 className="text-sm font-bold text-navy">{raffle.name}</h3>
                     <span
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         raffle.status === "drawn"
                           ? "text-gold bg-gold/10"
-                          : "text-cream/40 bg-cream/5"
+                          : "text-navy/40 bg-navy/5"
                       }`}
                     >
                       {raffle.status === "drawn" ? "Winner Drawn" : "Closed"}
@@ -147,7 +147,7 @@ export default function RafflePage() {
                     </div>
                   )}
                   {raffle.closedAt && (
-                    <p className="text-[10px] text-cream/30 mt-1">
+                    <p className="text-[10px] text-navy/30 mt-1">
                       {new Date(raffle.closedAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",
