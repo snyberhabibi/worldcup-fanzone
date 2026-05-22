@@ -89,9 +89,12 @@ function FlipDigit({ value, label }: { value: number; label: string }) {
 }
 
 export default function CountdownTimer() {
+  const [mounted, setMounted] = useState(false);
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
+    setMounted(true);
+    setNow(new Date());
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
@@ -102,6 +105,15 @@ export default function CountdownTimer() {
   const timeLeft = nextMatch
     ? calcTimeLeft(new Date(nextMatch.date), now)
     : null;
+
+  // SSR placeholder to avoid hydration mismatch
+  if (!mounted) {
+    return (
+      <div className="bg-white rounded-2xl p-6 text-center" style={{ boxShadow: "0 4px 20px rgba(15,27,58,0.06)", minHeight: 160 }}>
+        <div className="w-6 h-6 border-2 border-gold border-t-transparent rounded-full animate-spin mx-auto" />
+      </div>
+    );
+  }
 
   // No more matches
   if (!nextMatch) {

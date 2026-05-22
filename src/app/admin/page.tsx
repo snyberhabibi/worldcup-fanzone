@@ -112,8 +112,8 @@ function PinEntry({ onSuccess }: { onSuccess: () => void }) {
         {/* Number pad */}
         <div className="grid grid-cols-3 gap-3">
           {["1", "2", "3", "4", "5", "6", "7", "8", "9", "", "0", "del"].map(
-            (key) => {
-              if (key === "") return <div key="empty" />;
+            (key, idx) => {
+              if (key === "") return <div key={`spacer-${idx}`} />;
               if (key === "del") {
                 return (
                   <button
