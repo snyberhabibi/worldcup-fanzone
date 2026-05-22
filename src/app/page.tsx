@@ -28,7 +28,7 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full object-cover opacity-60"
           poster="/mascot/celebrating.png"
         >
-          <source src="/video/stadium-v2.mp4" type="video/mp4" />
+          <source src="/video/hero-bg.mp4" type="video/mp4" />
         </video>
 
         {/* Gradient overlay — lighter so video is more visible */}
