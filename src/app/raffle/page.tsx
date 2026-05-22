@@ -2,10 +2,21 @@
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
+import { motion } from "framer-motion";
 import RaffleForm from "@/components/RaffleForm";
 import { getRaffles } from "@/lib/store";
 import { Raffle } from "@/types";
 import { Gift, Trophy, Sparkles, Download } from "lucide-react";
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.12 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 25 } },
+};
 
 export default function RafflePage() {
   const [raffles, setRaffles] = useState<Raffle[]>([]);

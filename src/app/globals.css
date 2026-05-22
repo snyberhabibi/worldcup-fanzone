@@ -986,6 +986,23 @@ select:focus,
 
 
 /* ═══════════════════════════════════
+   ANIMATED GRADIENT HERO
+   ═══════════════════════════════════ */
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 50% 0%; }
+  50% { background-position: 50% 100%; }
+}
+.bg-gradient-animated {
+  background: radial-gradient(ellipse at 50% 0%, rgba(201,162,75,0.08) 0%, transparent 50%),
+              radial-gradient(ellipse at 50% 100%, rgba(26,107,60,0.04) 0%, transparent 50%),
+              linear-gradient(180deg, var(--cream) 0%, #F8F3EB 50%, var(--cream) 100%);
+  background-size: 100% 200%;
+  animation: gradient-shift 15s ease-in-out infinite;
+}
+
+
+/* ═══════════════════════════════════
    ACCESSIBILITY
    ═══════════════════════════════════ */
 

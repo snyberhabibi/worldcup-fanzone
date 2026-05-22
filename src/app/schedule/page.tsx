@@ -1,12 +1,23 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { MATCHES, GROUPS, TEAMS, type Match } from "@/data/schedule";
 import MatchCard from "@/components/MatchCard";
 import GroupTable from "@/components/GroupTable";
 import { Search, X } from "lucide-react";
 
 type Tab = "groups" | "schedule" | "knockout";
+
+const staggerContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.08 } },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 25 } },
+};
 
 function formatDateHeader(dateStr: string): string {
   const date = new Date(dateStr);
@@ -172,18 +183,25 @@ export default function SchedulePage() {
           )}
 
           {/* Tab bar */}
-          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm relative">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
+                className={`flex-1 py-2 rounded-lg text-sm font-bold transition-colors duration-200 relative z-10 ${
                   activeTab === tab.id
-                    ? "bg-gold text-white"
+                    ? "text-white"
                     : "text-navy/55 active:text-navy/60"
                 }`}
               >
-                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="schedule-tab"
+                    className="absolute inset-0 bg-gold rounded-lg"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10">{tab.label}</span>
               </button>
             ))}
           </div>
@@ -194,27 +212,40 @@ export default function SchedulePage() {
       <div ref={scrollRef} className="px-5 py-5">
         {/* Groups Tab */}
         {activeTab === "groups" && (
-          <div id="groups" className="grid grid-cols-2 gap-3">
+          <motion.div
+            id="groups"
+            className="grid grid-cols-2 gap-3"
+            initial="hidden"
+            animate="visible"
+            variants={staggerContainer}
+          >
             {filteredGroups.map((group) => (
-              <GroupTable
-                key={group.groupName}
-                groupName={group.groupName}
-                teams={group.teams}
-              />
+              <motion.div key={group.groupName} variants={fadeUp}>
+                <GroupTable
+                  groupName={group.groupName}
+                  teams={group.teams}
+                />
+              </motion.div>
             ))}
             {filteredGroups.length === 0 && (
               <div className="col-span-2 text-center py-16">
                 <p className="text-navy/50 text-sm">No groups match your search.</p>
               </div>
             )}
-          </div>
+          </motion.div>
         )}
 
         {/* Schedule Tab */}
         {activeTab === "schedule" && (
           <div className="space-y-5">
             {filteredMatchesByDate.map(([dateKey, { label, matches }]) => (
-              <div key={dateKey}>
+              <motion.div
+                key={dateKey}
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={staggerContainer}
+              >
                 {/* Date header */}
                 <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm -mx-5 px-5 py-2 border-b border-gold/10 mb-3">
                   <h3 className="text-xs font-bold text-gold uppercase tracking-wider">
@@ -226,10 +257,12 @@ export default function SchedulePage() {
                 </div>
                 <div className="space-y-2">
                   {matches.map((match) => (
-                    <MatchCard key={match.id} match={match} compact />
+                    <motion.div key={match.id} variants={fadeUp}>
+                      <MatchCard match={match} compact />
+                    </motion.div>
                   ))}
                 </div>
-              </div>
+              </motion.div>
             ))}
             {filteredMatchesByDate.length === 0 && (
               <div className="text-center py-16">
@@ -243,7 +276,13 @@ export default function SchedulePage() {
         {activeTab === "knockout" && (
           <div className="space-y-6">
             {filteredKnockout.map((stage) => (
-              <div key={stage.stage}>
+              <motion.div
+                key={stage.stage}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+              >
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-sm font-extrabold text-gold">{stage.label}</h3>
                   <div className="flex-1 h-px bg-gold/15" />
@@ -262,7 +301,7 @@ export default function SchedulePage() {
                     <p className="text-navy/50 text-xs">TBD - Determined by group stage results</p>
                   </div>
                 )}
-              </div>
+              </motion.div>
             ))}
           </div>
         )}
