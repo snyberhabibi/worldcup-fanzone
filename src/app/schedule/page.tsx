@@ -212,27 +212,20 @@ export default function SchedulePage() {
       <div ref={scrollRef} className="px-4 py-5 max-w-full overflow-x-hidden">
         {/* Groups Tab */}
         {activeTab === "groups" && (
-          <motion.div
-            id="groups"
-            className="grid grid-cols-2 gap-3"
-            initial="hidden"
-            animate="visible"
-            variants={staggerContainer}
-          >
+          <div id="groups" className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             {filteredGroups.map((group) => (
-              <motion.div key={group.groupName} variants={fadeUp}>
-                <GroupTable
-                  groupName={group.groupName}
-                  teams={group.teams}
-                />
-              </motion.div>
+              <GroupTable
+                key={group.groupName}
+                groupName={group.groupName}
+                teams={group.teams}
+              />
             ))}
             {filteredGroups.length === 0 && (
               <div className="col-span-2 text-center py-16">
                 <p className="text-navy/50 text-sm">No groups match your search.</p>
               </div>
             )}
-          </motion.div>
+          </div>
         )}
 
         {/* Schedule Tab */}
