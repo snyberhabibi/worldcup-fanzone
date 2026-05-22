@@ -1,29 +1,35 @@
 "use client";
 
-export default function PartnerLogos() {
-  const partners = [
-    { name: "DAR Coffee", role: "Host Venue" },
-    { name: "Haus of Design", role: "Decor Partner" },
-    { name: "Yalla Bites", role: "Food Partner" },
-  ];
+import { motion } from "framer-motion";
 
+const partners = ["DAR Coffee", "Haus of Design", "Yalla Bites"];
+
+export default function PartnerLogos() {
   return (
-    <div className="text-center">
-      <p className="text-cream/30 text-[10px] font-semibold uppercase tracking-[0.2em] mb-4">
-        Presented By
-      </p>
-      <div className="flex items-center justify-center gap-6">
-        {partners.map((p) => (
-          <div key={p.name} className="flex flex-col items-center gap-1">
-            <div className="w-12 h-12 rounded-full bg-cream/10 flex items-center justify-center">
-              <span className="text-gold font-extrabold text-lg">
-                {p.name.charAt(0)}
-              </span>
-            </div>
-            <span className="text-cream/50 text-[10px] font-medium">{p.name}</span>
-          </div>
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ delay: 0.3 }}
+      className="text-center py-4"
+    >
+      <div className="flex items-center justify-center gap-0 flex-wrap">
+        {partners.map((name, i) => (
+          <span key={name} className="flex items-center">
+            <span
+              className="text-[11px] font-medium tracking-wide"
+              style={{ color: "rgba(15,27,58,0.4)" }}
+            >
+              {name}
+            </span>
+            {i < partners.length - 1 && (
+              <span
+                className="inline-block w-1 h-1 rounded-full mx-3"
+                style={{ backgroundColor: "#C9A24B" }}
+              />
+            )}
+          </span>
         ))}
       </div>
-    </div>
+    </motion.div>
   );
 }

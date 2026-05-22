@@ -1,10 +1,10 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 :root {
   --navy: #0F1B3A;
   --navy-light: #1a2d54;
-  --cream: #F2EBDC;
+  --cream: #F5F0E8;
+  --cream-dark: #EDE6D8;
   --gold: #C9A24B;
   --gold-light: #e3c877;
   --red: #E54141;
@@ -17,6 +17,7 @@
   --color-navy: var(--navy);
   --color-navy-light: var(--navy-light);
   --color-cream: var(--cream);
+  --color-cream-dark: var(--cream-dark);
   --color-gold: var(--gold);
   --color-gold-light: var(--gold-light);
   --color-red: var(--red);
@@ -36,22 +37,10 @@ html {
 
 body {
   font-family: 'Poppins', sans-serif;
-  background: var(--navy);
-  color: var(--cream);
+  background: var(--cream);
+  color: var(--navy);
   min-height: 100vh;
   overscroll-behavior-y: contain;
-}
-
-/* Stadium gradient background */
-.bg-stadium {
-  background: linear-gradient(
-    180deg,
-    var(--navy) 0%,
-    #0d1730 40%,
-    #112040 70%,
-    var(--green) 95%,
-    #15552f 100%
-  );
 }
 
 /* Gold shimmer text */
@@ -69,19 +58,17 @@ body {
   50% { background-position: 100% 50%; }
 }
 
-/* Card glass effect */
-.glass-card {
-  background: rgba(15, 27, 58, 0.6);
-  backdrop-filter: blur(12px);
-  border: 1px solid rgba(201, 162, 75, 0.15);
+/* White cards with soft shadow */
+.card {
+  background: #FFFFFF;
   border-radius: 16px;
+  box-shadow: 0 2px 12px rgba(15, 27, 58, 0.06), 0 1px 3px rgba(15, 27, 58, 0.04);
 }
 
-.glass-card-light {
-  background: rgba(242, 235, 220, 0.08);
-  backdrop-filter: blur(8px);
-  border: 1px solid rgba(242, 235, 220, 0.12);
+.card-light {
+  background: rgba(255, 255, 255, 0.7);
   border-radius: 16px;
+  box-shadow: 0 1px 8px rgba(15, 27, 58, 0.04);
 }
 
 /* Vote button */
@@ -102,24 +89,6 @@ body {
 
 .vote-btn:active {
   transform: scale(0.92);
-}
-
-/* Pitch lines pattern */
-.pitch-pattern {
-  position: relative;
-  overflow: hidden;
-}
-.pitch-pattern::before {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 200px;
-  height: 100px;
-  border: 2px solid rgba(255,255,255,0.06);
-  border-bottom: none;
-  border-radius: 100px 100px 0 0;
 }
 
 /* Bottom nav safe area */
@@ -161,9 +130,18 @@ body {
   animation: flag-bounce 0.6s ease-in-out;
 }
 
+/* Mascot floating */
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+}
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
 /* Match timer glow */
 .timer-glow {
-  text-shadow: 0 0 20px rgba(201, 162, 75, 0.5), 0 0 40px rgba(201, 162, 75, 0.2);
+  text-shadow: 0 0 20px rgba(201, 162, 75, 0.3), 0 0 40px rgba(201, 162, 75, 0.1);
 }
 
 /* Trophy shimmer */
@@ -173,4 +151,31 @@ body {
 }
 .trophy-glow {
   animation: trophy-glow 2s ease-in-out infinite;
+}
+
+/* Subtle soccer ball pattern for decorative sections */
+.soccer-pattern {
+  background-image: radial-gradient(circle, rgba(201, 162, 75, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Scrollbar hide utility */
+.scrollbar-hide::-webkit-scrollbar { display: none; }
+.scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* Gold star scatter keyframe */
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+.animate-twinkle {
+  animation: twinkle 2.5s ease-in-out infinite;
+}
+
+/* PIN shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-8px); }
+  50% { transform: translateX(8px); }
+  75% { transform: translateX(-4px); }
 }

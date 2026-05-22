@@ -1,31 +1,15 @@
-import type { Metadata, Viewport } from "next";
+"use client";
+
 import "./globals.css";
+import { Poppins } from "next/font/google";
 import BottomNav from "@/components/BottomNav";
 
-export const metadata: Metadata = {
-  title: "World Cup Fanzone 2026 | DAR × Yalla × Haus",
-  description: "Dallas's first World Cup fan zone. Vote, win raffles, and watch every match at DAR Coffee.",
-  manifest: "/manifest.json",
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "black-translucent",
-    title: "Fanzone 2026",
-  },
-  openGraph: {
-    title: "World Cup Fanzone 2026",
-    description: "Dallas's first World Cup fan zone. Vote, win raffles, and watch every match.",
-    type: "website",
-  },
-};
-
-export const viewport: Viewport = {
-  width: "device-width",
-  initialScale: 1,
-  maximumScale: 1,
-  userScalable: false,
-  themeColor: "#0F1B3A",
-  viewportFit: "cover",
-};
+const poppins = Poppins({
+  subsets: ["latin"],
+  weight: ["400", "500", "600", "700", "800", "900"],
+  display: "swap",
+  variable: "--font-poppins",
+});
 
 export default function RootLayout({
   children,
@@ -33,14 +17,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={poppins.variable}>
       <head>
+        <title>World Cup Fanzone 2026 | DAR x Yalla x Haus</title>
+        <meta name="description" content="Dallas's first World Cup fan zone. Vote, win raffles, and watch every match at DAR Coffee." />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="theme-color" content="#F5F0E8" />
+        <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="Fanzone 2026" />
+        <meta property="og:title" content="World Cup Fanzone 2026" />
+        <meta property="og:description" content="Dallas's first World Cup fan zone. Vote, win raffles, and watch every match." />
+        <meta property="og:type" content="website" />
       </head>
-      <body className="antialiased">
-        <main className="pb-nav min-h-screen bg-stadium">
+      <body className={`${poppins.className} antialiased`}>
+        <main className="pb-nav min-h-screen bg-cream">
           {children}
         </main>
         <BottomNav />

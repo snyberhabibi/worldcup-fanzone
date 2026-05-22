@@ -3,6 +3,7 @@
 import { TEAMS, type Match } from "@/data/schedule";
 import { getVotes } from "@/lib/store";
 import { MapPin, Clock } from "lucide-react";
+import { motion } from "framer-motion";
 
 function etToCt(etTime: string): string {
   const match = etTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
@@ -50,8 +51,13 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
 
   if (compact) {
     return (
-      <div className="glass-card-light px-4 py-3 flex items-center gap-3">
-        <div className="text-gold/80 text-xs font-semibold w-16 shrink-0 text-center">
+      <motion.div
+        initial={{ opacity: 0, y: 6 }}
+        animate={{ opacity: 1, y: 0 }}
+        className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
+        style={{ boxShadow: "0 1px 6px rgba(15,27,58,0.04)" }}
+      >
+        <div className="text-[#C9A24B]/70 text-xs font-semibold w-16 shrink-0 text-center">
           {etToCt(match.time)} CT
         </div>
 
@@ -59,11 +65,11 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2 min-w-0">
               <span className="text-lg leading-none">{home.flag}</span>
-              <span className="text-sm font-semibold truncate">{home.code}</span>
+              <span className="text-sm font-semibold text-[#0F1B3A] truncate">{home.code}</span>
             </div>
-            <span className="text-gold/40 text-xs font-bold">vs</span>
+            <span className="text-[#C9A24B]/40 text-xs font-bold">vs</span>
             <div className="flex items-center gap-2 min-w-0 justify-end">
-              <span className="text-sm font-semibold truncate">{away.code}</span>
+              <span className="text-sm font-semibold text-[#0F1B3A] truncate">{away.code}</span>
               <span className="text-lg leading-none">{away.flag}</span>
             </div>
           </div>
@@ -71,83 +77,119 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
 
         <div className="shrink-0">
           {match.group ? (
-            <span className="text-[10px] font-bold text-gold/60 bg-gold/10 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-[#C9A24B] bg-[#C9A24B]/10 px-2 py-0.5 rounded-full">
               GRP {match.group}
             </span>
           ) : (
-            <span className="text-[10px] font-bold text-red bg-red/10 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] font-bold text-[#E54141] bg-[#E54141]/10 px-2 py-0.5 rounded-full">
               {stageLabels[match.stage] || match.stage}
             </span>
           )}
         </div>
-      </div>
+      </motion.div>
     );
   }
 
   return (
-    <div className="glass-card p-4 relative overflow-hidden">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="bg-white rounded-2xl p-5 relative overflow-hidden"
+      style={{ boxShadow: "0 2px 12px rgba(15,27,58,0.05)" }}
+    >
+      {/* Top row: group badge + time */}
+      <div className="flex items-center justify-between mb-4">
+        <div>
           {match.group ? (
-            <span className="text-xs font-bold text-gold bg-gold/10 px-2.5 py-1 rounded-full">
+            <span
+              className="text-xs font-bold text-[#C9A24B] px-3 py-1 rounded-full"
+              style={{ backgroundColor: "rgba(201,162,75,0.1)" }}
+            >
               Group {match.group}
             </span>
           ) : (
-            <span className="text-xs font-bold text-red bg-red/10 px-2.5 py-1 rounded-full uppercase">
+            <span
+              className="text-xs font-bold text-[#E54141] px-3 py-1 rounded-full uppercase"
+              style={{ backgroundColor: "rgba(229,65,65,0.08)" }}
+            >
               {stageLabels[match.stage] || match.stage}
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-cream/40">
+        <div className="flex items-center gap-1.5 text-[#0F1B3A]/35">
           <Clock size={12} />
           <span className="text-xs font-medium">{etToCt(match.time)} CT</span>
         </div>
       </div>
 
-      <div className="flex items-center justify-between gap-4">
+      {/* Teams row */}
+      <div className="flex items-center justify-between gap-2">
+        {/* Home team */}
         <div className="flex-1 text-center">
-          <div className="text-3xl mb-1">{home.flag}</div>
-          <p className="text-sm font-bold leading-tight">{home.name}</p>
-          <p className="text-[10px] text-cream/40 font-medium">{home.code}</p>
+          <div className="text-4xl mb-1.5">{home.flag}</div>
+          <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{home.name}</p>
+          <p className="text-[10px] text-[#0F1B3A]/30 font-medium">{home.code}</p>
         </div>
 
-        <div className="flex flex-col items-center">
-          <span className="text-gold font-extrabold text-lg">VS</span>
+        {/* VS circle */}
+        <div className="flex flex-col items-center shrink-0">
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              background: "linear-gradient(135deg, #C9A24B 0%, #E8D48B 100%)",
+              boxShadow: "0 2px 8px rgba(201,162,75,0.25)",
+            }}
+          >
+            <span className="text-white font-extrabold text-xs tracking-wide">VS</span>
+          </div>
         </div>
 
+        {/* Away team */}
         <div className="flex-1 text-center">
-          <div className="text-3xl mb-1">{away.flag}</div>
-          <p className="text-sm font-bold leading-tight">{away.name}</p>
-          <p className="text-[10px] text-cream/40 font-medium">{away.code}</p>
+          <div className="text-4xl mb-1.5">{away.flag}</div>
+          <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{away.name}</p>
+          <p className="text-[10px] text-[#0F1B3A]/30 font-medium">{away.code}</p>
         </div>
       </div>
 
+      {/* Vote bar */}
       {showVotes && totalVotes > 0 && (
-        <div className="mt-4 pt-3 border-t border-gold/10">
+        <div className="mt-4 pt-3 border-t border-[#0F1B3A]/5">
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
-            <span className="text-green-light">{homePercent}%</span>
-            <span className="text-cream/30 text-[10px]">{totalVotes} votes</span>
-            <span className="text-red">{awayPercent}%</span>
+            <span className="text-[#1A6B3C]">{homePercent}%</span>
+            <span className="text-[#0F1B3A]/25 text-[10px]">{totalVotes} votes</span>
+            <span className="text-[#E54141]">{awayPercent}%</span>
           </div>
-          <div className="h-1.5 rounded-full bg-navy-light overflow-hidden flex">
-            <div
-              className="h-full bg-green-light rounded-l-full transition-all duration-500"
-              style={{ width: `${homePercent}%` }}
+          <div className="h-2 rounded-full bg-[#F5F0E8] overflow-hidden flex">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${homePercent}%` }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="h-full rounded-l-full"
+              style={{
+                background: "linear-gradient(90deg, #1A6B3C, #2d8a52)",
+              }}
             />
-            <div
-              className="h-full bg-red rounded-r-full transition-all duration-500"
-              style={{ width: `${awayPercent}%` }}
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${awayPercent}%` }}
+              transition={{ duration: 0.7, ease: "easeOut" }}
+              className="h-full rounded-r-full"
+              style={{
+                background: "linear-gradient(90deg, #E54141, #c93535)",
+              }}
             />
           </div>
         </div>
       )}
 
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-cream/30">
+      {/* Venue info */}
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-[#0F1B3A]/25">
         <MapPin size={11} />
         <span className="text-[11px]">
           {match.venue}, {match.city}
         </span>
       </div>
-    </div>
+    </motion.div>
   );
 }

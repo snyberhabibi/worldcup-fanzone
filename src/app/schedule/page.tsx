@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useMemo, useRef, useEffect } from "react";
+import { useState, useMemo, useRef } from "react";
 import { MATCHES, GROUPS, TEAMS, type Match } from "@/data/schedule";
 import MatchCard from "@/components/MatchCard";
 import GroupTable from "@/components/GroupTable";
-import { Search, X, ChevronDown } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 type Tab = "groups" | "schedule" | "knockout";
 
@@ -35,7 +35,6 @@ function formatDateHeader(dateStr: string): string {
 
 function getDateKey(dateStr: string): string {
   const date = new Date(dateStr);
-  // Convert to CT for grouping
   return date.toLocaleDateString("en-CA", { timeZone: "America/Chicago" });
 }
 
@@ -44,7 +43,6 @@ export default function SchedulePage() {
   const [search, setSearch] = useState("");
   const [showSearch, setShowSearch] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
-  const [stickyDate, setStickyDate] = useState("");
 
   // Group stage matches sorted by date
   const groupMatches = useMemo(() => {
@@ -144,58 +142,58 @@ export default function SchedulePage() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: "groups", label: "Groups" },
-    { id: "schedule", label: "Schedule" },
+    { id: "schedule", label: "Matches" },
     { id: "knockout", label: "Knockout" },
   ];
 
   return (
     <div className="min-h-screen">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-navy/95 backdrop-blur-xl border-b border-gold/10">
+      <div className="sticky top-0 z-40 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
         <div className="px-5 pt-4 pb-3">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-extrabold">Schedule</h1>
+            <h1 className="text-xl font-extrabold text-navy">Schedule</h1>
             <button
               onClick={() => setShowSearch(!showSearch)}
-              className="w-9 h-9 rounded-xl bg-cream/5 flex items-center justify-center active:scale-90 transition-transform"
+              className="w-9 h-9 rounded-xl bg-white flex items-center justify-center active:scale-90 transition-transform shadow-sm"
             >
-              {showSearch ? <X size={18} /> : <Search size={18} />}
+              {showSearch ? <X size={18} className="text-navy/60" /> : <Search size={18} className="text-navy/60" />}
             </button>
           </div>
 
           {/* Search bar */}
           {showSearch && (
             <div className="relative mb-3">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-cream/30" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-navy/30" />
               <input
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search teams, venues..."
                 autoFocus
-                className="w-full bg-cream/5 border border-cream/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-cream placeholder:text-cream/20 focus:outline-none focus:border-gold/30"
+                className="w-full bg-white border border-navy/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-navy placeholder:text-navy/25 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 shadow-sm"
               />
               {search && (
                 <button
                   onClick={() => setSearch("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  <X size={14} className="text-cream/30" />
+                  <X size={14} className="text-navy/30" />
                 </button>
               )}
             </div>
           )}
 
           {/* Tab bar */}
-          <div className="flex gap-1 bg-cream/5 rounded-xl p-1">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
                 className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
                   activeTab === tab.id
-                    ? "bg-gold text-navy"
-                    : "text-cream/50 active:text-cream/70"
+                    ? "bg-gold text-white"
+                    : "text-navy/40 active:text-navy/60"
                 }`}
               >
                 {tab.label}
@@ -219,7 +217,7 @@ export default function SchedulePage() {
             ))}
             {filteredGroups.length === 0 && (
               <div className="col-span-2 text-center py-16">
-                <p className="text-cream/30 text-sm">No groups match your search.</p>
+                <p className="text-navy/30 text-sm">No groups match your search.</p>
               </div>
             )}
           </div>
@@ -231,11 +229,11 @@ export default function SchedulePage() {
             {filteredMatchesByDate.map(([dateKey, { label, matches }]) => (
               <div key={dateKey}>
                 {/* Date header */}
-                <div className="sticky top-[140px] z-30 bg-navy/90 backdrop-blur-md -mx-5 px-5 py-2 border-b border-gold/5 mb-3">
+                <div className="sticky top-[140px] z-30 bg-cream/90 backdrop-blur-md -mx-5 px-5 py-2 border-b border-gold/10 mb-3">
                   <h3 className="text-xs font-bold text-gold uppercase tracking-wider">
                     {label}
                   </h3>
-                  <span className="text-[10px] text-cream/30">
+                  <span className="text-[10px] text-navy/30">
                     {matches.length} match{matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>
@@ -248,7 +246,7 @@ export default function SchedulePage() {
             ))}
             {filteredMatchesByDate.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-cream/30 text-sm">No matches found.</p>
+                <p className="text-navy/30 text-sm">No matches found.</p>
               </div>
             )}
           </div>
@@ -261,8 +259,8 @@ export default function SchedulePage() {
               <div key={stage.stage}>
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-sm font-extrabold text-gold">{stage.label}</h3>
-                  <div className="flex-1 h-px bg-gold/10" />
-                  <span className="text-[10px] text-cream/30 font-medium">
+                  <div className="flex-1 h-px bg-gold/15" />
+                  <span className="text-[10px] text-navy/30 font-medium">
                     {stage.matches.length} match{stage.matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>
@@ -273,8 +271,8 @@ export default function SchedulePage() {
                     ))}
                   </div>
                 ) : (
-                  <div className="glass-card-light p-4 text-center">
-                    <p className="text-cream/30 text-xs">TBD - Determined by group stage results</p>
+                  <div className="card-light p-4 text-center">
+                    <p className="text-navy/30 text-xs">TBD - Determined by group stage results</p>
                   </div>
                 )}
               </div>
