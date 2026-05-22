@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Share, Plus } from "lucide-react";
+import { X, Share, Gift, Download, ChevronRight, Smartphone } from "lucide-react";
 import Image from "next/image";
 
 interface BeforeInstallPromptEvent extends Event {
@@ -11,7 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = "fanzone-install-dismissed";
-const DISMISS_DURATION = 7 * 24 * 60 * 60 * 1000; // 7 days
+const DISMISS_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days
 
 function isIOS(): boolean {
   if (typeof navigator === "undefined") return false;
@@ -19,6 +19,11 @@ function isIOS(): boolean {
     /iPad|iPhone|iPod/.test(navigator.userAgent) &&
     !(window as unknown as { MSStream?: unknown }).MSStream
   );
+}
+
+function isAndroid(): boolean {
+  if (typeof navigator === "undefined") return false;
+  return /Android/.test(navigator.userAgent);
 }
 
 function isStandalone(): boolean {
@@ -43,14 +48,16 @@ export default function InstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showIOS, setShowIOS] = useState(false);
   const [visible, setVisible] = useState(false);
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     if (isStandalone() || isDismissed()) return;
 
     if (isIOS()) {
       setShowIOS(true);
-      setVisible(true);
-      return;
+      // Show after 2 seconds on iOS
+      const timer = setTimeout(() => setVisible(true), 2000);
+      return () => clearTimeout(timer);
     }
 
     const handler = (e: Event) => {
@@ -78,72 +85,160 @@ export default function InstallPrompt() {
     localStorage.setItem(DISMISS_KEY, String(Date.now()));
   };
 
+  if (!visible) return null;
+
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
-          initial={{ y: 100, opacity: 0 }}
+          initial={{ y: 200, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: 100, opacity: 0 }}
-          transition={{ type: "spring", stiffness: 350, damping: 30 }}
-          className="fixed bottom-[calc(80px+env(safe-area-inset-bottom,0px))] left-3 right-3 z-40"
+          exit={{ y: 200, opacity: 0 }}
+          transition={{ type: "spring", stiffness: 300, damping: 28 }}
+          className="fixed inset-x-0 bottom-[calc(80px+env(safe-area-inset-bottom,0px))] z-50 px-3"
         >
           <div
-            className="bg-white rounded-2xl px-4 py-3.5 flex items-center gap-3"
-            style={{ boxShadow: "0 4px 24px rgba(15,27,58,0.12), 0 1px 4px rgba(15,27,58,0.06)" }}
+            className="bg-white rounded-2xl overflow-hidden"
+            style={{ boxShadow: "0 -4px 30px rgba(15,27,58,0.15), 0 2px 8px rgba(15,27,58,0.08)" }}
           >
-            {/* Icon */}
-            <div className="w-10 h-10 rounded-xl overflow-hidden shrink-0 bg-[#F5F0E8] flex items-center justify-center">
-              <Image
-                src="/icons/icon-192.png"
-                alt="Fanzone"
-                width={32}
-                height={32}
-                className="rounded-lg"
-              />
-            </div>
+            {/* Header — always visible */}
+            <div className="px-4 pt-4 pb-3 flex items-center gap-3">
+              <div className="w-12 h-12 rounded-2xl overflow-hidden shrink-0 bg-[#F5F0E8] flex items-center justify-center">
+                <Image
+                  src="/icons/icon-192.png"
+                  alt="Fanzone"
+                  width={40}
+                  height={40}
+                  className="rounded-xl"
+                  unoptimized
+                />
+              </div>
 
-            {/* Text */}
-            <div className="flex-1 min-w-0">
-              {showIOS ? (
-                <>
-                  <p className="text-sm font-bold text-[#0F1B3A] leading-tight">Add to Home Screen</p>
-                  <p className="text-[11px] text-[#0F1B3A]/50 leading-snug mt-0.5 flex items-center gap-1">
-                    Tap <Share size={11} className="inline text-[#007AFF]" /> then <Plus size={11} className="inline" /> Add to Home Screen
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-1.5 mb-0.5">
+                  <Gift size={14} className="text-red shrink-0" />
+                  <p className="text-sm font-extrabold text-navy leading-tight">
+                    Get the App — Free Raffle Entry!
                   </p>
-                </>
-              ) : (
-                <>
-                  <p className="text-sm font-bold text-[#0F1B3A] leading-tight">Add to Home Screen</p>
-                  <p className="text-[11px] text-[#0F1B3A]/50 leading-snug mt-0.5">
-                    Quick access to matches and votes
-                  </p>
-                </>
-              )}
-            </div>
+                </div>
+                <p className="text-[12px] text-navy/60 leading-snug">
+                  Download now and enter to win prizes at the fanzone
+                </p>
+              </div>
 
-            {/* Actions */}
-            {!showIOS && (
               <button
-                onClick={handleInstall}
-                className="shrink-0 px-4 py-2 rounded-xl text-sm font-bold text-white"
-                style={{
-                  background: "linear-gradient(135deg, #9A7A30 0%, #D4A843 100%)",
-                  boxShadow: "0 2px 8px rgba(201,162,75,0.3)",
-                }}
+                onClick={handleDismiss}
+                className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full hover:bg-navy/5"
+                aria-label="Dismiss"
               >
-                Install
+                <X size={16} className="text-navy/40" />
               </button>
+            </div>
+
+            {/* Android — direct install button */}
+            {!showIOS && deferredPrompt && (
+              <div className="px-4 pb-4">
+                <button
+                  onClick={handleInstall}
+                  className="w-full py-3.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+                  style={{
+                    background: "linear-gradient(135deg, #1A6B3C 0%, #2D8A52 100%)",
+                    boxShadow: "0 4px 12px rgba(26,107,60,0.3)",
+                  }}
+                >
+                  <Download size={18} />
+                  Install App Now
+                </button>
+              </div>
             )}
 
-            {/* Close */}
-            <button
-              onClick={handleDismiss}
-              className="shrink-0 w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#0F1B3A]/5 transition-colors"
-              aria-label="Dismiss"
-            >
-              <X size={14} className="text-[#0F1B3A]/40" />
-            </button>
+            {/* iOS — step by step instructions */}
+            {showIOS && (
+              <div className="px-4 pb-4">
+                {!expanded ? (
+                  <button
+                    onClick={() => setExpanded(true)}
+                    className="w-full py-3.5 rounded-xl text-sm font-bold text-white flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+                    style={{
+                      background: "linear-gradient(135deg, #1A6B3C 0%, #2D8A52 100%)",
+                      boxShadow: "0 4px 12px rgba(26,107,60,0.3)",
+                    }}
+                  >
+                    <Smartphone size={18} />
+                    Add to Home Screen
+                    <ChevronRight size={16} />
+                  </button>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-xs font-bold text-navy/70 uppercase tracking-wider">
+                      Follow these steps:
+                    </p>
+
+                    {/* Step 1 */}
+                    <div className="flex items-start gap-3 bg-[#F5F0E8] rounded-xl p-3">
+                      <span className="shrink-0 w-7 h-7 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center">
+                        1
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-navy">
+                          Tap the Share button
+                          <Share size={16} className="inline ml-1.5 text-[#007AFF]" />
+                        </p>
+                        <p className="text-[12px] text-navy/50 mt-0.5">
+                          It&apos;s at the bottom of your Safari browser
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 2 */}
+                    <div className="flex items-start gap-3 bg-[#F5F0E8] rounded-xl p-3">
+                      <span className="shrink-0 w-7 h-7 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center">
+                        2
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-navy">
+                          Scroll down and tap &quot;Add to Home Screen&quot;
+                        </p>
+                        <p className="text-[12px] text-navy/50 mt-0.5">
+                          Look for the + icon in the share menu
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Step 3 */}
+                    <div className="flex items-start gap-3 bg-[#F5F0E8] rounded-xl p-3">
+                      <span className="shrink-0 w-7 h-7 rounded-full bg-navy text-white text-xs font-bold flex items-center justify-center">
+                        3
+                      </span>
+                      <div>
+                        <p className="text-sm font-bold text-navy">
+                          Tap &quot;Add&quot; to confirm
+                        </p>
+                        <p className="text-[12px] text-navy/50 mt-0.5">
+                          The app will appear on your home screen!
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      onClick={handleDismiss}
+                      className="w-full py-2.5 rounded-xl text-xs font-semibold text-navy/40 active:text-navy/60"
+                    >
+                      I&apos;ll do it later
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* No prompt available (desktop or unsupported) */}
+            {!showIOS && !deferredPrompt && (
+              <div className="px-4 pb-4">
+                <p className="text-[12px] text-navy/50 text-center">
+                  Open this site on your phone and tap &quot;Add to Home Screen&quot; for the full experience
+                </p>
+              </div>
+            )}
           </div>
         </motion.div>
       )}
