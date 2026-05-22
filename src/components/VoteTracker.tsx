@@ -46,10 +46,42 @@ export default function VoteTracker() {
 
   const currentMatch = useMemo(() => getCurrentOrNextMatch(now), [now]);
 
+  // Fetch votes from API (shared tally), fallback to localStorage
   useEffect(() => {
     if (!currentMatch) return;
-    setVotes(getVotes(currentMatch.id));
     setMyVote(getMyVote(currentMatch.id));
+
+    // Optimistic: show localStorage immediately
+    const local = getVotes(currentMatch.id);
+    setVotes({ homeVotes: local.homeVotes, awayVotes: local.awayVotes });
+
+    // Then fetch real totals from API
+    fetch(`/api/votes?matchId=${currentMatch.id}`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.homeVotes !== undefined) {
+          setVotes({ homeVotes: data.homeVotes, awayVotes: data.awayVotes });
+        }
+      })
+      .catch(() => {
+        // API failed, keep localStorage values
+      });
+  }, [currentMatch]);
+
+  // Poll for live updates every 10 seconds
+  useEffect(() => {
+    if (!currentMatch) return;
+    const interval = setInterval(() => {
+      fetch(`/api/votes?matchId=${currentMatch.id}`)
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.homeVotes !== undefined) {
+            setVotes({ homeVotes: data.homeVotes, awayVotes: data.awayVotes });
+          }
+        })
+        .catch(() => {});
+    }, 10000);
+    return () => clearInterval(interval);
   }, [currentMatch]);
 
   const totalVotes = votes ? votes.homeVotes + votes.awayVotes : 0;
@@ -59,11 +91,43 @@ export default function VoteTracker() {
   const handleVote = useCallback(
     (side: "home" | "away") => {
       if (!currentMatch) return;
-      if (myVote === side) return; // Already voted this side
+      if (myVote === side) return;
 
-      const updated = castPublicVote(currentMatch.id, side);
-      setVotes({ ...updated });
+      const oldVote = myVote;
+
+      // Optimistic update locally
+      castPublicVote(currentMatch.id, side);
       setMyVote(side);
+      setVotes((prev) => {
+        if (!prev) return { homeVotes: side === "home" ? 1 : 0, awayVotes: side === "away" ? 1 : 0 };
+        const updated = { ...prev };
+        // Remove old vote
+        if (oldVote === "home") updated.homeVotes = Math.max(0, updated.homeVotes - 1);
+        else if (oldVote === "away") updated.awayVotes = Math.max(0, updated.awayVotes - 1);
+        // Add new vote
+        if (side === "home") updated.homeVotes++;
+        else updated.awayVotes++;
+        return updated;
+      });
+
+      // Send to API
+      fetch("/api/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          matchId: currentMatch.id,
+          side,
+          action: oldVote ? "change" : "cast",
+          oldSide: oldVote,
+        }),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          if (data.homeVotes !== undefined) {
+            setVotes({ homeVotes: data.homeVotes, awayVotes: data.awayVotes });
+          }
+        })
+        .catch(() => {});
 
       // Confetti burst
       const x = side === "home" ? 0.3 : 0.7;
