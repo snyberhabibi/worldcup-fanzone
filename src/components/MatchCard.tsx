@@ -34,38 +34,46 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl px-3 py-3 flex items-center gap-2 max-w-full overflow-hidden"
-        style={{ boxShadow: "0 1px 6px rgba(15,27,58,0.04)" }}
+        className="bg-white rounded-2xl px-4 py-4 max-w-full overflow-hidden"
+        style={{ boxShadow: "0 1px 8px rgba(15,27,58,0.05)" }}
       >
-        <div className="text-[#C9A24B]/70 text-[11px] font-semibold w-14 shrink-0 text-center">
-          {etToCt(match.time)} CT
+        {/* Top: badge + time */}
+        <div className="flex items-center justify-between mb-3">
+          <div>
+            {match.group ? (
+              <span className="text-[11px] font-bold text-[#9A7A30] bg-[#C9A24B]/10 px-2 py-0.5 rounded-full">
+                Group {match.group}
+              </span>
+            ) : (
+              <span className="text-[11px] font-bold text-[#E54141] bg-[#E54141]/10 px-2 py-0.5 rounded-full">
+                {stageLabels[match.stage] || match.stage}
+              </span>
+            )}
+          </div>
+          <span className="text-[11px] font-semibold text-[#0F1B3A]/45">{etToCt(match.time)} CT</span>
         </div>
 
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-1.5">
-            <div className="flex items-center gap-1.5 min-w-0">
-              <span className="text-base leading-none shrink-0">{home.flag}</span>
-              <span className="text-sm font-semibold text-[#0F1B3A] truncate">{home.code}</span>
+        {/* Teams row */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+            <span className="text-2xl leading-none shrink-0">{home.flag}</span>
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-[#0F1B3A] truncate">{home.name}</p>
+              <p className="text-[11px] text-[#0F1B3A]/40 font-medium">{home.code}</p>
             </div>
-            <span className="text-[#C9A24B]/40 text-[11px] font-bold shrink-0">vs</span>
-            <div className="flex items-center gap-1.5 min-w-0 justify-end">
-              <span className="text-sm font-semibold text-[#0F1B3A] truncate">{away.code}</span>
-              <span className="text-base leading-none shrink-0">{away.flag}</span>
+          </div>
+          <span className="text-[#9A7A30] text-xs font-extrabold px-2 shrink-0">VS</span>
+          <div className="flex items-center gap-2.5 flex-1 min-w-0 justify-end text-right">
+            <div className="min-w-0">
+              <p className="text-sm font-bold text-[#0F1B3A] truncate">{away.name}</p>
+              <p className="text-[11px] text-[#0F1B3A]/40 font-medium">{away.code}</p>
             </div>
+            <span className="text-2xl leading-none shrink-0">{away.flag}</span>
           </div>
         </div>
 
-        <div className="shrink-0">
-          {match.group ? (
-            <span className="text-[11px] font-bold text-[#C9A24B] bg-[#C9A24B]/10 px-2 py-0.5 rounded-full">
-              GRP {match.group}
-            </span>
-          ) : (
-            <span className="text-[11px] font-bold text-[#E54141] bg-[#E54141]/10 px-2 py-0.5 rounded-full">
-              {stageLabels[match.stage] || match.stage}
-            </span>
-          )}
-        </div>
+        {/* Venue */}
+        <p className="text-[11px] text-[#0F1B3A]/35 mt-2 text-center truncate">{match.venue}, {match.city}</p>
       </motion.div>
     );
   }
