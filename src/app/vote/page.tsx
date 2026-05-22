@@ -4,7 +4,7 @@ import VoteTracker from "@/components/VoteTracker";
 
 export default function VotePage() {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen">
       {/* Header */}
       <div className="px-5 pt-6 pb-2">
         <h1 className="text-xl font-extrabold text-center text-navy mb-1">

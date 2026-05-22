@@ -86,7 +86,7 @@ export default function VoteTracker() {
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center"
+        className="flex flex-col items-center justify-center px-6 text-center py-8"
       >
         <div className="relative w-44 h-44 mb-6">
           <Image src="/mascot/fan.png" alt="Mascot" fill unoptimized className="object-contain drop-shadow-lg" />

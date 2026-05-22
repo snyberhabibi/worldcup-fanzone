@@ -84,7 +84,7 @@ export default function RafflePage() {
           ))
         ) : (
           /* No active raffle */
-          <div className="flex flex-col items-center justify-center py-12 text-center">
+          <div className="flex flex-col items-center justify-center py-6 text-center">
             <motion.div
               className="relative w-40 h-40 mb-6"
               animate={{ y: [0, -15, 0] }}
@@ -98,7 +98,7 @@ export default function RafflePage() {
                 className="object-contain"
               />
             </motion.div>
-            <h2 className="text-xl font-extrabold text-gold mb-2">
+            <h2 className="text-xl font-extrabold text-navy mb-2">
               No Active Raffle Right Now
             </h2>
             <p className="text-navy/50 text-sm max-w-xs">
@@ -147,8 +147,7 @@ export default function RafflePage() {
             <motion.div
               className="space-y-3"
               initial="hidden"
-              whileInView="visible"
-              viewport={{ once: true }}
+              animate="visible"
               variants={staggerContainer}
             >
               {pastRaffles.map((raffle) => (

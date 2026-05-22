@@ -30,8 +30,8 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
       {/* Group header */}
       <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[#0F1B3A]/5">
         <span
-          className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-extrabold text-[#C9A24B]"
-          style={{ backgroundColor: "rgba(201,162,75,0.1)" }}
+          className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-extrabold text-[#7a6020]"
+          style={{ backgroundColor: "rgba(201,162,75,0.15)" }}
         >
           Group {groupName}
         </span>
