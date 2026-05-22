@@ -43,6 +43,36 @@ export function decrementVote(matchId: number, side: "home" | "away"): VoteCount
   return votes;
 }
 
+// ── PUBLIC VOTING (one vote per person, changeable) ─
+
+export function getMyVote(matchId: number): "home" | "away" | null {
+  return getItem<"home" | "away" | null>(`myvote_${matchId}`, null);
+}
+
+export function castPublicVote(matchId: number, side: "home" | "away"): VoteCount {
+  const currentVote = getMyVote(matchId);
+  const votes = getVotes(matchId);
+
+  if (currentVote === side) {
+    // Already voted this side, no change
+    return votes;
+  }
+
+  // Remove old vote if changing
+  if (currentVote !== null) {
+    if (currentVote === "home") votes.homeVotes = Math.max(0, votes.homeVotes - 1);
+    else votes.awayVotes = Math.max(0, votes.awayVotes - 1);
+  }
+
+  // Add new vote
+  if (side === "home") votes.homeVotes++;
+  else votes.awayVotes++;
+
+  setItem(`votes_${matchId}`, votes);
+  setItem(`myvote_${matchId}`, side);
+  return votes;
+}
+
 // ── RAFFLES ────────────────────────────────────────
 
 export function getRaffles(): Raffle[] {

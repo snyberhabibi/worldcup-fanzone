@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useMemo, useCallback } from "react";
 import { MATCHES, TEAMS, type Match } from "@/data/schedule";
-import { getVotes, incrementVote, decrementVote } from "@/lib/store";
-import { Trophy, Plus, Minus } from "lucide-react";
+import { getVotes, getMyVote, castPublicVote } from "@/lib/store";
+import { Trophy, Check } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
@@ -42,7 +42,6 @@ function etToCt(etTime: string): string {
   return `${displayHours}:${minutes} ${newPeriod}`;
 }
 
-/** Time until next match */
 function calcTimeLeft(target: Date, now: Date) {
   const diff = Math.max(0, target.getTime() - now.getTime());
   return {
@@ -56,6 +55,7 @@ function calcTimeLeft(target: Date, now: Date) {
 export default function VoteTracker() {
   const [now, setNow] = useState(() => new Date());
   const [votes, setVotes] = useState<{ homeVotes: number; awayVotes: number } | null>(null);
+  const [myVote, setMyVote] = useState<"home" | "away" | null>(null);
 
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 1000);
@@ -64,56 +64,43 @@ export default function VoteTracker() {
 
   const currentMatch = useMemo(() => getCurrentOrNextMatch(now), [now]);
 
-  // Sync votes from store
   useEffect(() => {
     if (!currentMatch) return;
     setVotes(getVotes(currentMatch.id));
-  }, [currentMatch, now]);
+    setMyVote(getMyVote(currentMatch.id));
+  }, [currentMatch]);
 
   const totalVotes = votes ? votes.homeVotes + votes.awayVotes : 0;
   const homePercent = totalVotes > 0 ? Math.round((votes!.homeVotes / totalVotes) * 100) : 50;
   const awayPercent = totalVotes > 0 ? 100 - homePercent : 50;
 
-  const handleIncrement = useCallback(
+  const handleVote = useCallback(
     (side: "home" | "away") => {
       if (!currentMatch) return;
-      const updated = incrementVote(currentMatch.id, side);
-      setVotes({ ...updated });
+      if (myVote === side) return; // Already voted this side
 
-      // Small confetti burst
-      const x = side === "home" ? 0.25 : 0.75;
+      const updated = castPublicVote(currentMatch.id, side);
+      setVotes({ ...updated });
+      setMyVote(side);
+
+      // Confetti burst
+      const x = side === "home" ? 0.3 : 0.7;
       confetti({
-        particleCount: 30,
-        spread: 50,
-        origin: { x, y: 0.5 },
-        colors:
-          side === "home"
-            ? ["#1A6B3C", "#C9A24B", "#2d8a52"]
-            : ["#E54141", "#C9A24B", "#c93535"],
+        particleCount: 40,
+        spread: 60,
+        origin: { x, y: 0.6 },
+        colors: side === "home" ? ["#1A6B3C", "#C9A24B", "#2d8a52"] : ["#E54141", "#C9A24B", "#c93535"],
       });
     },
-    [currentMatch]
-  );
-
-  const handleDecrement = useCallback(
-    (side: "home" | "away") => {
-      if (!currentMatch) return;
-      const updated = decrementVote(currentMatch.id, side);
-      setVotes({ ...updated });
-    },
-    [currentMatch]
+    [currentMatch, myVote]
   );
 
   // No match state
   if (!currentMatch) {
-    const timeLeft = calcTimeLeft(
-      new Date(
-        [...MATCHES].sort(
-          (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-        )[0]?.date || Date.now()
-      ),
-      now
-    );
+    const firstMatch = [...MATCHES].sort(
+      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+    )[0];
+    const timeLeft = calcTimeLeft(new Date(firstMatch?.date || Date.now()), now);
 
     return (
       <motion.div
@@ -122,19 +109,12 @@ export default function VoteTracker() {
         className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center"
       >
         <div className="relative w-44 h-44 mb-6">
-          <Image
-            src="/mascot/fan.png"
-            alt="Mascot waving"
-            fill
-            className="object-contain drop-shadow-lg"
-          />
+          <Image src="/mascot/fan.png" alt="Mascot" fill className="object-contain drop-shadow-lg" />
         </div>
         <h2 className="text-2xl font-extrabold text-[#0F1B3A] mb-2">No Match Right Now</h2>
         <p className="text-[#0F1B3A]/40 text-sm max-w-xs mb-6">
           Check back during the next match to cast your vote!
         </p>
-
-        {/* Mini countdown */}
         <div className="flex items-center gap-2">
           {[
             { v: timeLeft.days, l: "d" },
@@ -169,12 +149,7 @@ export default function VoteTracker() {
     >
       {/* Mascot */}
       <div className="relative w-28 h-28 mb-2">
-        <Image
-          src="/mascot/kicking.png"
-          alt="Excited mascot"
-          fill
-          className="object-contain drop-shadow-lg"
-        />
+        <Image src="/mascot/kicking.png" alt="Mascot" fill className="object-contain drop-shadow-lg" />
       </div>
 
       {/* Header */}
@@ -195,129 +170,77 @@ export default function VoteTracker() {
           </span>
         )}
         <p className="text-[#0F1B3A]/35 text-xs mt-1.5">
-          {currentMatch.venue} &middot; {currentMatch.city} &middot;{" "}
-          {etToCt(currentMatch.time)} CT
+          {currentMatch.venue} · {currentMatch.city} · {etToCt(currentMatch.time)} CT
         </p>
       </div>
 
-      {/* Two team cards */}
+      {/* Tap to vote instruction */}
+      {!myVote && (
+        <p className="text-[#0F1B3A]/30 text-xs font-medium mb-4">Tap a team to cast your vote</p>
+      )}
+      {myVote && (
+        <p className="text-[#1A6B3C] text-xs font-semibold mb-4 flex items-center gap-1">
+          <Check size={14} />
+          Vote cast! Tap the other team to change.
+        </p>
+      )}
+
+      {/* Two team cards — TAP TO VOTE */}
       <div className="flex items-stretch gap-4 w-full max-w-sm mb-6">
         {/* Home team card */}
-        <div
-          className="flex-1 bg-white rounded-2xl p-5 flex flex-col items-center gap-2"
-          style={{ boxShadow: "0 4px 16px rgba(15,27,58,0.06)" }}
+        <motion.button
+          onClick={() => handleVote("home")}
+          whileTap={{ scale: 0.96 }}
+          className={`flex-1 rounded-2xl p-5 flex flex-col items-center gap-2 transition-all duration-200 relative overflow-hidden ${
+            myVote === "home"
+              ? "bg-white ring-2 ring-[#1A6B3C]"
+              : "bg-white hover:bg-[#f0ede5]"
+          }`}
+          style={{ boxShadow: myVote === "home" ? "0 4px 20px rgba(26,107,60,0.15)" : "0 2px 12px rgba(15,27,58,0.05)" }}
         >
+          {myVote === "home" && (
+            <div className="absolute top-2 right-2 w-6 h-6 bg-[#1A6B3C] rounded-full flex items-center justify-center">
+              <Check size={14} className="text-white" />
+            </div>
+          )}
           <span className="text-5xl leading-none">{home.flag}</span>
-          <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">
-            {home.name}
-          </span>
+          <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{home.name}</span>
           <span className="text-[#0F1B3A]/30 text-xs font-medium">{home.code}</span>
-
-          {/* Vote count */}
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              key={votes?.homeVotes ?? 0}
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.3, opacity: 0 }}
-              className="text-[#C9A24B] font-extrabold text-3xl tabular-nums mt-1"
-            >
-              {votes?.homeVotes ?? 0}
-            </motion.span>
-          </AnimatePresence>
-
-          {/* +/- buttons */}
-          <div className="flex items-center gap-2 mt-1">
-            <button
-              onClick={() => handleDecrement("home")}
-              className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style={{
-                backgroundColor: "#F5F0E8",
-                color: "#0F1B3A",
-              }}
-            >
-              <Minus size={18} strokeWidth={2.5} />
-            </button>
-            <button
-              onClick={() => handleIncrement("home")}
-              className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style={{
-                background: "linear-gradient(135deg, #C9A24B 0%, #E8D48B 100%)",
-                color: "#fff",
-                boxShadow: "0 2px 8px rgba(201,162,75,0.3)",
-              }}
-            >
-              <Plus size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
+        </motion.button>
 
         {/* Away team card */}
-        <div
-          className="flex-1 bg-white rounded-2xl p-5 flex flex-col items-center gap-2"
-          style={{ boxShadow: "0 4px 16px rgba(15,27,58,0.06)" }}
+        <motion.button
+          onClick={() => handleVote("away")}
+          whileTap={{ scale: 0.96 }}
+          className={`flex-1 rounded-2xl p-5 flex flex-col items-center gap-2 transition-all duration-200 relative overflow-hidden ${
+            myVote === "away"
+              ? "bg-white ring-2 ring-[#E54141]"
+              : "bg-white hover:bg-[#f0ede5]"
+          }`}
+          style={{ boxShadow: myVote === "away" ? "0 4px 20px rgba(229,65,65,0.15)" : "0 2px 12px rgba(15,27,58,0.05)" }}
         >
+          {myVote === "away" && (
+            <div className="absolute top-2 right-2 w-6 h-6 bg-[#E54141] rounded-full flex items-center justify-center">
+              <Check size={14} className="text-white" />
+            </div>
+          )}
           <span className="text-5xl leading-none">{away.flag}</span>
-          <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">
-            {away.name}
-          </span>
+          <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{away.name}</span>
           <span className="text-[#0F1B3A]/30 text-xs font-medium">{away.code}</span>
-
-          {/* Vote count */}
-          <AnimatePresence mode="popLayout">
-            <motion.span
-              key={votes?.awayVotes ?? 0}
-              initial={{ scale: 0.7, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 1.3, opacity: 0 }}
-              className="text-[#C9A24B] font-extrabold text-3xl tabular-nums mt-1"
-            >
-              {votes?.awayVotes ?? 0}
-            </motion.span>
-          </AnimatePresence>
-
-          {/* +/- buttons */}
-          <div className="flex items-center gap-2 mt-1">
-            <button
-              onClick={() => handleDecrement("away")}
-              className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style={{
-                backgroundColor: "#F5F0E8",
-                color: "#0F1B3A",
-              }}
-            >
-              <Minus size={18} strokeWidth={2.5} />
-            </button>
-            <button
-              onClick={() => handleIncrement("away")}
-              className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-90"
-              style={{
-                background: "linear-gradient(135deg, #C9A24B 0%, #E8D48B 100%)",
-                color: "#fff",
-                boxShadow: "0 2px 8px rgba(201,162,75,0.3)",
-              }}
-            >
-              <Plus size={18} strokeWidth={2.5} />
-            </button>
-          </div>
-        </div>
+        </motion.button>
       </div>
 
-      {/* Animated vote bar */}
+      {/* Vote results bar — always visible */}
       {totalVotes > 0 && (
         <motion.div
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           className="w-full max-w-sm"
         >
-          <div className="flex items-center justify-between text-sm font-bold mb-2">
-            <span className="text-[#1A6B3C]">
-              {home.code} {homePercent}%
-            </span>
-            <span className="text-[#0F1B3A]/25 text-xs">{totalVotes} total votes</span>
-            <span className="text-[#E54141]">
-              {awayPercent}% {away.code}
-            </span>
+          <div className="flex items-center justify-between text-xs font-bold mb-1.5">
+            <span className="text-[#1A6B3C]">{home.code} {homePercent}%</span>
+            <span className="text-[#0F1B3A]/25 text-[10px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
+            <span className="text-[#E54141]">{awayPercent}% {away.code}</span>
           </div>
           <div className="h-3 rounded-full bg-[#F5F0E8] overflow-hidden flex">
             <motion.div
@@ -325,27 +248,17 @@ export default function VoteTracker() {
               animate={{ width: `${homePercent}%` }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="h-full rounded-l-full"
-              style={{
-                background: "linear-gradient(90deg, #1A6B3C, #2d8a52)",
-              }}
+              style={{ background: "linear-gradient(90deg, #1A6B3C, #2d8a52)" }}
             />
             <motion.div
               initial={{ width: 0 }}
               animate={{ width: `${awayPercent}%` }}
               transition={{ duration: 0.7, ease: "easeOut" }}
               className="h-full rounded-r-full"
-              style={{
-                background: "linear-gradient(90deg, #E54141, #c93535)",
-              }}
+              style={{ background: "linear-gradient(90deg, #E54141, #c93535)" }}
             />
           </div>
         </motion.div>
-      )}
-
-      {totalVotes === 0 && (
-        <p className="text-[#0F1B3A]/30 text-sm text-center animate-pulse">
-          Tap + to start counting votes
-        </p>
       )}
     </motion.div>
   );
