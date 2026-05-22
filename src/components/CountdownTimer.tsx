@@ -187,7 +187,7 @@ export default function CountdownTimer() {
       style={{ boxShadow: "0 4px 20px rgba(15,27,58,0.06)" }}
     >
       {/* Mascot decoration */}
-      <div className="absolute -right-4 -top-2 w-24 h-24 opacity-20 pointer-events-none">
+      <div className="absolute right-2 -top-1 w-20 h-20 opacity-20 pointer-events-none">
         <Image
           src="/mascot/goalkeeper.png"
           alt=""
