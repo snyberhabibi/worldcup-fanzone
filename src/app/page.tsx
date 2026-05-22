@@ -109,9 +109,9 @@ export default function HomePage() {
       </section>
 
       {/* ═══ QUICK ACTIONS — Simple, big, tappable ═══ */}
-      <section className="px-5 -mt-8 relative z-20">
+      <section className="px-5 mt-6 relative z-20">
         <motion.div
-          className="grid grid-cols-2 gap-3"
+          className="grid grid-cols-2 gap-4"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
