@@ -1,4 +1,4 @@
-const CACHE_NAME = 'fanzone-2026-v1';
+const CACHE_NAME = 'fanzone-2026-v2';
 const STATIC_ASSETS = [
   '/',
   '/schedule',
@@ -9,6 +9,11 @@ const STATIC_ASSETS = [
   '/mascot/goalkeeper.png',
   '/mascot/kicking.png',
   '/mascot/trophy.png',
+  '/mascot/saudi-fan.png',
+  '/mascot/usa-fan.png',
+  '/mascot/mexico-fan.png',
+  '/mascot/argentina-fan.png',
+  '/mascot/japan-fan.png',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 ];

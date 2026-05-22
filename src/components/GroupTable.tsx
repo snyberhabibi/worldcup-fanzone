@@ -8,11 +8,23 @@ interface GroupTableProps {
   teams: Team[];
 }
 
+const rowVariants = {
+  hidden: { opacity: 0, x: -10 },
+  visible: { opacity: 1, x: 0 },
+};
+
+const tableStagger = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06 } },
+};
+
 export default function GroupTable({ groupName, teams }: GroupTableProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="bg-white rounded-2xl overflow-hidden"
       style={{ boxShadow: "0 2px 12px rgba(15,27,58,0.05)" }}
     >
@@ -37,10 +49,16 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
             <th className="w-10 text-center py-2.5 pr-4 font-semibold">Pts</th>
           </tr>
         </thead>
-        <tbody>
+        <motion.tbody
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={tableStagger}
+        >
           {teams.map((team, idx) => (
-            <tr
+            <motion.tr
               key={team.code}
+              variants={rowVariants}
               style={{
                 backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F5F0E8",
               }}
@@ -74,9 +92,9 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
               >
                 0
               </td>
-            </tr>
+            </motion.tr>
           ))}
-        </tbody>
+        </motion.tbody>
       </table>
     </motion.div>
   );

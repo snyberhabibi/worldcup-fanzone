@@ -7,9 +7,10 @@ const partners = ["DAR Coffee", "Haus of Design", "Yalla Bites"];
 export default function PartnerLogos() {
   return (
     <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ delay: 0.3 }}
+      initial={{ opacity: 0, y: 15 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ type: "spring", stiffness: 300, damping: 25, delay: 0.1 }}
       className="text-center py-4"
     >
       <div className="flex items-center justify-center gap-0 flex-wrap">

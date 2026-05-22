@@ -55,7 +55,12 @@ export default function RafflePage() {
         {/* Active Raffles */}
         {activeRaffles.length > 0 ? (
           activeRaffles.map((raffle) => (
-            <div key={raffle.id}>
+            <motion.div
+              key={raffle.id}
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 25 }}
+            >
               {/* Active badge */}
               <div className="flex items-center gap-2 mb-3">
                 <span className="pulse-dot inline-block w-2 h-2 rounded-full bg-green" />
@@ -75,19 +80,23 @@ export default function RafflePage() {
 
               {/* Raffle form */}
               <RaffleForm raffleId={raffle.id} raffleName={raffle.name} />
-            </div>
+            </motion.div>
           ))
         ) : (
           /* No active raffle */
           <div className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="relative w-40 h-40 mb-6">
+            <motion.div
+              className="relative w-40 h-40 mb-6"
+              animate={{ y: [0, -15, 0] }}
+              transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            >
               <Image
                 src="/mascot/trophy.png"
                 alt="Mascot dancing"
                 fill
                 className="object-contain"
               />
-            </div>
+            </motion.div>
             <h2 className="text-xl font-extrabold text-gold mb-2">
               No Active Raffle Right Now
             </h2>
@@ -134,9 +143,15 @@ export default function RafflePage() {
             <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-3">
               Past Raffles
             </h2>
-            <div className="space-y-3">
+            <motion.div
+              className="space-y-3"
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={staggerContainer}
+            >
               {pastRaffles.map((raffle) => (
-                <div key={raffle.id} className="card p-4">
+                <motion.div key={raffle.id} className="card p-4" variants={fadeUp}>
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-bold text-navy">{raffle.name}</h3>
                     <span
@@ -166,9 +181,9 @@ export default function RafflePage() {
                       })}
                     </p>
                   )}
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           </div>
         )}
       </div>

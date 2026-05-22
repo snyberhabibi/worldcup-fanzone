@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   verifyPin,
   isAdminAuthenticated,
@@ -127,13 +128,14 @@ function PinEntry({ onSuccess }: { onSuccess: () => void }) {
                 );
               }
               return (
-                <button
+                <motion.button
                   key={key}
                   onClick={() => handleDigit(key)}
-                  className="h-14 rounded-xl bg-navy/5 text-navy text-lg font-bold active:bg-gold/20 active:text-gold active:scale-95 transition-all"
+                  whileTap={{ scale: 0.9 }}
+                  className="h-14 rounded-xl bg-navy/5 text-navy text-lg font-bold active:bg-gold/20 active:text-gold transition-all"
                 >
                   {key}
-                </button>
+                </motion.button>
               );
             }
           )}
@@ -858,19 +860,28 @@ export default function AdminPage() {
           </div>
 
           {/* Tab bar */}
-          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm relative">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-all duration-200 ${
+                className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-lg text-xs font-bold transition-colors duration-200 relative z-10 ${
                   activeTab === tab.id
-                    ? "bg-gold text-white"
+                    ? "text-white"
                     : "text-navy/40 active:text-navy/60"
                 }`}
               >
-                {tab.icon}
-                {tab.label}
+                {activeTab === tab.id && (
+                  <motion.div
+                    layoutId="admin-tab"
+                    className="absolute inset-0 bg-gold rounded-lg"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span className="relative z-10 flex items-center gap-1.5">
+                  {tab.icon}
+                  {tab.label}
+                </span>
               </button>
             ))}
           </div>
@@ -879,10 +890,20 @@ export default function AdminPage() {
 
       {/* Content */}
       <div className="px-5 py-5">
-        {activeTab === "votes" && <VoteManagement />}
-        {activeTab === "raffles" && <RaffleManagement />}
-        {activeTab === "events" && <EventManagement />}
-        {activeTab === "push" && <PushNotifications />}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
+          >
+            {activeTab === "votes" && <VoteManagement />}
+            {activeTab === "raffles" && <RaffleManagement />}
+            {activeTab === "events" && <EventManagement />}
+            {activeTab === "push" && <PushNotifications />}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );

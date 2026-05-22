@@ -74,6 +74,8 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
+      whileHover={{ y: -2 }}
+      transition={{ type: "spring", stiffness: 300, damping: 25 }}
       className="bg-white rounded-2xl p-5 relative overflow-hidden"
       style={{ boxShadow: "0 2px 12px rgba(15,27,58,0.05)" }}
     >

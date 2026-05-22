@@ -76,7 +76,7 @@ export default function HomePage() {
         >
           <div className="absolute inset-0 bg-gold/8 rounded-full blur-3xl" />
           <Image
-            src="/mascot/celebrating.png"
+            src="/mascot/saudi-fan.png"
             alt="World Cup Mascot"
             fill
             className="object-contain drop-shadow-2xl"
@@ -249,6 +249,44 @@ export default function HomePage() {
               <span className="text-[11px] text-navy/55">48 teams</span>
             </Link>
           </motion.div>
+        </motion.div>
+      </section>
+
+      {/* Mascot Gallery — branded fans */}
+      <section className="px-5 py-6">
+        <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-4 text-center">
+          Meet Our Fans
+        </h2>
+        <motion.div
+          className="flex gap-4 overflow-x-auto pb-3 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide"
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true }}
+          variants={staggerContainer}
+        >
+          {[
+            { src: "/mascot/saudi-fan.png", label: "Saudi Arabia" },
+            { src: "/mascot/usa-fan.png", label: "USA" },
+            { src: "/mascot/mexico-fan.png", label: "México" },
+            { src: "/mascot/argentina-fan.png", label: "Argentina" },
+            { src: "/mascot/japan-fan.png", label: "Japan" },
+          ].map((fan) => (
+            <motion.div
+              key={fan.label}
+              className="snap-center shrink-0 flex flex-col items-center gap-2"
+              variants={fadeUp}
+            >
+              <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+                <Image
+                  src={fan.src}
+                  alt={`Fufu ${fan.label} fan`}
+                  fill
+                  className="object-contain drop-shadow-lg"
+                />
+              </div>
+              <span className="text-[11px] font-bold text-navy/60">{fan.label}</span>
+            </motion.div>
+          ))}
         </motion.div>
       </section>
 

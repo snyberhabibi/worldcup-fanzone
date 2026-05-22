@@ -40,16 +40,16 @@ export default function BottomNav() {
               : pathname.startsWith(href);
 
           return (
+            <motion.div key={href} whileTap={{ scale: 0.9 }} className="flex-1">
             <Link
-              key={href}
               href={href}
-              className="flex flex-col items-center justify-center gap-0.5 flex-1 py-2 relative"
+              className="flex flex-col items-center justify-center gap-0.5 py-2 relative"
             >
               <div className="relative flex flex-col items-center">
                 {/* Active pill background */}
                 {isActive && (
                   <motion.div
-                    layoutId="activeTab"
+                    layoutId="nav-indicator"
                     className="absolute -inset-x-3 -inset-y-1.5 rounded-2xl"
                     style={{ backgroundColor: "rgba(201,162,75,0.12)" }}
                     transition={{ type: "spring", stiffness: 400, damping: 30 }}
@@ -84,6 +84,7 @@ export default function BottomNav() {
                 {label}
               </span>
             </Link>
+            </motion.div>
           );
         })}
       </div>

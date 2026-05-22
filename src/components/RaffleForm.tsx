@@ -91,20 +91,25 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
         className="bg-white rounded-2xl p-8 text-center"
         style={{ boxShadow: "0 4px 20px rgba(15,27,58,0.06)" }}
       >
-        {/* Mascot */}
-        <div className="relative w-32 h-32 mx-auto mb-4">
+        {/* Mascot with bounce-in */}
+        <motion.div
+          className="relative w-32 h-32 mx-auto mb-4"
+          initial={{ scale: 0, y: 40 }}
+          animate={{ scale: 1, y: 0 }}
+          transition={{ type: "spring", stiffness: 260, damping: 20 }}
+        >
           <Image
             src="/mascot/celebrating.png"
             alt="Celebrating mascot"
             fill
             className="object-contain drop-shadow-lg"
           />
-        </div>
+        </motion.div>
 
         <motion.div
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 300, delay: 0.1 }}
+          transition={{ type: "spring", stiffness: 300, delay: 0.2 }}
         >
           <CheckCircle className="text-[#1A6B3C] mx-auto mb-3" size={48} />
         </motion.div>
@@ -246,16 +251,17 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
         </div>
       </div>
 
-      <button
+      <motion.button
         type="submit"
-        className="w-full mt-6 font-extrabold py-4 rounded-xl text-base text-white active:scale-[0.97] transition-all"
+        whileTap={{ scale: 0.95 }}
+        className="w-full mt-6 font-extrabold py-4 rounded-xl text-base text-white transition-all"
         style={{
           background: "linear-gradient(135deg, #C9A24B 0%, #DFC06A 50%, #C9A24B 100%)",
           boxShadow: "0 4px 12px rgba(201,162,75,0.3)",
         }}
       >
         Enter Raffle
-      </button>
+      </motion.button>
     </motion.form>
   );
 }
