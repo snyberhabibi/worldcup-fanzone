@@ -116,7 +116,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1.5 text-[#0F1B3A]/35">
+        <div className="flex items-center gap-1.5 text-[#0F1B3A]/55">
           <Clock size={12} />
           <span className="text-xs font-medium">{etToCt(match.time)} CT</span>
         </div>
@@ -128,7 +128,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="flex-1 text-center">
           <div className="text-4xl mb-1.5">{home.flag}</div>
           <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{home.name}</p>
-          <p className="text-[10px] text-[#0F1B3A]/30 font-medium">{home.code}</p>
+          <p className="text-[10px] text-[#0F1B3A]/45 font-medium">{home.code}</p>
         </div>
 
         {/* VS circle */}
@@ -148,7 +148,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="flex-1 text-center">
           <div className="text-4xl mb-1.5">{away.flag}</div>
           <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{away.name}</p>
-          <p className="text-[10px] text-[#0F1B3A]/30 font-medium">{away.code}</p>
+          <p className="text-[10px] text-[#0F1B3A]/45 font-medium">{away.code}</p>
         </div>
       </div>
 
@@ -157,7 +157,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="mt-4 pt-3 border-t border-[#0F1B3A]/5">
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
             <span className="text-[#1A6B3C]">{homePercent}%</span>
-            <span className="text-[#0F1B3A]/25 text-[10px]">{totalVotes} votes</span>
+            <span className="text-[#0F1B3A]/40 text-[10px]">{totalVotes} votes</span>
             <span className="text-[#E54141]">{awayPercent}%</span>
           </div>
           <div className="h-2 rounded-full bg-[#F5F0E8] overflow-hidden flex">
@@ -184,7 +184,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
       )}
 
       {/* Venue info */}
-      <div className="mt-3 flex items-center justify-center gap-1.5 text-[#0F1B3A]/25">
+      <div className="mt-3 flex items-center justify-center gap-1.5 text-[#0F1B3A]/40">
         <MapPin size={11} />
         <span className="text-[11px]">
           {match.venue}, {match.city}

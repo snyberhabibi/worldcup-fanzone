@@ -164,7 +164,7 @@ export default function SchedulePage() {
           {/* Search bar */}
           {showSearch && (
             <div className="relative mb-3">
-              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-navy/30" />
+              <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-navy/50" />
               <input
                 type="text"
                 value={search}
@@ -178,7 +178,7 @@ export default function SchedulePage() {
                   onClick={() => setSearch("")}
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
-                  <X size={14} className="text-navy/30" />
+                  <X size={14} className="text-navy/50" />
                 </button>
               )}
             </div>
@@ -193,7 +193,7 @@ export default function SchedulePage() {
                 className={`flex-1 py-2 rounded-lg text-sm font-bold transition-all duration-200 ${
                   activeTab === tab.id
                     ? "bg-gold text-white"
-                    : "text-navy/40 active:text-navy/60"
+                    : "text-navy/55 active:text-navy/60"
                 }`}
               >
                 {tab.label}
@@ -217,7 +217,7 @@ export default function SchedulePage() {
             ))}
             {filteredGroups.length === 0 && (
               <div className="col-span-2 text-center py-16">
-                <p className="text-navy/30 text-sm">No groups match your search.</p>
+                <p className="text-navy/50 text-sm">No groups match your search.</p>
               </div>
             )}
           </div>
@@ -233,7 +233,7 @@ export default function SchedulePage() {
                   <h3 className="text-xs font-bold text-gold uppercase tracking-wider">
                     {label}
                   </h3>
-                  <span className="text-[10px] text-navy/30">
+                  <span className="text-[10px] text-navy/50">
                     {matches.length} match{matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>
@@ -246,7 +246,7 @@ export default function SchedulePage() {
             ))}
             {filteredMatchesByDate.length === 0 && (
               <div className="text-center py-16">
-                <p className="text-navy/30 text-sm">No matches found.</p>
+                <p className="text-navy/50 text-sm">No matches found.</p>
               </div>
             )}
           </div>
@@ -260,7 +260,7 @@ export default function SchedulePage() {
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-sm font-extrabold text-gold">{stage.label}</h3>
                   <div className="flex-1 h-px bg-gold/15" />
-                  <span className="text-[10px] text-navy/30 font-medium">
+                  <span className="text-[10px] text-navy/50 font-medium">
                     {stage.matches.length} match{stage.matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>
@@ -272,7 +272,7 @@ export default function SchedulePage() {
                   </div>
                 ) : (
                   <div className="card-light p-4 text-center">
-                    <p className="text-navy/30 text-xs">TBD - Determined by group stage results</p>
+                    <p className="text-navy/50 text-xs">TBD - Determined by group stage results</p>
                   </div>
                 )}
               </div>

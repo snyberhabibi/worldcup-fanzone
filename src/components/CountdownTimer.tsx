@@ -95,7 +95,7 @@ function FlipDigit({ value, label }: { value: number; label: string }) {
           </motion.span>
         </AnimatePresence>
       </div>
-      <span className="text-[#0F1B3A]/35 text-[10px] font-semibold uppercase tracking-widest mt-2">
+      <span className="text-[#0F1B3A]/55 text-[10px] font-semibold uppercase tracking-widest mt-2">
         {label}
       </span>
     </div>
@@ -221,7 +221,7 @@ export default function CountdownTimer() {
           <span className="text-[#C9A24B]/50 text-sm">vs</span>
           <span>{getTeamLabel(nextMatch.awayTeam)}</span>
         </div>
-        <p className="text-[#0F1B3A]/35 text-xs mt-1.5">
+        <p className="text-[#0F1B3A]/55 text-xs mt-1.5">
           {etToCt(nextMatch.time)} CT &middot; {nextMatch.venue}
         </p>
       </div>

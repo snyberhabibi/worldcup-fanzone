@@ -130,7 +130,7 @@ export default function VoteTracker() {
               <span className="text-[#C9A24B] font-extrabold text-lg tabular-nums">
                 {String(u.v).padStart(2, "0")}
               </span>
-              <span className="text-[#0F1B3A]/30 text-[10px] font-semibold ml-0.5">{u.l}</span>
+              <span className="text-[#0F1B3A]/45 text-[10px] font-semibold ml-0.5">{u.l}</span>
             </div>
           ))}
         </div>
@@ -169,14 +169,14 @@ export default function VoteTracker() {
             Group {currentMatch.group}
           </span>
         )}
-        <p className="text-[#0F1B3A]/35 text-xs mt-1.5">
+        <p className="text-[#0F1B3A]/55 text-xs mt-1.5">
           {currentMatch.venue} · {currentMatch.city} · {etToCt(currentMatch.time)} CT
         </p>
       </div>
 
       {/* Tap to vote instruction */}
       {!myVote && (
-        <p className="text-[#0F1B3A]/30 text-xs font-medium mb-4">Tap a team to cast your vote</p>
+        <p className="text-[#0F1B3A]/45 text-xs font-medium mb-4">Tap a team to cast your vote</p>
       )}
       {myVote && (
         <p className="text-[#1A6B3C] text-xs font-semibold mb-4 flex items-center gap-1">
@@ -205,7 +205,7 @@ export default function VoteTracker() {
           )}
           <span className="text-5xl leading-none">{home.flag}</span>
           <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{home.name}</span>
-          <span className="text-[#0F1B3A]/30 text-xs font-medium">{home.code}</span>
+          <span className="text-[#0F1B3A]/45 text-xs font-medium">{home.code}</span>
         </motion.button>
 
         {/* Away team card */}
@@ -226,7 +226,7 @@ export default function VoteTracker() {
           )}
           <span className="text-5xl leading-none">{away.flag}</span>
           <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{away.name}</span>
-          <span className="text-[#0F1B3A]/30 text-xs font-medium">{away.code}</span>
+          <span className="text-[#0F1B3A]/45 text-xs font-medium">{away.code}</span>
         </motion.button>
       </div>
 
@@ -239,7 +239,7 @@ export default function VoteTracker() {
         >
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
             <span className="text-[#1A6B3C]">{home.code} {homePercent}%</span>
-            <span className="text-[#0F1B3A]/25 text-[10px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
+            <span className="text-[#0F1B3A]/40 text-[10px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
             <span className="text-[#E54141]">{awayPercent}% {away.code}</span>
           </div>
           <div className="h-3 rounded-full bg-[#F5F0E8] overflow-hidden flex">

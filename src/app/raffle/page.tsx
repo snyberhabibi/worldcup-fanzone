@@ -33,9 +33,9 @@ export default function RafflePage() {
       <div className="px-5 pt-6 pb-4">
         <div className="flex items-center justify-center gap-2 mb-1">
           <Gift className="text-gold" size={24} />
-          <h1 className="text-xl font-extrabold text-shimmer">Raffle</h1>
+          <h1 className="text-xl font-extrabold text-navy">Raffle</h1>
         </div>
-        <p className="text-navy/40 text-xs text-center">
+        <p className="text-navy/50 text-xs text-center">
           Enter for a chance to win amazing prizes
         </p>
       </div>
@@ -92,7 +92,7 @@ export default function RafflePage() {
           <p className="text-sm font-bold text-navy mb-1">
             Download Yalla Bites to increase your chances!
           </p>
-          <p className="text-navy/40 text-xs mb-4">
+          <p className="text-navy/55 text-xs mb-4">
             Yalla Bites users get bonus raffle entries on match days.
           </p>
           <div className="flex items-center justify-center gap-3">
@@ -120,7 +120,7 @@ export default function RafflePage() {
         {/* Past Raffle Winners */}
         {pastRaffles.length > 0 && (
           <div>
-            <h2 className="text-xs font-bold text-navy/30 uppercase tracking-[0.15em] mb-3">
+            <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-3">
               Past Raffles
             </h2>
             <div className="space-y-3">
@@ -132,7 +132,7 @@ export default function RafflePage() {
                       className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                         raffle.status === "drawn"
                           ? "text-gold bg-gold/10"
-                          : "text-navy/40 bg-navy/5"
+                          : "text-navy/55 bg-navy/5"
                       }`}
                     >
                       {raffle.status === "drawn" ? "Winner Drawn" : "Closed"}
@@ -147,7 +147,7 @@ export default function RafflePage() {
                     </div>
                   )}
                   {raffle.closedAt && (
-                    <p className="text-[10px] text-navy/30 mt-1">
+                    <p className="text-[10px] text-navy/50 mt-1">
                       {new Date(raffle.closedAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

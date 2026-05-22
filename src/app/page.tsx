@@ -50,7 +50,7 @@ export default function HomePage() {
           <span className="text-shimmer">FANZONE</span>
           <span className="text-navy"> 2026</span>
         </h1>
-        <p className="text-center text-navy/40 text-sm font-medium mb-8 max-w-xs mx-auto">
+        <p className="text-center text-navy/55 text-sm font-medium mb-8 max-w-xs mx-auto">
           Dallas&apos;s first World Cup fan zone
         </p>
 
@@ -62,7 +62,7 @@ export default function HomePage() {
 
       {/* Partner Cards */}
       <section className="px-5 py-6">
-        <h2 className="text-xs font-bold text-navy/30 uppercase tracking-[0.15em] mb-4">
+        <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-4">
           Presented by
         </h2>
         <div className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide">
@@ -74,7 +74,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">DAR Coffee</p>
-                <p className="text-[10px] text-navy/40 font-medium">Host Venue</p>
+                <p className="text-[10px] text-navy/55 font-medium">Host Venue</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -90,7 +90,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">Haus of Design</p>
-                <p className="text-[10px] text-navy/40 font-medium">Decor Partner</p>
+                <p className="text-[10px] text-navy/55 font-medium">Decor Partner</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -106,7 +106,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">Yalla Bites</p>
-                <p className="text-[10px] text-navy/40 font-medium">Food Partner</p>
+                <p className="text-[10px] text-navy/55 font-medium">Food Partner</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -120,7 +120,7 @@ export default function HomePage() {
       {mounted && events.length > 0 && (
         <section className="px-5 py-6">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-bold text-navy/30 uppercase tracking-[0.15em]">
+            <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em]">
               Watch Locations
             </h2>
             <span className="flex items-center gap-1.5 text-green text-xs font-semibold">
@@ -137,8 +137,8 @@ export default function HomePage() {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-bold text-navy truncate">{event.name}</p>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[11px] text-navy/40">{event.address}</span>
-                    <span className="text-[11px] text-navy/30">{event.time}</span>
+                    <span className="text-[11px] text-navy/55">{event.address}</span>
+                    <span className="text-[11px] text-navy/50">{event.time}</span>
                   </div>
                 </div>
                 <ChevronRight size={16} className="text-navy/20 shrink-0" />
@@ -157,7 +157,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#128197;</span>
             <span className="text-sm font-bold text-navy">Full Schedule</span>
-            <span className="text-[10px] text-navy/40">104 matches</span>
+            <span className="text-[10px] text-navy/55">104 matches</span>
           </Link>
           <Link
             href="/vote"
@@ -165,7 +165,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#128499;&#65039;</span>
             <span className="text-sm font-bold text-navy">Vote Now</span>
-            <span className="text-[10px] text-navy/40">Who wins?</span>
+            <span className="text-[10px] text-navy/55">Who wins?</span>
           </Link>
           <Link
             href="/raffle"
@@ -173,7 +173,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#127873;</span>
             <span className="text-sm font-bold text-navy">Win Prizes</span>
-            <span className="text-[10px] text-navy/40">Enter raffle</span>
+            <span className="text-[10px] text-navy/55">Enter raffle</span>
           </Link>
           <Link
             href="/schedule#groups"
@@ -181,7 +181,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#9917;</span>
             <span className="text-sm font-bold text-navy">Groups</span>
-            <span className="text-[10px] text-navy/40">48 teams</span>
+            <span className="text-[10px] text-navy/55">48 teams</span>
           </Link>
         </div>
       </section>
