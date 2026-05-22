@@ -119,6 +119,7 @@ function PinEntry({ onSuccess }: { onSuccess: () => void }) {
                   <button
                     key="del"
                     onClick={handleDelete}
+                    aria-label="Delete digit"
                     className="h-14 rounded-xl bg-navy/5 flex items-center justify-center text-navy/40 active:bg-navy/10 active:scale-95 transition-all"
                   >
                     <X size={20} />
@@ -217,6 +218,7 @@ function VoteManagement() {
                     decrementVote(selectedMatchId!, "home");
                     refreshVotes();
                   }}
+                  aria-label="Decrease home votes"
                   className="w-10 h-10 rounded-xl bg-red/10 text-red flex items-center justify-center active:scale-90 transition-transform"
                 >
                   <Minus size={18} />
@@ -229,6 +231,7 @@ function VoteManagement() {
                     incrementVote(selectedMatchId!, "home");
                     refreshVotes();
                   }}
+                  aria-label="Increase home votes"
                   className="w-10 h-10 rounded-xl bg-green/10 text-green flex items-center justify-center active:scale-90 transition-transform"
                 >
                   <Plus size={18} />
@@ -245,6 +248,7 @@ function VoteManagement() {
                     decrementVote(selectedMatchId!, "away");
                     refreshVotes();
                   }}
+                  aria-label="Decrease away votes"
                   className="w-10 h-10 rounded-xl bg-red/10 text-red flex items-center justify-center active:scale-90 transition-transform"
                 >
                   <Minus size={18} />
@@ -257,6 +261,7 @@ function VoteManagement() {
                     incrementVote(selectedMatchId!, "away");
                     refreshVotes();
                   }}
+                  aria-label="Increase away votes"
                   className="w-10 h-10 rounded-xl bg-green/10 text-green flex items-center justify-center active:scale-90 transition-transform"
                 >
                   <Plus size={18} />
@@ -283,6 +288,8 @@ function RaffleManagement() {
   const [expandedRaffle, setExpandedRaffle] = useState<string | null>(null);
   const [entries, setEntries] = useState<RaffleEntry[]>([]);
   const [showCreate, setShowCreate] = useState(false);
+  const [toast, setToast] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
 
   const refresh = useCallback(() => {
     setRaffles(getRaffles());
@@ -307,12 +314,17 @@ function RaffleManagement() {
     refresh();
   };
 
+  const showToast = (msg: string) => {
+    setToast(msg);
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const handleDraw = (raffleId: string) => {
     const winner = drawRaffleWinner(raffleId);
     if (winner) {
-      alert(`Winner: ${winner.name} (${winner.phone})`);
+      showToast(`Winner: ${winner.name} (${winner.phone})`);
     } else {
-      alert("No entries to draw from.");
+      showToast("No entries to draw from.");
     }
     refresh();
   };
@@ -323,15 +335,26 @@ function RaffleManagement() {
   };
 
   const handleDelete = (raffleId: string) => {
-    if (confirm("Delete this raffle and all entries?")) {
+    if (confirmingDeleteId === raffleId) {
       deleteRaffle(raffleId);
       if (expandedRaffle === raffleId) setExpandedRaffle(null);
+      setConfirmingDeleteId(null);
       refresh();
+    } else {
+      setConfirmingDeleteId(raffleId);
+      setTimeout(() => setConfirmingDeleteId(null), 3000);
     }
   };
 
   return (
     <div className="space-y-4">
+      {/* Toast notification */}
+      {toast && (
+        <div className="fixed top-4 left-4 right-4 z-50 bg-navy text-white text-sm font-semibold px-4 py-3 rounded-xl shadow-lg text-center animate-[fade-in_0.2s_ease]">
+          {toast}
+        </div>
+      )}
+
       {/* Create new */}
       {!showCreate ? (
         <button
@@ -405,7 +428,7 @@ function RaffleManagement() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-navy truncate">{raffle.name}</p>
-              <p className="text-[10px] text-navy/40">
+              <p className="text-[11px] text-navy/40">
                 {raffle.status === "active" && "Active"}
                 {raffle.status === "closed" && "Closed"}
                 {raffle.status === "drawn" && `Winner: ${raffle.winnerName}`}
@@ -458,9 +481,9 @@ function RaffleManagement() {
                       >
                         <div>
                           <p className="text-xs font-semibold text-navy">{entry.name}</p>
-                          <p className="text-[10px] text-navy/30">{entry.phone}</p>
+                          <p className="text-[11px] text-navy/30">{entry.phone}</p>
                         </div>
-                        <span className="text-[10px] text-navy/20">
+                        <span className="text-[11px] text-navy/20">
                           {new Date(entry.enteredAt).toLocaleDateString()}
                         </span>
                       </div>
@@ -474,10 +497,14 @@ function RaffleManagement() {
               {/* Delete */}
               <button
                 onClick={() => handleDelete(raffle.id)}
-                className="w-full flex items-center justify-center gap-1.5 text-red/60 text-xs font-semibold py-2 active:text-red transition-colors"
+                className={`w-full flex items-center justify-center gap-1.5 text-xs font-semibold py-2 transition-colors ${
+                  confirmingDeleteId === raffle.id
+                    ? "text-red bg-red/10 rounded-lg"
+                    : "text-red/60 active:text-red"
+                }`}
               >
                 <Trash2 size={12} />
-                Delete Raffle
+                {confirmingDeleteId === raffle.id ? "Tap again to confirm" : "Delete Raffle"}
               </button>
             </div>
           )}
@@ -493,6 +520,7 @@ function EventManagement() {
   const [events, setEvents] = useState<FanzoneEvent[]>([]);
   const [showAdd, setShowAdd] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [confirmingDeleteId, setConfirmingDeleteId] = useState<string | null>(null);
   const [form, setForm] = useState({
     name: "",
     location: "",
@@ -542,9 +570,13 @@ function EventManagement() {
   };
 
   const handleDelete = (eventId: string) => {
-    if (confirm("Delete this event?")) {
+    if (confirmingDeleteId === eventId) {
       deleteEvent(eventId);
+      setConfirmingDeleteId(null);
       refresh();
+    } else {
+      setConfirmingDeleteId(eventId);
+      setTimeout(() => setConfirmingDeleteId(null), 3000);
     }
   };
 
@@ -659,7 +691,7 @@ function EventManagement() {
               <div className="flex items-center gap-2">
                 <p className="text-sm font-bold text-navy truncate">{event.name}</p>
                 {event.active && (
-                  <span className="text-[9px] font-bold text-green bg-green/10 px-1.5 py-0.5 rounded-full">
+                  <span className="text-[11px] font-bold text-green bg-green/10 px-1.5 py-0.5 rounded-full">
                     ACTIVE
                   </span>
                 )}
@@ -688,9 +720,14 @@ function EventManagement() {
             </button>
             <button
               onClick={() => handleDelete(event.id)}
-              className="text-xs font-semibold px-3 py-1.5 rounded-lg text-red/50"
+              aria-label={confirmingDeleteId === event.id ? "Confirm delete event" : "Delete event"}
+              className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                confirmingDeleteId === event.id
+                  ? "text-red bg-red/10"
+                  : "text-red/50"
+              }`}
             >
-              <Trash2 size={12} />
+              {confirmingDeleteId === event.id ? "Sure?" : <Trash2 size={12} />}
             </button>
           </div>
         </div>

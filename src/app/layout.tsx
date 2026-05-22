@@ -2,6 +2,7 @@
 
 import "./globals.css";
 import { Poppins } from "next/font/google";
+import Script from "next/script";
 import BottomNav from "@/components/BottomNav";
 
 const poppins = Poppins({
@@ -21,7 +22,7 @@ export default function RootLayout({
       <head>
         <title>World Cup Fanzone 2026 | DAR x Yalla x Haus</title>
         <meta name="description" content="Dallas's first World Cup fan zone. Vote, win raffles, and watch every match at DAR Coffee." />
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
         <meta name="theme-color" content="#F5F0E8" />
         <link rel="manifest" href="/manifest.json" />
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
@@ -37,17 +38,13 @@ export default function RootLayout({
           {children}
         </main>
         <BottomNav />
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                  navigator.serviceWorker.register('/sw.js').catch(() => {});
-                });
-              }
-            `,
-          }}
-        />
+        <Script id="sw-register" strategy="afterInteractive">
+          {`if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+              navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+          }`}
+        </Script>
       </body>
     </html>
   );

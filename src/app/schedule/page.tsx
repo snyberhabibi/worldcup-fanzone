@@ -8,21 +8,6 @@ import { Search, X } from "lucide-react";
 
 type Tab = "groups" | "schedule" | "knockout";
 
-function etToCt(etTime: string): string {
-  const m = etTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!m) return etTime;
-  let hours = parseInt(m[1], 10);
-  const minutes = m[2];
-  const period = m[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  hours = (hours - 1 + 24) % 24;
-  const newPeriod = hours >= 12 ? "PM" : "AM";
-  let displayHours = hours % 12;
-  if (displayHours === 0) displayHours = 12;
-  return `${displayHours}:${minutes} ${newPeriod}`;
-}
-
 function formatDateHeader(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString("en-US", {
@@ -155,6 +140,7 @@ export default function SchedulePage() {
             <h1 className="text-xl font-extrabold text-navy">Schedule</h1>
             <button
               onClick={() => setShowSearch(!showSearch)}
+              aria-label={showSearch ? "Close search" : "Search"}
               className="w-9 h-9 rounded-xl bg-white flex items-center justify-center active:scale-90 transition-transform shadow-sm"
             >
               {showSearch ? <X size={18} className="text-navy/60" /> : <Search size={18} className="text-navy/60" />}
@@ -176,6 +162,7 @@ export default function SchedulePage() {
               {search && (
                 <button
                   onClick={() => setSearch("")}
+                  aria-label="Clear search"
                   className="absolute right-3 top-1/2 -translate-y-1/2"
                 >
                   <X size={14} className="text-navy/50" />
@@ -229,11 +216,11 @@ export default function SchedulePage() {
             {filteredMatchesByDate.map(([dateKey, { label, matches }]) => (
               <div key={dateKey}>
                 {/* Date header */}
-                <div className="sticky top-[140px] z-30 bg-cream/90 backdrop-blur-md -mx-5 px-5 py-2 border-b border-gold/10 mb-3">
+                <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm -mx-5 px-5 py-2 border-b border-gold/10 mb-3">
                   <h3 className="text-xs font-bold text-gold uppercase tracking-wider">
                     {label}
                   </h3>
-                  <span className="text-[10px] text-navy/50">
+                  <span className="text-[11px] text-navy/50">
                     {matches.length} match{matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>
@@ -260,7 +247,7 @@ export default function SchedulePage() {
                 <div className="flex items-center gap-3 mb-3">
                   <h3 className="text-sm font-extrabold text-gold">{stage.label}</h3>
                   <div className="flex-1 h-px bg-gold/15" />
-                  <span className="text-[10px] text-navy/50 font-medium">
+                  <span className="text-[11px] text-navy/50 font-medium">
                     {stage.matches.length} match{stage.matches.length !== 1 ? "es" : ""}
                   </span>
                 </div>

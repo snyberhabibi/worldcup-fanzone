@@ -18,6 +18,8 @@ export default function BottomNav() {
 
   return (
     <nav
+      aria-label="Main navigation"
+      role="navigation"
       className="fixed bottom-0 left-0 right-0 z-50"
       style={{ paddingBottom: "env(safe-area-inset-bottom, 0px)" }}
     >
@@ -73,7 +75,7 @@ export default function BottomNav() {
               </div>
 
               <span
-                className={`text-[10px] font-medium leading-tight transition-colors duration-200 relative z-10 ${
+                className={`text-[11px] font-medium leading-tight transition-colors duration-200 relative z-10 ${
                   isActive
                     ? "font-semibold text-[#C9A24B]"
                     : "text-[#0F1B3A]/35"

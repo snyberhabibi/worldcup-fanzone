@@ -40,6 +40,26 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
       return;
     }
 
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email.trim())) {
+      setStatus("error");
+      setErrorMsg("Please enter a valid email address.");
+      setShaking(true);
+      setTimeout(() => setShaking(false), 500);
+      return;
+    }
+
+    // Phone validation — must have exactly 10 digits
+    const phoneDigits = phone.replace(/\D/g, "");
+    if (phoneDigits.length !== 10) {
+      setStatus("error");
+      setErrorMsg("Please enter a valid 10-digit phone number.");
+      setShaking(true);
+      setTimeout(() => setShaking(false), 500);
+      return;
+    }
+
     const result = addRaffleEntry(raffleId, name.trim(), phone.trim(), email.trim());
     if (result.success) {
       setStatus("success");
@@ -103,7 +123,7 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
           </p>
           <div className="flex items-center justify-center gap-3">
             <a
-              href="https://apps.apple.com/app/yalla-bites/id6502641498"
+              href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#0F1B3A] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-transform active:scale-95"
@@ -112,7 +132,7 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
               App Store
             </a>
             <a
-              href="https://play.google.com/store/apps/details?id=com.yallabites.app"
+              href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 bg-[#0F1B3A] text-white text-xs font-semibold px-4 py-2.5 rounded-xl transition-transform active:scale-95"

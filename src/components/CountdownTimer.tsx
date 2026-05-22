@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { MATCHES, TEAMS, type Match } from "@/data/schedule";
+import { MATCHES, type Match } from "@/data/schedule";
+import { etToCt, getTeamDisplay } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
@@ -12,11 +13,13 @@ interface TimeLeft {
   seconds: number;
 }
 
+/** Pre-sorted matches — computed once at module level */
+const SORTED_MATCHES = [...MATCHES].sort(
+  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+);
+
 function getNextMatch(now: Date): Match | null {
-  const sorted = [...MATCHES].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-  for (const match of sorted) {
+  for (const match of SORTED_MATCHES) {
     const matchTime = new Date(match.date).getTime();
     if (matchTime + 2 * 60 * 60 * 1000 > now.getTime()) {
       return match;
@@ -32,9 +35,7 @@ function isLive(match: Match, now: Date): boolean {
 }
 
 function tournamentHasStarted(now: Date): boolean {
-  const firstMatch = [...MATCHES].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  )[0];
+  const firstMatch = SORTED_MATCHES[0];
   if (!firstMatch) return false;
   return now.getTime() >= new Date(firstMatch.date).getTime();
 }
@@ -49,24 +50,9 @@ function calcTimeLeft(target: Date, now: Date): TimeLeft {
   };
 }
 
-function etToCt(etTime: string): string {
-  const match = etTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return etTime;
-  let hours = parseInt(match[1], 10);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  hours = (hours - 1 + 24) % 24;
-  const newPeriod = hours >= 12 ? "PM" : "AM";
-  let displayHours = hours % 12;
-  if (displayHours === 0) displayHours = 12;
-  return `${displayHours}:${minutes} ${newPeriod}`;
-}
-
 function getTeamLabel(code: string): string {
-  const team = TEAMS[code];
-  return team ? `${team.flag_emoji} ${team.name}` : code;
+  const d = getTeamDisplay(code);
+  return d.flag ? `${d.flag} ${d.name}` : code;
 }
 
 /** Flip-style digit with exit/enter animation */
@@ -95,7 +81,7 @@ function FlipDigit({ value, label }: { value: number; label: string }) {
           </motion.span>
         </AnimatePresence>
       </div>
-      <span className="text-[#0F1B3A]/55 text-[10px] font-semibold uppercase tracking-widest mt-2">
+      <span className="text-[#0F1B3A]/55 text-[11px] font-semibold uppercase tracking-widest mt-2">
         {label}
       </span>
     </div>

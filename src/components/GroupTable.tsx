@@ -29,7 +29,7 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
       {/* Table */}
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-[10px] uppercase tracking-wider" style={{ color: "rgba(15,27,58,0.3)" }}>
+          <tr className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(15,27,58,0.3)" }}>
             <th className="text-left py-2.5 pl-4 pr-2 font-semibold">Team</th>
             <th className="w-9 text-center py-2.5 font-semibold">W</th>
             <th className="w-9 text-center py-2.5 font-semibold">D</th>
@@ -48,7 +48,7 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
               <td className="py-3 pl-4 pr-2">
                 <div className="flex items-center gap-2.5">
                   <span
-                    className="text-[10px] font-bold w-4 text-center tabular-nums"
+                    className="text-[11px] font-bold w-4 text-center tabular-nums"
                     style={{ color: "rgba(15,27,58,0.25)" }}
                   >
                     {idx + 1}

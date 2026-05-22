@@ -1,30 +1,10 @@
 "use client";
 
-import { TEAMS, type Match } from "@/data/schedule";
+import { type Match } from "@/data/schedule";
 import { getVotes } from "@/lib/store";
+import { etToCt, getTeamDisplay } from "@/lib/utils";
 import { MapPin, Clock } from "lucide-react";
 import { motion } from "framer-motion";
-
-function etToCt(etTime: string): string {
-  const match = etTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!match) return etTime;
-  let hours = parseInt(match[1], 10);
-  const minutes = match[2];
-  const period = match[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  hours = (hours - 1 + 24) % 24;
-  const newPeriod = hours >= 12 ? "PM" : "AM";
-  let displayHours = hours % 12;
-  if (displayHours === 0) displayHours = 12;
-  return `${displayHours}:${minutes} ${newPeriod}`;
-}
-
-function getTeamDisplay(code: string) {
-  const team = TEAMS[code];
-  if (team) return { flag: team.flag_emoji, name: team.name, code: team.code };
-  return { flag: "", name: code, code };
-}
 
 interface MatchCardProps {
   match: Match;
@@ -77,11 +57,11 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
 
         <div className="shrink-0">
           {match.group ? (
-            <span className="text-[10px] font-bold text-[#C9A24B] bg-[#C9A24B]/10 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-[#C9A24B] bg-[#C9A24B]/10 px-2 py-0.5 rounded-full">
               GRP {match.group}
             </span>
           ) : (
-            <span className="text-[10px] font-bold text-[#E54141] bg-[#E54141]/10 px-2 py-0.5 rounded-full">
+            <span className="text-[11px] font-bold text-[#E54141] bg-[#E54141]/10 px-2 py-0.5 rounded-full">
               {stageLabels[match.stage] || match.stage}
             </span>
           )}
@@ -128,7 +108,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="flex-1 text-center">
           <div className="text-4xl mb-1.5">{home.flag}</div>
           <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{home.name}</p>
-          <p className="text-[10px] text-[#0F1B3A]/45 font-medium">{home.code}</p>
+          <p className="text-[11px] text-[#0F1B3A]/45 font-medium">{home.code}</p>
         </div>
 
         {/* VS circle */}
@@ -148,7 +128,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="flex-1 text-center">
           <div className="text-4xl mb-1.5">{away.flag}</div>
           <p className="text-sm font-bold text-[#0F1B3A] leading-tight">{away.name}</p>
-          <p className="text-[10px] text-[#0F1B3A]/45 font-medium">{away.code}</p>
+          <p className="text-[11px] text-[#0F1B3A]/45 font-medium">{away.code}</p>
         </div>
       </div>
 
@@ -157,7 +137,7 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
         <div className="mt-4 pt-3 border-t border-[#0F1B3A]/5">
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
             <span className="text-[#1A6B3C]">{homePercent}%</span>
-            <span className="text-[#0F1B3A]/40 text-[10px]">{totalVotes} votes</span>
+            <span className="text-[#0F1B3A]/40 text-[11px]">{totalVotes} votes</span>
             <span className="text-[#E54141]">{awayPercent}%</span>
           </div>
           <div className="h-2 rounded-full bg-[#F5F0E8] overflow-hidden flex">

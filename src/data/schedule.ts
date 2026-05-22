@@ -330,63 +330,6 @@ export const MATCHES: Match[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Helper functions
-// ---------------------------------------------------------------------------
-
-/** Get all matches for a specific group */
-export function getGroupMatches(groupLetter: string): Match[] {
-  return MATCHES.filter((m) => m.group === groupLetter);
-}
-
-/** Get all matches for a specific stage */
-export function getStageMatches(stage: Match["stage"]): Match[] {
-  return MATCHES.filter((m) => m.stage === stage);
-}
-
-/** Get all matches on a specific date (YYYY-MM-DD in ET) */
-export function getMatchesByDate(dateStr: string): Match[] {
-  return MATCHES.filter((m) => m.date.startsWith(dateStr));
-}
-
-/** Get all matches at a specific venue */
-export function getMatchesByVenue(venueName: string): Match[] {
-  return MATCHES.filter((m) =>
-    m.venue.toLowerCase().includes(venueName.toLowerCase())
-  );
-}
-
-/** Get all matches for a specific team (by FIFA code) */
-export function getTeamMatches(teamCode: string): Match[] {
-  return MATCHES.filter(
-    (m) => m.homeTeam === teamCode || m.awayTeam === teamCode
-  );
-}
-
-/** Get team info by FIFA code */
-export function getTeam(code: string): Team | undefined {
-  return TEAMS[code];
-}
-
-/** Get the group a team belongs to */
-export function getTeamGroup(teamCode: string): Group | undefined {
-  return GROUPS.find((g) => g.teams.some((t) => t.code === teamCode));
-}
-
-/** Get all group stage matches sorted chronologically */
-export function getGroupStageSchedule(): Match[] {
-  return MATCHES.filter((m) => m.stage === "group").sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-}
-
-/** Get all knockout matches sorted chronologically */
-export function getKnockoutSchedule(): Match[] {
-  return MATCHES.filter((m) => m.stage !== "group").sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Round of 32 bracket mapping (for reference)
 // ---------------------------------------------------------------------------
 

@@ -129,7 +129,7 @@ export default function RafflePage() {
                   <div className="flex items-center justify-between mb-2">
                     <h3 className="text-sm font-bold text-navy">{raffle.name}</h3>
                     <span
-                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
                         raffle.status === "drawn"
                           ? "text-gold bg-gold/10"
                           : "text-navy/55 bg-navy/5"
@@ -147,7 +147,7 @@ export default function RafflePage() {
                     </div>
                   )}
                   {raffle.closedAt && (
-                    <p className="text-[10px] text-navy/50 mt-1">
+                    <p className="text-[11px] text-navy/50 mt-1">
                       {new Date(raffle.closedAt).toLocaleDateString("en-US", {
                         month: "short",
                         day: "numeric",

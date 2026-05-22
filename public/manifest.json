@@ -4,8 +4,8 @@
   "description": "Dallas's first World Cup fan zone. Vote, win raffles, and watch every match.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#0F1B3A",
-  "theme_color": "#0F1B3A",
+  "background_color": "#F5F0E8",
+  "theme_color": "#F5F0E8",
   "orientation": "portrait",
   "scope": "/",
   "icons": [

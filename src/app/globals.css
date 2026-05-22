@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
 
 /* ═══════════════════════════════════════════
    WORLD CUP FANZONE 2026
@@ -15,8 +14,8 @@
   --navy: #0F1B3A;
   --navy-light: #1a2d54;
   --navy-muted: #3A4A6B;
-  --gold: #C9A24B;
-  --gold-light: #E3C877;
+  --gold: #9A7A30;
+  --gold-light: #C9A24B;
   --gold-warm: #D4A843;
   --gold-glow: rgba(201, 162, 75, 0.35);
   --orange-warm: #E8934A;
@@ -244,11 +243,11 @@ body {
 .text-shimmer {
   background: linear-gradient(
     105deg,
-    #9a7a30 0%,
+    #7a6020 0%,
     var(--gold) 30%,
-    #b8903e 50%,
+    #9a7a30 50%,
     var(--gold) 70%,
-    #9a7a30 100%
+    #7a6020 100%
   );
   background-size: 250% 100%;
   -webkit-background-clip: text;

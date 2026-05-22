@@ -74,7 +74,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">DAR Coffee</p>
-                <p className="text-[10px] text-navy/55 font-medium">Host Venue</p>
+                <p className="text-[11px] text-navy/55 font-medium">Host Venue</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -90,7 +90,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">Haus of Design</p>
-                <p className="text-[10px] text-navy/55 font-medium">Decor Partner</p>
+                <p className="text-[11px] text-navy/55 font-medium">Decor Partner</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -106,7 +106,7 @@ export default function HomePage() {
               </div>
               <div>
                 <p className="text-sm font-extrabold text-navy">Yalla Bites</p>
-                <p className="text-[10px] text-navy/55 font-medium">Food Partner</p>
+                <p className="text-[11px] text-navy/55 font-medium">Food Partner</p>
               </div>
             </div>
             <p className="text-xs text-navy/50 leading-relaxed">
@@ -157,7 +157,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#128197;</span>
             <span className="text-sm font-bold text-navy">Full Schedule</span>
-            <span className="text-[10px] text-navy/55">104 matches</span>
+            <span className="text-[11px] text-navy/55">104 matches</span>
           </Link>
           <Link
             href="/vote"
@@ -165,7 +165,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#128499;&#65039;</span>
             <span className="text-sm font-bold text-navy">Vote Now</span>
-            <span className="text-[10px] text-navy/55">Who wins?</span>
+            <span className="text-[11px] text-navy/55">Who wins?</span>
           </Link>
           <Link
             href="/raffle"
@@ -173,7 +173,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#127873;</span>
             <span className="text-sm font-bold text-navy">Win Prizes</span>
-            <span className="text-[10px] text-navy/55">Enter raffle</span>
+            <span className="text-[11px] text-navy/55">Enter raffle</span>
           </Link>
           <Link
             href="/schedule#groups"
@@ -181,7 +181,7 @@ export default function HomePage() {
           >
             <span className="text-3xl">&#9917;</span>
             <span className="text-sm font-bold text-navy">Groups</span>
-            <span className="text-[10px] text-navy/55">48 teams</span>
+            <span className="text-[11px] text-navy/55">48 teams</span>
           </Link>
         </div>
       </section>
@@ -231,7 +231,7 @@ export default function HomePage() {
 
       {/* Footer text */}
       <div className="text-center pb-4 px-5">
-        <p className="text-navy/20 text-[10px]">
+        <p className="text-navy/20 text-[11px]">
           &copy; 2026 World Cup Fanzone Dallas. Not affiliated with FIFA.
         </p>
       </div>

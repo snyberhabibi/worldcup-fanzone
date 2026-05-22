@@ -1,45 +1,27 @@
 "use client";
 
 import { useState, useEffect, useMemo, useCallback } from "react";
-import { MATCHES, TEAMS, type Match } from "@/data/schedule";
+import { MATCHES, type Match } from "@/data/schedule";
 import { getVotes, getMyVote, castPublicVote } from "@/lib/store";
+import { etToCt, getTeamDisplay } from "@/lib/utils";
 import { Trophy, Check } from "lucide-react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import confetti from "canvas-confetti";
 
-function getTeamDisplay(code: string) {
-  const team = TEAMS[code];
-  if (team) return { flag: team.flag_emoji, name: team.name, code: team.code };
-  return { flag: "", name: code, code };
-}
+/** Pre-sorted matches — computed once at module level */
+const SORTED_MATCHES = [...MATCHES].sort(
+  (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+);
 
 function getCurrentOrNextMatch(now: Date): Match | null {
-  const sorted = [...MATCHES].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-  );
-  for (const match of sorted) {
+  for (const match of SORTED_MATCHES) {
     const matchTime = new Date(match.date).getTime();
     if (matchTime + 2 * 60 * 60 * 1000 > now.getTime()) {
       return match;
     }
   }
   return null;
-}
-
-function etToCt(etTime: string): string {
-  const m = etTime.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/i);
-  if (!m) return etTime;
-  let hours = parseInt(m[1], 10);
-  const minutes = m[2];
-  const period = m[3].toUpperCase();
-  if (period === "PM" && hours !== 12) hours += 12;
-  if (period === "AM" && hours === 12) hours = 0;
-  hours = (hours - 1 + 24) % 24;
-  const newPeriod = hours >= 12 ? "PM" : "AM";
-  let displayHours = hours % 12;
-  if (displayHours === 0) displayHours = 12;
-  return `${displayHours}:${minutes} ${newPeriod}`;
 }
 
 function calcTimeLeft(target: Date, now: Date) {
@@ -97,9 +79,7 @@ export default function VoteTracker() {
 
   // No match state
   if (!currentMatch) {
-    const firstMatch = [...MATCHES].sort(
-      (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
-    )[0];
+    const firstMatch = SORTED_MATCHES[0];
     const timeLeft = calcTimeLeft(new Date(firstMatch?.date || Date.now()), now);
 
     return (
@@ -130,7 +110,7 @@ export default function VoteTracker() {
               <span className="text-[#C9A24B] font-extrabold text-lg tabular-nums">
                 {String(u.v).padStart(2, "0")}
               </span>
-              <span className="text-[#0F1B3A]/45 text-[10px] font-semibold ml-0.5">{u.l}</span>
+              <span className="text-[#0F1B3A]/45 text-[11px] font-semibold ml-0.5">{u.l}</span>
             </div>
           ))}
         </div>
@@ -191,6 +171,7 @@ export default function VoteTracker() {
         <motion.button
           onClick={() => handleVote("home")}
           whileTap={{ scale: 0.96 }}
+          aria-label={`Vote for ${home.name}`}
           className={`flex-1 rounded-2xl p-5 flex flex-col items-center gap-2 transition-all duration-200 relative overflow-hidden ${
             myVote === "home"
               ? "bg-white ring-2 ring-[#1A6B3C]"
@@ -212,6 +193,7 @@ export default function VoteTracker() {
         <motion.button
           onClick={() => handleVote("away")}
           whileTap={{ scale: 0.96 }}
+          aria-label={`Vote for ${away.name}`}
           className={`flex-1 rounded-2xl p-5 flex flex-col items-center gap-2 transition-all duration-200 relative overflow-hidden ${
             myVote === "away"
               ? "bg-white ring-2 ring-[#E54141]"
@@ -239,7 +221,7 @@ export default function VoteTracker() {
         >
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
             <span className="text-[#1A6B3C]">{home.code} {homePercent}%</span>
-            <span className="text-[#0F1B3A]/40 text-[10px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
+            <span className="text-[#0F1B3A]/40 text-[11px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
             <span className="text-[#E54141]">{awayPercent}% {away.code}</span>
           </div>
           <div className="h-3 rounded-full bg-[#F5F0E8] overflow-hidden flex">
