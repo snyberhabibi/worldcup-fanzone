@@ -36,7 +36,7 @@ export default function HomePage() {
         <div className="relative mx-auto w-[200px] h-[200px] mb-6">
           <div className="absolute inset-0 bg-gold/8 rounded-full blur-3xl" />
           <Image
-            src="/mascot/01_front_thumbsup.png"
+            src="/mascot/celebrating.png"
             alt="World Cup Mascot"
             fill
             className="object-contain drop-shadow-2xl animate-float"

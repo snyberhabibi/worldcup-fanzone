@@ -191,7 +191,7 @@ export default function CountdownTimer() {
       {/* Mascot decoration */}
       <div className="absolute -right-4 -top-2 w-24 h-24 opacity-20 pointer-events-none">
         <Image
-          src="/mascot/referee.png"
+          src="/mascot/goalkeeper.png"
           alt=""
           fill
           className="object-contain"

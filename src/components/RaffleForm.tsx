@@ -74,7 +74,7 @@ export default function RaffleForm({ raffleId, raffleName }: RaffleFormProps) {
         {/* Mascot */}
         <div className="relative w-32 h-32 mx-auto mb-4">
           <Image
-            src="/mascot/jumping.png"
+            src="/mascot/celebrating.png"
             alt="Celebrating mascot"
             fill
             className="object-contain drop-shadow-lg"

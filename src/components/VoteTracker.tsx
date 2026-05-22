@@ -123,7 +123,7 @@ export default function VoteTracker() {
       >
         <div className="relative w-44 h-44 mb-6">
           <Image
-            src="/mascot/waving.png"
+            src="/mascot/fan.png"
             alt="Mascot waving"
             fill
             className="object-contain drop-shadow-lg"
@@ -170,7 +170,7 @@ export default function VoteTracker() {
       {/* Mascot */}
       <div className="relative w-28 h-28 mb-2">
         <Image
-          src="/mascot/excited.png"
+          src="/mascot/kicking.png"
           alt="Excited mascot"
           fill
           className="object-contain drop-shadow-lg"

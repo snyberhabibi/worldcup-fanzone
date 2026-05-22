@@ -71,7 +71,7 @@ export default function RafflePage() {
           <div className="flex flex-col items-center justify-center py-12 text-center">
             <div className="relative w-40 h-40 mb-6">
               <Image
-                src="/mascot/11_dancing.png"
+                src="/mascot/trophy.png"
                 alt="Mascot dancing"
                 fill
                 className="object-contain"
