@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   verifyPin,
   isAdminAuthenticated,
@@ -889,21 +889,11 @@ export default function AdminPage() {
       </div>
 
       {/* Content */}
-      <div className="px-5 py-5">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ type: "spring", stiffness: 300, damping: 25 }}
-          >
-            {activeTab === "votes" && <VoteManagement />}
-            {activeTab === "raffles" && <RaffleManagement />}
-            {activeTab === "events" && <EventManagement />}
-            {activeTab === "push" && <PushNotifications />}
-          </motion.div>
-        </AnimatePresence>
+      <div className="px-4 pb-8">
+        {activeTab === "votes" && <VoteManagement />}
+        {activeTab === "raffles" && <RaffleManagement />}
+        {activeTab === "events" && <EventManagement />}
+        {activeTab === "push" && <PushNotifications />}
       </div>
     </div>
   );

@@ -135,7 +135,7 @@ export default function VoteTracker() {
       {/* Header */}
       <div className="flex items-center gap-3 mb-1">
         <Trophy className="text-[#C9A24B]" size={24} />
-        <h1 className="text-2xl font-extrabold text-[#0F1B3A] tracking-tight">WHO WINS?</h1>
+        <h1 className="text-2xl font-extrabold text-[#0F1B3A] tracking-tight">WHO&apos;S TAKING IT?</h1>
         <Trophy className="text-[#C9A24B]" size={24} />
       </div>
 

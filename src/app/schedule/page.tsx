@@ -3,6 +3,7 @@
 import { useState, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { MATCHES, GROUPS, TEAMS, type Match } from "@/data/schedule";
+import { getMatchBadge } from "@/data/match-badges";
 import MatchCard from "@/components/MatchCard";
 import GroupTable from "@/components/GroupTable";
 import { Search, X } from "lucide-react";
@@ -248,11 +249,19 @@ export default function SchedulePage() {
                   </span>
                 </div>
                 <div className="space-y-2">
-                  {matches.map((match) => (
-                    <motion.div key={match.id} variants={fadeUp}>
-                      <MatchCard match={match} compact />
-                    </motion.div>
-                  ))}
+                  {matches.map((m) => {
+                    const badge = getMatchBadge(m.id);
+                    return (
+                      <motion.div key={m.id} variants={fadeUp}>
+                        {badge && (
+                          <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full mb-1 ${badge.color}`}>
+                            {badge.label}
+                          </span>
+                        )}
+                        <MatchCard match={m} compact />
+                      </motion.div>
+                    );
+                  })}
                 </div>
               </motion.div>
             ))}

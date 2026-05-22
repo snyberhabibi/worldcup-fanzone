@@ -65,7 +65,7 @@ export default function HomePage() {
             transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
           >
             <Image
-              src="/mascot/saudi-fan.png"
+              src="/mascot/usa-fan.png"
               alt="Fufu the World Cup mascot"
               fill
               className="object-contain drop-shadow-2xl"
