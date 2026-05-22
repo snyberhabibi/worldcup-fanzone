@@ -143,12 +143,12 @@ export default function SchedulePage() {
   ];
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen overflow-hidden">
       {/* Header */}
-      <div className="sticky top-0 z-40 bg-cream/95 backdrop-blur-xl border-b border-navy/5">
-        <div className="px-5 pt-4 pb-3">
+      <div className="sticky top-0 z-40 bg-cream/95 backdrop-blur-xl border-b border-navy/5 max-w-full overflow-hidden">
+        <div className="px-4 pt-4 pb-3">
           <div className="flex items-center justify-between mb-3">
-            <h1 className="text-xl font-extrabold text-navy">Schedule</h1>
+            <h1 className="text-xl font-extrabold text-navy truncate">Schedule</h1>
             <button
               onClick={() => setShowSearch(!showSearch)}
               aria-label={showSearch ? "Close search" : "Search"}
@@ -160,7 +160,7 @@ export default function SchedulePage() {
 
           {/* Search bar */}
           {showSearch && (
-            <div className="relative mb-3">
+            <div className="relative mb-3 max-w-full">
               <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-navy/50" />
               <input
                 type="text"
@@ -168,7 +168,7 @@ export default function SchedulePage() {
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search teams, venues..."
                 autoFocus
-                className="w-full bg-white border border-navy/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-navy placeholder:text-navy/25 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 shadow-sm"
+                className="w-full min-w-0 bg-white border border-navy/10 rounded-xl pl-10 pr-4 py-2.5 text-sm text-navy placeholder:text-navy/25 focus:outline-none focus:border-gold/50 focus:ring-1 focus:ring-gold/20 shadow-sm"
               />
               {search && (
                 <button
@@ -183,7 +183,7 @@ export default function SchedulePage() {
           )}
 
           {/* Tab bar */}
-          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm relative">
+          <div className="flex gap-1 bg-white rounded-xl p-1 shadow-sm relative max-w-full overflow-hidden">
             {tabs.map((tab) => (
               <button
                 key={tab.id}
@@ -209,7 +209,7 @@ export default function SchedulePage() {
       </div>
 
       {/* Content */}
-      <div ref={scrollRef} className="px-5 py-5">
+      <div ref={scrollRef} className="px-4 py-5 max-w-full overflow-x-hidden">
         {/* Groups Tab */}
         {activeTab === "groups" && (
           <motion.div
@@ -242,12 +242,11 @@ export default function SchedulePage() {
               <motion.div
                 key={dateKey}
                 initial="hidden"
-                whileInView="visible"
-                viewport={{ once: true }}
+                animate="visible"
                 variants={staggerContainer}
               >
                 {/* Date header */}
-                <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm -mx-5 px-5 py-2 border-b border-gold/10 mb-3">
+                <div className="sticky top-0 z-10 bg-cream/95 backdrop-blur-sm -mx-4 px-4 py-2 border-b border-gold/10 mb-3">
                   <h3 className="text-xs font-bold text-gold uppercase tracking-wider">
                     {label}
                   </h3>
@@ -279,8 +278,7 @@ export default function SchedulePage() {
               <motion.div
                 key={stage.stage}
                 initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
               >
                 <div className="flex items-center gap-3 mb-3">

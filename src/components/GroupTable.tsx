@@ -22,16 +22,15 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 15 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ type: "spring", stiffness: 300, damping: 25 }}
-      className="bg-white rounded-2xl overflow-hidden"
+      className="bg-white rounded-2xl overflow-hidden min-w-0"
       style={{ boxShadow: "0 2px 12px rgba(15,27,58,0.05)" }}
     >
       {/* Group header */}
-      <div className="flex items-center gap-2.5 px-4 py-3 border-b border-[#0F1B3A]/5">
+      <div className="flex items-center gap-2.5 px-3 py-3 border-b border-[#0F1B3A]/5">
         <span
-          className="inline-flex items-center justify-center px-3 py-1 rounded-full text-xs font-extrabold text-[#C9A24B]"
+          className="inline-flex items-center justify-center px-2.5 py-1 rounded-full text-[11px] font-extrabold text-[#C9A24B]"
           style={{ backgroundColor: "rgba(201,162,75,0.1)" }}
         >
           Group {groupName}
@@ -39,20 +38,20 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
       </div>
 
       {/* Table */}
+      <div className="overflow-x-auto">
       <table className="w-full text-sm">
         <thead>
-          <tr className="text-[11px] uppercase tracking-wider" style={{ color: "rgba(15,27,58,0.3)" }}>
-            <th className="text-left py-2.5 pl-4 pr-2 font-semibold">Team</th>
-            <th className="w-9 text-center py-2.5 font-semibold">W</th>
-            <th className="w-9 text-center py-2.5 font-semibold">D</th>
-            <th className="w-9 text-center py-2.5 font-semibold">L</th>
-            <th className="w-10 text-center py-2.5 pr-4 font-semibold">Pts</th>
+          <tr className="text-[10px] uppercase tracking-wider" style={{ color: "rgba(15,27,58,0.3)" }}>
+            <th className="text-left py-2.5 pl-3 pr-1 font-semibold">Team</th>
+            <th className="w-7 text-center py-2.5 font-semibold">W</th>
+            <th className="w-7 text-center py-2.5 font-semibold">D</th>
+            <th className="w-7 text-center py-2.5 font-semibold">L</th>
+            <th className="w-8 text-center py-2.5 pr-3 font-semibold">Pts</th>
           </tr>
         </thead>
         <motion.tbody
           initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
+          animate="visible"
           variants={tableStagger}
         >
           {teams.map((team, idx) => (
@@ -63,16 +62,16 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
                 backgroundColor: idx % 2 === 0 ? "#FFFFFF" : "#F5F0E8",
               }}
             >
-              <td className="py-3 pl-4 pr-2">
-                <div className="flex items-center gap-2.5">
+              <td className="py-3 pl-3 pr-1">
+                <div className="flex items-center gap-1.5 min-w-0">
                   <span
-                    className="text-[11px] font-bold w-4 text-center tabular-nums"
+                    className="text-[10px] font-bold w-3 shrink-0 text-center tabular-nums"
                     style={{ color: "rgba(15,27,58,0.25)" }}
                   >
                     {idx + 1}
                   </span>
-                  <span className="text-lg leading-none">{team.flag_emoji}</span>
-                  <span className="font-medium text-[#0F1B3A] text-sm truncate">
+                  <span className="text-base leading-none shrink-0">{team.flag_emoji}</span>
+                  <span className="font-medium text-[#0F1B3A] text-xs truncate min-w-0">
                     {team.name}
                   </span>
                 </div>
@@ -87,7 +86,7 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
                 0
               </td>
               <td
-                className="text-center font-bold tabular-nums pr-4"
+                className="text-center font-bold tabular-nums pr-3"
                 style={{ color: "#C9A24B" }}
               >
                 0
@@ -96,6 +95,7 @@ export default function GroupTable({ groupName, teams }: GroupTableProps) {
           ))}
         </motion.tbody>
       </table>
+      </div>
     </motion.div>
   );
 }

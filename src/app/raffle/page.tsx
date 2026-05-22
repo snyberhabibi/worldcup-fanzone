@@ -94,6 +94,7 @@ export default function RafflePage() {
                 src="/mascot/trophy.png"
                 alt="Mascot dancing"
                 fill
+                unoptimized
                 className="object-contain"
               />
             </motion.div>

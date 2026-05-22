@@ -89,10 +89,10 @@ export default function VoteTracker() {
         className="flex flex-col items-center justify-center min-h-[60vh] px-6 text-center"
       >
         <div className="relative w-44 h-44 mb-6">
-          <Image src="/mascot/fan.png" alt="Mascot" fill className="object-contain drop-shadow-lg" />
+          <Image src="/mascot/fan.png" alt="Mascot" fill unoptimized className="object-contain drop-shadow-lg" />
         </div>
         <h2 className="text-2xl font-extrabold text-[#0F1B3A] mb-2">No Match Right Now</h2>
-        <p className="text-[#0F1B3A]/40 text-sm max-w-xs mb-6">
+        <p className="text-[#0F1B3A]/60 text-sm max-w-xs mb-6">
           Check back during the next match to cast your vote!
         </p>
         <div className="flex items-center gap-2">
@@ -110,7 +110,7 @@ export default function VoteTracker() {
               <span className="text-[#C9A24B] font-extrabold text-lg tabular-nums">
                 {String(u.v).padStart(2, "0")}
               </span>
-              <span className="text-[#0F1B3A]/45 text-[11px] font-semibold ml-0.5">{u.l}</span>
+              <span className="text-[#0F1B3A]/65 text-[11px] font-semibold ml-0.5">{u.l}</span>
             </div>
           ))}
         </div>
@@ -129,7 +129,7 @@ export default function VoteTracker() {
     >
       {/* Mascot */}
       <div className="relative w-28 h-28 mb-2">
-        <Image src="/mascot/kicking.png" alt="Mascot" fill className="object-contain drop-shadow-lg" />
+        <Image src="/mascot/kicking.png" alt="Mascot" fill unoptimized className="object-contain drop-shadow-lg" />
       </div>
 
       {/* Header */}
@@ -143,20 +143,20 @@ export default function VoteTracker() {
       <div className="text-center mb-6">
         {currentMatch.group && (
           <span
-            className="text-xs font-bold text-[#C9A24B] px-3 py-1 rounded-full inline-block"
-            style={{ backgroundColor: "rgba(201,162,75,0.1)" }}
+            className="text-xs font-bold text-[#7a6020] px-3 py-1 rounded-full inline-block"
+            style={{ backgroundColor: "rgba(201,162,75,0.15)" }}
           >
             Group {currentMatch.group}
           </span>
         )}
-        <p className="text-[#0F1B3A]/55 text-xs mt-1.5">
+        <p className="text-[#0F1B3A]/70 text-xs mt-1.5">
           {currentMatch.venue} · {currentMatch.city} · {etToCt(currentMatch.time)} CT
         </p>
       </div>
 
       {/* Tap to vote instruction */}
       {!myVote && (
-        <p className="text-[#0F1B3A]/45 text-xs font-medium mb-4">Tap a team to cast your vote</p>
+        <p className="text-[#0F1B3A]/65 text-xs font-medium mb-4">Tap a team to cast your vote</p>
       )}
       {myVote && (
         <p className="text-[#1A6B3C] text-xs font-semibold mb-4 flex items-center gap-1">
@@ -186,7 +186,7 @@ export default function VoteTracker() {
           )}
           <span className="text-5xl leading-none">{home.flag}</span>
           <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{home.name}</span>
-          <span className="text-[#0F1B3A]/45 text-xs font-medium">{home.code}</span>
+          <span className="text-[#0F1B3A]/65 text-xs font-medium">{home.code}</span>
         </motion.button>
 
         {/* Away team card */}
@@ -208,7 +208,7 @@ export default function VoteTracker() {
           )}
           <span className="text-5xl leading-none">{away.flag}</span>
           <span className="text-base font-extrabold text-[#0F1B3A] text-center leading-tight">{away.name}</span>
-          <span className="text-[#0F1B3A]/45 text-xs font-medium">{away.code}</span>
+          <span className="text-[#0F1B3A]/65 text-xs font-medium">{away.code}</span>
         </motion.button>
       </div>
 
@@ -221,7 +221,7 @@ export default function VoteTracker() {
         >
           <div className="flex items-center justify-between text-xs font-bold mb-1.5">
             <span className="text-[#1A6B3C]">{home.code} {homePercent}%</span>
-            <span className="text-[#0F1B3A]/40 text-[11px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
+            <span className="text-[#0F1B3A]/60 text-[11px]">{totalVotes} vote{totalVotes !== 1 ? "s" : ""}</span>
             <span className="text-[#E54141]">{awayPercent}% {away.code}</span>
           </div>
           <div className="h-3 rounded-full bg-[#F5F0E8] overflow-hidden flex">

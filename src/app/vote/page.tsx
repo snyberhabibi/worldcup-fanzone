@@ -16,7 +16,7 @@ export default function VotePage() {
       </div>
 
       {/* Vote Tracker */}
-      <div className="flex-1 flex flex-col justify-center py-6">
+      <div className="py-4">
         <VoteTracker />
       </div>
     </div>

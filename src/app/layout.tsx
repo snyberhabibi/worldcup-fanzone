@@ -4,6 +4,8 @@ import "./globals.css";
 import { Poppins } from "next/font/google";
 import Script from "next/script";
 import BottomNav from "@/components/BottomNav";
+import InstallPrompt from "@/components/InstallPrompt";
+import PushOptIn from "@/components/PushOptIn";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -37,6 +39,8 @@ export default function RootLayout({
         <main className="pb-nav min-h-screen bg-cream">
           {children}
         </main>
+        <InstallPrompt />
+        <PushOptIn />
         <BottomNav />
         <Script id="sw-register" strategy="afterInteractive">
           {`if ('serviceWorker' in navigator) {

@@ -34,23 +34,23 @@ export default function MatchCard({ match, showVotes = false, compact = false }:
       <motion.div
         initial={{ opacity: 0, y: 6 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-xl px-4 py-3 flex items-center gap-3"
+        className="bg-white rounded-xl px-3 py-3 flex items-center gap-2 max-w-full overflow-hidden"
         style={{ boxShadow: "0 1px 6px rgba(15,27,58,0.04)" }}
       >
-        <div className="text-[#C9A24B]/70 text-xs font-semibold w-16 shrink-0 text-center">
+        <div className="text-[#C9A24B]/70 text-[11px] font-semibold w-14 shrink-0 text-center">
           {etToCt(match.time)} CT
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2 min-w-0">
-              <span className="text-lg leading-none">{home.flag}</span>
+          <div className="flex items-center justify-between gap-1.5">
+            <div className="flex items-center gap-1.5 min-w-0">
+              <span className="text-base leading-none shrink-0">{home.flag}</span>
               <span className="text-sm font-semibold text-[#0F1B3A] truncate">{home.code}</span>
             </div>
-            <span className="text-[#C9A24B]/40 text-xs font-bold">vs</span>
-            <div className="flex items-center gap-2 min-w-0 justify-end">
+            <span className="text-[#C9A24B]/40 text-[11px] font-bold shrink-0">vs</span>
+            <div className="flex items-center gap-1.5 min-w-0 justify-end">
               <span className="text-sm font-semibold text-[#0F1B3A] truncate">{away.code}</span>
-              <span className="text-lg leading-none">{away.flag}</span>
+              <span className="text-base leading-none shrink-0">{away.flag}</span>
             </div>
           </div>
         </div>
