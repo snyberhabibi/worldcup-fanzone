@@ -190,11 +190,20 @@ export default function HomePage() {
 
       {/* ═══ ORDER FOOD CTA ═══ */}
       <section className="px-5 pb-4">
-        <div className="card p-5 text-center">
+        <div className="card p-6 text-center">
+          {/* Yalla Bites Logo */}
+          <Image
+            src="/yallabites-logo.svg"
+            alt="Yalla Bites"
+            width={140}
+            height={40}
+            className="mx-auto mb-3"
+            unoptimized
+          />
           <p className="text-sm font-bold text-navy mb-1">
             Exclusive discounts for DAR Kitchen &amp; Catering
           </p>
-          <p className="text-navy/45 text-xs mb-3">
+          <p className="text-navy/50 text-xs mb-4">
             Order for pickup on Yalla Bites
           </p>
           <div className="flex items-center justify-center gap-3">
@@ -202,17 +211,17 @@ export default function HomePage() {
               href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-navy text-cream font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
+              className="active:scale-[0.96] transition-transform"
             >
-              App Store
+              <Image src="/appstore-badge.png" alt="Download on App Store" width={130} height={40} unoptimized />
             </a>
             <a
               href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-navy text-cream font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
+              className="active:scale-[0.96] transition-transform"
             >
-              Google Play
+              <Image src="/googleplay-badge.png" alt="Get it on Google Play" width={130} height={40} unoptimized />
             </a>
           </div>
         </div>

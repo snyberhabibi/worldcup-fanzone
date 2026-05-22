@@ -108,32 +108,37 @@ export default function RafflePage() {
         )}
 
         {/* Download Yalla Bites CTA */}
-        <div className="card p-5 text-center">
-          <Sparkles className="text-gold mx-auto mb-2" size={22} />
+        <div className="card p-6 text-center">
+          <Image
+            src="/yallabites-logo.svg"
+            alt="Yalla Bites"
+            width={140}
+            height={40}
+            className="mx-auto mb-3"
+            unoptimized
+          />
           <p className="text-sm font-bold text-navy mb-1">
-            Download Yalla Bites to increase your chances!
+            Exclusive discounts for DAR Kitchen &amp; Catering
           </p>
-          <p className="text-navy/55 text-xs mb-4">
-            Yalla Bites users get bonus raffle entries on match days.
+          <p className="text-navy/50 text-xs mb-4">
+            Order for pickup on Yalla Bites
           </p>
           <div className="flex items-center justify-center gap-3">
             <a
               href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gold/10 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
+              className="active:scale-[0.96] transition-transform"
             >
-              <Download size={14} />
-              App Store
+              <Image src="/appstore-badge.png" alt="Download on App Store" width={130} height={40} unoptimized />
             </a>
             <a
               href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-gold/10 text-gold font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-gold/20"
+              className="active:scale-[0.96] transition-transform"
             >
-              <Download size={14} />
-              Google Play
+              <Image src="/googleplay-badge.png" alt="Get it on Google Play" width={130} height={40} unoptimized />
             </a>
           </div>
         </div>
