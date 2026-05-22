@@ -25,14 +25,14 @@ export default function HomePage() {
           loop
           muted
           playsInline
-          className="absolute inset-0 w-full h-full object-cover opacity-50"
+          className="absolute inset-0 w-full h-full object-cover opacity-60"
           poster="/mascot/celebrating.png"
         >
           <source src="/video/stadium-bg.mp4" type="video/mp4" />
         </video>
 
         {/* Gradient overlay — lighter so video is more visible */}
-        <div className="absolute inset-0 bg-gradient-to-b from-cream/40 via-cream/30 to-cream/90" />
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/30 via-cream/20 to-cream/80" />
 
         {/* Floating gold particles */}
         {[...Array(6)].map((_, i) => (
