@@ -183,7 +183,7 @@ export default function CountdownTimer() {
     <motion.div
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white rounded-2xl p-6 relative overflow-hidden"
+      className="bg-white rounded-2xl p-6 sm:p-8 sm:px-12 relative overflow-hidden"
       style={{ boxShadow: "0 4px 20px rgba(15,27,58,0.06)" }}
     >
       {/* Mascot decoration */}
