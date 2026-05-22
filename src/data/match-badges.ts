@@ -2,11 +2,11 @@ import { MATCHES } from "@/data/schedule";
 
 /**
  * Match badge system for the schedule page.
- * Priority: RIVALRY > MUST WATCH > LOCAL DERBY > HOT
+ * Priority: RIVALRY > MUST WATCH > DFW GAME > HOT
  * Only one badge per match.
  */
 
-type BadgeType = "RIVALRY" | "MUST WATCH" | "LOCAL DERBY" | "HOT";
+type BadgeType = "RIVALRY" | "MUST WATCH" | "DFW GAME" | "HOT";
 
 interface MatchBadge {
   label: string;
@@ -22,8 +22,8 @@ const BADGE_STYLES: Record<BadgeType, MatchBadge> = {
     label: "MUST WATCH",
     color: "bg-red/10 text-red",
   },
-  "LOCAL DERBY": {
-    label: "LOCAL DERBY",
+  "DFW GAME": {
+    label: "DFW GAME",
     color: "bg-gold/10 text-[#7a6020]",
   },
   HOT: {
@@ -88,7 +88,7 @@ function isHot(home: string, away: string): boolean {
 
 /**
  * Get the badge for a match by ID.
- * Priority: RIVALRY > MUST WATCH > LOCAL DERBY > HOT
+ * Priority: RIVALRY > MUST WATCH > DFW GAME > HOT
  * Returns null if no badge applies.
  */
 export function getMatchBadge(matchId: number): MatchBadge | null {
@@ -107,7 +107,7 @@ export function getMatchBadge(matchId: number): MatchBadge | null {
   }
 
   if (isLocalDerby(match.venue)) {
-    return BADGE_STYLES["LOCAL DERBY"];
+    return BADGE_STYLES["DFW GAME"];
   }
 
   if (isHot(match.homeTeam, match.awayTeam)) {
