@@ -11,7 +11,7 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const DISMISS_KEY = "fanzone-install-dismissed";
-const DISMISS_DURATION = 3 * 24 * 60 * 60 * 1000; // 3 days
+const DISMISS_DURATION = 4 * 60 * 60 * 1000; // 4 hours — shows again every session basically
 
 function isIOS(): boolean {
   if (typeof navigator === "undefined") return false;

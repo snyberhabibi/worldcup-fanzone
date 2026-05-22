@@ -28,7 +28,7 @@ export default function HomePage() {
           className="absolute inset-0 w-full h-full object-cover opacity-20"
           poster="/mascot/celebrating.png"
         >
-          <source src="/video/stadium-bg.mp4" type="video/mp4" />
+          <source src="/video/mascot-hero.mp4" type="video/mp4" />
         </video>
 
         {/* Gradient overlay */}
@@ -146,50 +146,6 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ═══ MASCOT GALLERY — scrollable branded fans ═══ */}
-      <section className="py-8">
-        <h2 className="text-xs font-bold text-navy/40 uppercase tracking-[0.2em] mb-5 text-center">
-          Meet Our Fans
-        </h2>
-        <motion.div
-          className="flex gap-5 overflow-x-auto pb-3 px-6 snap-x snap-mandatory scrollbar-hide"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
-        >
-          {[
-            { src: "/mascot/saudi-fan.png", label: "Saudi Arabia" },
-            { src: "/mascot/usa-fan.png", label: "USA" },
-            { src: "/mascot/mexico-fan.png", label: "México" },
-            { src: "/mascot/argentina-fan.png", label: "Argentina" },
-            { src: "/mascot/japan-fan.png", label: "Japan" },
-            { src: "/mascot/celebrating.png", label: "Celebrating" },
-            { src: "/mascot/kicking.png", label: "Fufu Kicks" },
-          ].map((fan) => (
-            <motion.div
-              key={fan.label}
-              className="snap-center shrink-0 flex flex-col items-center gap-2"
-              variants={{
-                hidden: { opacity: 0, scale: 0.8 },
-                visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 20 } },
-              }}
-              whileHover={{ scale: 1.08, y: -4 }}
-            >
-              <div className="relative w-24 h-24 sm:w-28 sm:h-28">
-                <Image
-                  src={fan.src}
-                  alt={`Fufu ${fan.label} fan`}
-                  fill
-                  className="object-contain drop-shadow-lg"
-                />
-              </div>
-              <span className="text-[11px] font-bold text-navy/50">{fan.label}</span>
-            </motion.div>
-          ))}
-        </motion.div>
-      </section>
-
       {/* ═══ DOWNLOAD CTA ═══ */}
       <motion.section
         className="px-5 pb-6"
@@ -200,10 +156,10 @@ export default function HomePage() {
       >
         <div className="card p-6 text-center">
           <h3 className="text-base font-extrabold text-navy mb-1">
-            Order Food to the Fanzone
+            Order Food on Yalla Bites
           </h3>
           <p className="text-navy/45 text-xs mb-4 max-w-xs mx-auto">
-            Download Yalla Bites and get homemade food delivered while you watch.
+            From DAR Kitchen &amp; Catering. Homemade food delivered to the fanzone while you watch.
           </p>
           <div className="flex items-center justify-center gap-3">
             <a
