@@ -1,0 +1,28 @@
+{
+  "name": "World Cup Fanzone 2026 | DAR × Yalla × Haus",
+  "short_name": "Fanzone 2026",
+  "description": "Dallas's first World Cup fan zone. Vote, win raffles, and watch every match.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0F1B3A",
+  "theme_color": "#0F1B3A",
+  "orientation": "portrait",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["sports", "entertainment"],
+  "lang": "en",
+  "dir": "ltr"
+}

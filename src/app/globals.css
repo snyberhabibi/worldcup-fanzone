@@ -1,0 +1,176 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+:root {
+  --navy: #0F1B3A;
+  --navy-light: #1a2d54;
+  --cream: #F2EBDC;
+  --gold: #C9A24B;
+  --gold-light: #e3c877;
+  --red: #E54141;
+  --green: #1A6B3C;
+  --green-light: #2d8a52;
+  --burgundy: #5A2A2E;
+}
+
+@theme inline {
+  --color-navy: var(--navy);
+  --color-navy-light: var(--navy-light);
+  --color-cream: var(--cream);
+  --color-gold: var(--gold);
+  --color-gold-light: var(--gold-light);
+  --color-red: var(--red);
+  --color-green: var(--green);
+  --color-green-light: var(--green-light);
+  --color-burgundy: var(--burgundy);
+  --font-sans: 'Poppins', sans-serif;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background: var(--navy);
+  color: var(--cream);
+  min-height: 100vh;
+  overscroll-behavior-y: contain;
+}
+
+/* Stadium gradient background */
+.bg-stadium {
+  background: linear-gradient(
+    180deg,
+    var(--navy) 0%,
+    #0d1730 40%,
+    #112040 70%,
+    var(--green) 95%,
+    #15552f 100%
+  );
+}
+
+/* Gold shimmer text */
+.text-shimmer {
+  background: linear-gradient(90deg, var(--gold), var(--gold-light), var(--gold));
+  background-size: 200% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 3s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Card glass effect */
+.glass-card {
+  background: rgba(15, 27, 58, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(201, 162, 75, 0.15);
+  border-radius: 16px;
+}
+
+.glass-card-light {
+  background: rgba(242, 235, 220, 0.08);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(242, 235, 220, 0.12);
+  border-radius: 16px;
+}
+
+/* Vote button */
+.vote-btn {
+  min-height: 64px;
+  min-width: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  transition: all 0.15s ease;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+.vote-btn:active {
+  transform: scale(0.92);
+}
+
+/* Pitch lines pattern */
+.pitch-pattern {
+  position: relative;
+  overflow: hidden;
+}
+.pitch-pattern::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  height: 100px;
+  border: 2px solid rgba(255,255,255,0.06);
+  border-bottom: none;
+  border-radius: 100px 100px 0 0;
+}
+
+/* Bottom nav safe area */
+.pb-nav {
+  padding-bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 4px; }
+
+/* PWA status bar */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .safe-top { padding-top: env(safe-area-inset-top); }
+}
+
+/* Pulse animation for live indicator */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(1.5); }
+}
+.pulse-dot {
+  animation: pulse-dot 1.5s ease-in-out infinite;
+}
+
+/* Confetti burst */
+@keyframes confetti-fall {
+  0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+}
+
+/* Flag bounce */
+@keyframes flag-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.flag-bounce {
+  animation: flag-bounce 0.6s ease-in-out;
+}
+
+/* Match timer glow */
+.timer-glow {
+  text-shadow: 0 0 20px rgba(201, 162, 75, 0.5), 0 0 40px rgba(201, 162, 75, 0.2);
+}
+
+/* Trophy shimmer */
+@keyframes trophy-glow {
+  0%, 100% { filter: drop-shadow(0 0 8px rgba(201, 162, 75, 0.3)); }
+  50% { filter: drop-shadow(0 0 20px rgba(201, 162, 75, 0.6)); }
+}
+.trophy-glow {
+  animation: trophy-glow 2s ease-in-out infinite;
+}
