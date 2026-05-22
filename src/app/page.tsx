@@ -6,263 +6,157 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import CountdownTimer from "@/components/CountdownTimer";
 import PartnerLogos from "@/components/PartnerLogos";
-import { getEvents } from "@/lib/store";
-import { FanzoneEvent } from "@/types";
-import { MapPin, Clock, ChevronRight, Coffee, Paintbrush, UtensilsCrossed, Sparkles } from "lucide-react";
-
-const staggerContainer = {
-  hidden: {},
-  visible: { transition: { staggerChildren: 0.15 } },
-};
-
-const fadeUp = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 25 } },
-};
+import { Calendar, Vote, Gift, Trophy } from "lucide-react";
 
 export default function HomePage() {
-  const [events, setEvents] = useState<FanzoneEvent[]>([]);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    setEvents(getEvents().filter((e) => e.active));
   }, []);
 
   return (
-    <div className="min-h-screen relative">
-      {/* Floating decorative gold stars */}
-      <motion.div
-        className="absolute top-20 left-6 text-gold/20 text-lg pointer-events-none"
-        animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
-      >
-        &#10022;
-      </motion.div>
-      <motion.div
-        className="absolute top-36 right-10 text-gold/15 text-sm pointer-events-none"
-        animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-      >
-        &#10022;
-      </motion.div>
-      <motion.div
-        className="absolute top-64 left-16 text-gold/10 text-xl pointer-events-none"
-        animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-      >
-        &#10022;
-      </motion.div>
-      <motion.div
-        className="absolute top-80 right-8 text-gold/15 text-base pointer-events-none"
-        animate={{ y: [0, -8, 0], opacity: [0.3, 0.7, 0.3] }}
-        transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
-      >
-        &#10022;
-      </motion.div>
-
-      {/* Hero Section */}
-      <section
-        className="relative px-5 pt-14 pb-8 overflow-hidden bg-gradient-animated"
-      >
-        {/* Subtle soccer ball pattern overlay */}
-        <div className="absolute inset-0 soccer-pattern pointer-events-none" />
-
-        {/* Mascot with parallax float */}
-        <motion.div
-          className="relative mx-auto w-[200px] h-[200px] mb-6"
-          animate={{ y: [0, -15, 0] }}
-          transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+    <div className="min-h-screen relative overflow-hidden">
+      {/* ═══ HERO — Full viewport, breathtaking ═══ */}
+      <section className="relative min-h-[85vh] flex flex-col items-center justify-center px-6">
+        {/* Video background */}
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          poster="/mascot/celebrating.png"
         >
-          <div className="absolute inset-0 bg-gold/8 rounded-full blur-3xl" />
-          <Image
-            src="/mascot/saudi-fan.png"
-            alt="World Cup Mascot"
-            fill
-            className="object-contain drop-shadow-2xl"
-            priority
-          />
-        </motion.div>
+          <source src="/video/stadium-bg.mp4" type="video/mp4" />
+        </video>
 
-        {/* Title */}
-        <h1 className="text-center text-3xl sm:text-4xl font-black leading-tight tracking-tight mb-1">
-          <span className="text-navy">WORLD CUP </span>
-          <span className="text-shimmer">FANZONE</span>
-          <span className="text-navy"> 2026</span>
-        </h1>
-        <p className="text-center text-navy/55 text-sm font-medium mb-8 max-w-xs mx-auto">
-          Dallas&apos;s first World Cup fan zone
-        </p>
+        {/* Gradient overlay */}
+        <div className="absolute inset-0 bg-gradient-to-b from-cream/80 via-cream/60 to-cream" />
 
-        {/* Countdown */}
-        <div className="max-w-sm mx-auto">
-          <CountdownTimer />
+        {/* Floating gold particles */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute text-gold/20 pointer-events-none"
+            style={{
+              top: `${15 + i * 12}%`,
+              left: `${10 + (i * 17) % 80}%`,
+              fontSize: `${10 + (i % 3) * 6}px`,
+            }}
+            animate={{ y: [0, -12, 0], opacity: [0.15, 0.4, 0.15] }}
+            transition={{
+              repeat: Infinity,
+              duration: 2.5 + i * 0.5,
+              ease: "easeInOut",
+              delay: i * 0.3,
+            }}
+          >
+            ✦
+          </motion.div>
+        ))}
+
+        {/* Content */}
+        <div className="relative z-10 text-center">
+          {/* Mascot — floating, no white box */}
+          <motion.div
+            className="relative mx-auto w-48 h-48 sm:w-56 sm:h-56 mb-6"
+            animate={{ y: [0, -18, 0] }}
+            transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
+          >
+            <Image
+              src="/mascot/saudi-fan.png"
+              alt="Fufu the World Cup mascot"
+              fill
+              className="object-contain drop-shadow-2xl"
+              priority
+            />
+          </motion.div>
+
+          {/* Welcome text */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+          >
+            <p className="text-navy/50 text-xs font-semibold uppercase tracking-[0.2em] mb-2">
+              DAR Coffee × Yalla Bites × Haus of Design
+            </p>
+            <h1 className="text-4xl sm:text-5xl font-black text-navy leading-none mb-2">
+              Welcome to the
+            </h1>
+            <h2 className="text-4xl sm:text-5xl font-black leading-none mb-4">
+              <span className="text-shimmer">Fan Zone</span>
+            </h2>
+            <p className="text-navy/50 text-sm max-w-xs mx-auto mb-2">
+              Dallas&apos;s first World Cup watch party.
+              <br />Every match. June 11 — July 19, 2026.
+            </p>
+          </motion.div>
+
+          {/* Countdown */}
+          {mounted && (
+            <motion.div
+              className="max-w-sm mx-auto mt-6"
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.5, duration: 0.6 }}
+            >
+              <CountdownTimer />
+            </motion.div>
+          )}
         </div>
       </section>
 
-      {/* Partner Cards */}
-      <section className="px-5 py-6">
-        <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-4">
-          Presented by
-        </h2>
-        <motion.div
-          className="flex gap-3 overflow-x-auto pb-2 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide"
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          variants={staggerContainer}
-        >
-          {/* DAR Coffee */}
-          <motion.div className="card p-4 min-w-[220px] snap-start shrink-0" variants={fadeUp}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
-                <Coffee size={20} className="text-gold" />
-              </div>
-              <div>
-                <p className="text-sm font-extrabold text-navy">DAR Coffee</p>
-                <p className="text-[11px] text-navy/55 font-medium">Host Venue</p>
-              </div>
-            </div>
-            <p className="text-xs text-navy/50 leading-relaxed">
-              Premium Saudi specialty coffee. Every match day, every goal, every sip.
-            </p>
-          </motion.div>
-
-          {/* Haus of Design */}
-          <motion.div className="card p-4 min-w-[220px] snap-start shrink-0" variants={fadeUp}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
-                <Paintbrush size={20} className="text-gold" />
-              </div>
-              <div>
-                <p className="text-sm font-extrabold text-navy">Haus of Design</p>
-                <p className="text-[11px] text-navy/55 font-medium">Decor Partner</p>
-              </div>
-            </div>
-            <p className="text-xs text-navy/50 leading-relaxed">
-              Transforming our fanzone into an immersive World Cup stadium experience.
-            </p>
-          </motion.div>
-
-          {/* Yalla Bites */}
-          <motion.div className="card p-4 min-w-[220px] snap-start shrink-0" variants={fadeUp}>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-xl bg-gold/10 flex items-center justify-center">
-                <UtensilsCrossed size={20} className="text-gold" />
-              </div>
-              <div>
-                <p className="text-sm font-extrabold text-navy">Yalla Bites</p>
-                <p className="text-[11px] text-navy/55 font-medium">Food Partner</p>
-              </div>
-            </div>
-            <p className="text-xs text-navy/50 leading-relaxed">
-              Homemade Arab food from Dallas&apos;s best home chefs, delivered to the fanzone.
-            </p>
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* Watch Locations */}
-      {mounted && events.length > 0 && (
-        <section className="px-5 py-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em]">
-              Watch Locations
-            </h2>
-            <span className="flex items-center gap-1.5 text-green text-xs font-semibold">
-              <span className="pulse-dot inline-block w-2 h-2 rounded-full bg-green" />
-              Active
-            </span>
-          </div>
-          <motion.div
-            className="space-y-3"
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-            variants={staggerContainer}
-          >
-            {events.map((event) => (
-              <motion.div key={event.id} className="card p-4 flex items-center gap-4" variants={fadeUp}>
-                <div className="w-10 h-10 rounded-xl bg-green/10 flex items-center justify-center shrink-0">
-                  <MapPin size={18} className="text-green" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-bold text-navy truncate">{event.name}</p>
-                  <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-[11px] text-navy/55">{event.address}</span>
-                    <span className="text-[11px] text-navy/50">{event.time}</span>
-                  </div>
-                </div>
-                <ChevronRight size={16} className="text-navy/20 shrink-0" />
-              </motion.div>
-            ))}
-          </motion.div>
-        </section>
-      )}
-
-      {/* Quick Actions */}
-      <section className="px-5 py-6">
+      {/* ═══ QUICK ACTIONS — Simple, big, tappable ═══ */}
+      <section className="px-5 -mt-8 relative z-20">
         <motion.div
           className="grid grid-cols-2 gap-3"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={staggerContainer}
+          variants={{
+            hidden: {},
+            visible: { transition: { staggerChildren: 0.1 } },
+          }}
         >
-          <motion.div variants={fadeUp}>
-            <Link
-              href="/schedule"
-              className="card p-5 flex flex-col items-center gap-2.5 text-center active:scale-[0.97] transition-transform block"
+          {[
+            { href: "/schedule", icon: Calendar, label: "Match Schedule", sub: "104 matches", color: "text-green" },
+            { href: "/vote", icon: Vote, label: "Vote Now", sub: "Who wins?", color: "text-red" },
+            { href: "/raffle", icon: Gift, label: "Win Prizes", sub: "Enter raffle", color: "text-gold" },
+            { href: "/schedule#groups", icon: Trophy, label: "Groups", sub: "48 teams", color: "text-navy" },
+          ].map((item) => (
+            <motion.div
+              key={item.href}
+              variants={{
+                hidden: { opacity: 0, y: 20 },
+                visible: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 25 } },
+              }}
             >
-              <span className="text-3xl">&#128197;</span>
-              <span className="text-sm font-bold text-navy">Full Schedule</span>
-              <span className="text-[11px] text-navy/55">104 matches</span>
-            </Link>
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <Link
-              href="/vote"
-              className="card p-5 flex flex-col items-center gap-2.5 text-center active:scale-[0.97] transition-transform block"
-            >
-              <span className="text-3xl">&#128499;&#65039;</span>
-              <span className="text-sm font-bold text-navy">Vote Now</span>
-              <span className="text-[11px] text-navy/55">Who wins?</span>
-            </Link>
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <Link
-              href="/raffle"
-              className="card p-5 flex flex-col items-center gap-2.5 text-center active:scale-[0.97] transition-transform block"
-            >
-              <span className="text-3xl">&#127873;</span>
-              <span className="text-sm font-bold text-navy">Win Prizes</span>
-              <span className="text-[11px] text-navy/55">Enter raffle</span>
-            </Link>
-          </motion.div>
-          <motion.div variants={fadeUp}>
-            <Link
-              href="/schedule#groups"
-              className="card p-5 flex flex-col items-center gap-2.5 text-center active:scale-[0.97] transition-transform block"
-            >
-              <span className="text-3xl">&#9917;</span>
-              <span className="text-sm font-bold text-navy">Groups</span>
-              <span className="text-[11px] text-navy/55">48 teams</span>
-            </Link>
-          </motion.div>
+              <Link
+                href={item.href}
+                className="card p-5 flex flex-col items-center gap-2 text-center block active:scale-[0.96] transition-transform"
+              >
+                <item.icon size={26} className={item.color} />
+                <span className="text-sm font-bold text-navy">{item.label}</span>
+                <span className="text-[11px] text-navy/45">{item.sub}</span>
+              </Link>
+            </motion.div>
+          ))}
         </motion.div>
       </section>
 
-      {/* Mascot Gallery — branded fans */}
-      <section className="px-5 py-6">
-        <h2 className="text-xs font-bold text-navy/50 uppercase tracking-[0.15em] mb-4 text-center">
+      {/* ═══ MASCOT GALLERY — scrollable branded fans ═══ */}
+      <section className="py-8">
+        <h2 className="text-xs font-bold text-navy/40 uppercase tracking-[0.2em] mb-5 text-center">
           Meet Our Fans
         </h2>
         <motion.div
-          className="flex gap-4 overflow-x-auto pb-3 -mx-5 px-5 snap-x snap-mandatory scrollbar-hide"
+          className="flex gap-5 overflow-x-auto pb-3 px-6 snap-x snap-mandatory scrollbar-hide"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true }}
-          variants={staggerContainer}
+          variants={{ hidden: {}, visible: { transition: { staggerChildren: 0.1 } } }}
         >
           {[
             { src: "/mascot/saudi-fan.png", label: "Saudi Arabia" },
@@ -270,13 +164,19 @@ export default function HomePage() {
             { src: "/mascot/mexico-fan.png", label: "México" },
             { src: "/mascot/argentina-fan.png", label: "Argentina" },
             { src: "/mascot/japan-fan.png", label: "Japan" },
+            { src: "/mascot/celebrating.png", label: "Celebrating" },
+            { src: "/mascot/kicking.png", label: "Fufu Kicks" },
           ].map((fan) => (
             <motion.div
               key={fan.label}
               className="snap-center shrink-0 flex flex-col items-center gap-2"
-              variants={fadeUp}
+              variants={{
+                hidden: { opacity: 0, scale: 0.8 },
+                visible: { opacity: 1, scale: 1, transition: { type: "spring" as const, stiffness: 300, damping: 20 } },
+              }}
+              whileHover={{ scale: 1.08, y: -4 }}
             >
-              <div className="relative w-28 h-28 sm:w-32 sm:h-32">
+              <div className="relative w-24 h-24 sm:w-28 sm:h-28">
                 <Image
                   src={fan.src}
                   alt={`Fufu ${fan.label} fan`}
@@ -284,37 +184,35 @@ export default function HomePage() {
                   className="object-contain drop-shadow-lg"
                 />
               </div>
-              <span className="text-[11px] font-bold text-navy/60">{fan.label}</span>
+              <span className="text-[11px] font-bold text-navy/50">{fan.label}</span>
             </motion.div>
           ))}
         </motion.div>
       </section>
 
-      {/* Download Yalla Bites */}
+      {/* ═══ DOWNLOAD CTA ═══ */}
       <motion.section
-        className="px-5 py-6"
-        initial={{ opacity: 0, y: 40 }}
+        className="px-5 pb-6"
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
         viewport={{ once: true }}
-        transition={{ type: "spring", stiffness: 300, damping: 25 }}
+        transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
       >
-        <div className="card p-6 text-center relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-32 h-32 bg-gold/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl" />
-          <Sparkles className="text-gold mx-auto mb-3" size={28} />
-          <h3 className="text-lg font-extrabold text-navy mb-1">
+        <div className="card p-6 text-center">
+          <h3 className="text-base font-extrabold text-navy mb-1">
             Order Food to the Fanzone
           </h3>
-          <p className="text-navy/50 text-xs mb-5 max-w-xs mx-auto">
-            Download Yalla Bites and get homemade Arab food delivered while you watch the match.
+          <p className="text-navy/45 text-xs mb-4 max-w-xs mx-auto">
+            Download Yalla Bites and get homemade food delivered while you watch.
           </p>
           <div className="flex items-center justify-center gap-3">
             <a
               href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-cream text-navy font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-navy/10"
+              className="bg-navy text-cream font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
               </svg>
               App Store
@@ -323,9 +221,9 @@ export default function HomePage() {
               href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-cream text-navy font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.97] transition-transform border border-navy/10"
+              className="bg-navy text-cream font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 0 1 0 1.38l-2.302 2.302-2.533-2.533 2.533-2.451zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/>
               </svg>
               Google Play
@@ -334,14 +232,10 @@ export default function HomePage() {
         </div>
       </motion.section>
 
-      {/* Partner Logos */}
-      <section className="px-5 py-8">
+      {/* ═══ PARTNER LOGOS + FOOTER ═══ */}
+      <div className="px-5 pb-6">
         <PartnerLogos />
-      </section>
-
-      {/* Footer text */}
-      <div className="text-center pb-4 px-5">
-        <p className="text-navy/20 text-[11px]">
+        <p className="text-navy/20 text-[11px] text-center mt-4">
           &copy; 2026 World Cup Fanzone Dallas. Not affiliated with FIFA.
         </p>
       </div>
