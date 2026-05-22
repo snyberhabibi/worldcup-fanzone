@@ -146,49 +146,79 @@ export default function HomePage() {
         </motion.div>
       </section>
 
-      {/* ═══ DOWNLOAD CTA ═══ */}
-      <motion.section
-        className="px-5 pb-6"
-        initial={{ opacity: 0, y: 30 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ type: "spring" as const, stiffness: 300, damping: 25 }}
-      >
-        <div className="card p-6 text-center">
-          <h3 className="text-base font-extrabold text-navy mb-1">
-            Order Food on Yalla Bites
-          </h3>
-          <p className="text-navy/45 text-xs mb-4 max-w-xs mx-auto">
-            From DAR Kitchen &amp; Catering. Homemade food delivered to the fanzone while you watch.
+      {/* ═══ SPONSOR INSTAGRAMS ═══ */}
+      <section className="px-5 py-6">
+        <h2 className="text-xs font-bold text-navy/40 uppercase tracking-[0.2em] mb-4 text-center">
+          Follow Us
+        </h2>
+        <div className="flex items-center justify-center gap-6">
+          <a
+            href="https://www.instagram.com/darcoffeeofficial"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1.5 group"
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </div>
+            <span className="text-[11px] font-bold text-navy/60 group-hover:text-navy transition-colors">@darcoffeeofficial</span>
+          </a>
+          <a
+            href="https://www.instagram.com/yallabitesapp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1.5 group"
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </div>
+            <span className="text-[11px] font-bold text-navy/60 group-hover:text-navy transition-colors">@yallabitesapp</span>
+          </a>
+          <a
+            href="https://www.instagram.com/hausofdesignevents"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex flex-col items-center gap-1.5 group"
+          >
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-[#f09433] via-[#e6683c] to-[#bc1888] flex items-center justify-center">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+            </div>
+            <span className="text-[11px] font-bold text-navy/60 group-hover:text-navy transition-colors">@hausofdesignevents</span>
+          </a>
+        </div>
+      </section>
+
+      {/* ═══ ORDER FOOD CTA ═══ */}
+      <section className="px-5 pb-4">
+        <div className="card p-5 text-center">
+          <p className="text-sm font-bold text-navy mb-1">
+            Exclusive discounts for DAR Kitchen &amp; Catering
+          </p>
+          <p className="text-navy/45 text-xs mb-3">
+            Order for pickup on Yalla Bites
           </p>
           <div className="flex items-center justify-center gap-3">
             <a
               href="https://apps.apple.com/us/app/yalla-bites/id6753923330"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-navy text-cream font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
+              className="bg-navy text-cream font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
-              </svg>
               App Store
             </a>
             <a
               href="https://play.google.com/store/apps/details?id=com.yallabites"
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-navy text-cream font-bold text-xs py-3 px-5 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
+              className="bg-navy text-cream font-bold text-xs py-2.5 px-4 rounded-xl flex items-center gap-2 active:scale-[0.96] transition-transform"
             >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 0 1-.61-.92V2.734a1 1 0 0 1 .609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.199l2.302 2.302a1 1 0 0 1 0 1.38l-2.302 2.302-2.533-2.533 2.533-2.451zM5.864 2.658L16.8 8.99l-2.302 2.302-8.635-8.635z"/>
-              </svg>
               Google Play
             </a>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* ═══ PARTNER LOGOS + FOOTER ═══ */}
+      {/* ═══ FOOTER ═══ */}
       <div className="px-5 pb-6">
         <PartnerLogos />
         <p className="text-navy/20 text-[11px] text-center mt-4">
