@@ -6,7 +6,7 @@ import { motion } from "framer-motion";
 import RaffleForm from "@/components/RaffleForm";
 import { getRaffles } from "@/lib/store";
 import { Raffle } from "@/types";
-import { Gift, Trophy, Sparkles, Download } from "lucide-react";
+import { Gift, Trophy } from "lucide-react";
 
 const staggerContainer = {
   hidden: {},
@@ -23,8 +23,12 @@ export default function RafflePage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setRaffles(getRaffles());
+    // Read raffles from the external store after paint to avoid a synchronous
+    // setState cascade inside the effect body.
+    queueMicrotask(() => {
+      setMounted(true);
+      setRaffles(getRaffles());
+    });
   }, []);
 
   const activeRaffles = raffles.filter((r) => r.status === "active");

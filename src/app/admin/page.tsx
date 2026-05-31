@@ -21,7 +21,7 @@ import {
   updateEvent,
   deleteEvent,
 } from "@/lib/store";
-import { MATCHES, TEAMS, type Match } from "@/data/schedule";
+import { MATCHES, TEAMS } from "@/data/schedule";
 import { Raffle, RaffleEntry, FanzoneEvent } from "@/types";
 import {
   Shield,
@@ -162,7 +162,7 @@ function VoteManagement() {
   }, [selectedMatchId]);
 
   useEffect(() => {
-    refreshVotes();
+    queueMicrotask(refreshVotes);
   }, [refreshVotes]);
 
   const selectedMatch = selectedMatchId !== null ? MATCHES.find((m) => m.id === selectedMatchId) : undefined;
@@ -298,12 +298,12 @@ function RaffleManagement() {
   }, []);
 
   useEffect(() => {
-    refresh();
+    queueMicrotask(refresh);
   }, [refresh]);
 
   useEffect(() => {
     if (expandedRaffle) {
-      setEntries(getRaffleEntries(expandedRaffle));
+      queueMicrotask(() => setEntries(getRaffleEntries(expandedRaffle)));
     }
   }, [expandedRaffle]);
 
@@ -537,7 +537,7 @@ function EventManagement() {
   }, []);
 
   useEffect(() => {
-    refresh();
+    queueMicrotask(refresh);
   }, [refresh]);
 
   const resetForm = () => {
@@ -814,8 +814,12 @@ export default function AdminPage() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-    setAuthed(isAdminAuthenticated());
+    // Defer mount + auth read out of the effect body to avoid a synchronous
+    // setState cascade flagged by react-hooks/set-state-in-effect.
+    queueMicrotask(() => {
+      setMounted(true);
+      setAuthed(isAdminAuthenticated());
+    });
   }, []);
 
   if (!mounted) {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { MATCHES, GROUPS, TEAMS, type Match } from "@/data/schedule";
 import { getMatchBadge } from "@/data/match-badges";
 import MatchCard from "@/components/MatchCard";

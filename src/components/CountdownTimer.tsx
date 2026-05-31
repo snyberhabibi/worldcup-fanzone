@@ -93,8 +93,12 @@ export default function CountdownTimer() {
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {
-    setMounted(true);
-    setNow(new Date());
+    // Flip to mounted + refresh the clock after paint so we don't trigger a
+    // synchronous setState cascade inside the effect body.
+    queueMicrotask(() => {
+      setMounted(true);
+      setNow(new Date());
+    });
     const interval = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);

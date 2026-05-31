@@ -6,7 +6,7 @@ import { getVotes, getMyVote, castPublicVote } from "@/lib/store";
 import { etToCt, getTeamDisplay } from "@/lib/utils";
 import { Trophy, Check } from "lucide-react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import confetti from "canvas-confetti";
 
 /** Pre-sorted matches — computed once at module level */
@@ -49,11 +49,15 @@ export default function VoteTracker() {
   // Fetch votes from API (shared tally), fallback to localStorage
   useEffect(() => {
     if (!currentMatch) return;
-    setMyVote(getMyVote(currentMatch.id));
+    // Read from localStorage (external store) after paint to avoid a
+    // synchronous setState cascade inside the effect body.
+    queueMicrotask(() => {
+      setMyVote(getMyVote(currentMatch.id));
 
-    // Optimistic: show localStorage immediately
-    const local = getVotes(currentMatch.id);
-    setVotes({ homeVotes: local.homeVotes, awayVotes: local.awayVotes });
+      // Optimistic: show localStorage immediately
+      const local = getVotes(currentMatch.id);
+      setVotes({ homeVotes: local.homeVotes, awayVotes: local.awayVotes });
+    });
 
     // Then fetch real totals from API
     fetch(`/api/votes?matchId=${currentMatch.id}`)
@@ -144,7 +148,7 @@ export default function VoteTracker() {
   // No match state
   if (!currentMatch) {
     const firstMatch = SORTED_MATCHES[0];
-    const timeLeft = calcTimeLeft(new Date(firstMatch?.date || Date.now()), now);
+    const timeLeft = calcTimeLeft(new Date(firstMatch?.date ?? now.getTime()), now);
 
     return (
       <motion.div

@@ -6,6 +6,8 @@ import Script from "next/script";
 import BottomNav from "@/components/BottomNav";
 import InstallPrompt from "@/components/InstallPrompt";
 import PushOptIn from "@/components/PushOptIn";
+import { SmoothScroll, ScrollProgressBar } from "@/components/providers/smooth-scroll";
+import { SceneCanvas } from "@/components/three/scene-canvas";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -36,9 +38,17 @@ export default function RootLayout({
         <meta property="og:type" content="website" />
       </head>
       <body className={`${poppins.className} antialiased`}>
-        <main className="pb-nav min-h-screen bg-cream">
-          {children}
-        </main>
+        <SceneCanvas />
+        <ScrollProgressBar />
+        <SmoothScroll>
+          {/* No opaque background here: the body is cream (globals.css) and the
+              fixed WebGL canvas sits at -z-10 behind it. An opaque bg-cream on
+              <main> would cover the canvas, hiding AmbientField + the HostGlobe
+              View. Sections that need a solid backdrop set their own bg. */}
+          <main className="pb-nav min-h-screen">
+            {children}
+          </main>
+        </SmoothScroll>
         <InstallPrompt />
         <PushOptIn />
         <BottomNav />

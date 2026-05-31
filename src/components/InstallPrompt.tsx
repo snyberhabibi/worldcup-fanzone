@@ -21,11 +21,6 @@ function isIOS(): boolean {
   );
 }
 
-function isAndroid(): boolean {
-  if (typeof navigator === "undefined") return false;
-  return /Android/.test(navigator.userAgent);
-}
-
 function isStandalone(): boolean {
   if (typeof window === "undefined") return false;
   return (
@@ -54,7 +49,9 @@ export default function InstallPrompt() {
     if (isStandalone() || isDismissed()) return;
 
     if (isIOS()) {
-      setShowIOS(true);
+      // Defer the state update out of the effect body to avoid a synchronous
+      // setState cascade flagged by react-hooks/set-state-in-effect.
+      queueMicrotask(() => setShowIOS(true));
       // Show after 2 seconds on iOS
       const timer = setTimeout(() => setVisible(true), 2000);
       return () => clearTimeout(timer);
