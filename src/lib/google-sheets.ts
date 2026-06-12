@@ -8,8 +8,11 @@ import type {
   DrawResult,
 } from "@/types";
 
-const SHEET_ID =
-  process.env.GOOGLE_SHEET_ID || "10ch5yHsnDt_YNvf-D7LbFc_ZvaAfJksqFJ5kUo7zw68";
+const SHEET_ID = (
+  process.env.GOOGLE_SHEET_ID || "10ch5yHsnDt_YNvf-D7LbFc_ZvaAfJksqFJ5kUo7zw68"
+)
+  .replace(/\\n/g, "")
+  .trim(); // env value was saved with a trailing "\n" → "Requested entity was not found"
 
 function getAuth() {
   // Defensively strip stray whitespace / escaped newlines from env values — a
