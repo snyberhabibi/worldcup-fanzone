@@ -10,6 +10,7 @@ import { QrTile } from "./QrTile";
 import { SpinWheel } from "./SpinWheel";
 import { Splash } from "@/components/Splash";
 import { useHydrated } from "@/lib/use-hydrated";
+import { FullscreenButton } from "@/components/FullscreenButton";
 
 export function BoardApp() {
   const mounted = useHydrated();
@@ -81,9 +82,12 @@ export function BoardApp() {
           <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>{stageLabel(match)}</p>
           <p className="text-dim" style={{ fontSize: "0.85rem" }}>{full}</p>
         </div>
-        <div className={`live ${status === "closed" ? "live--closed" : ""}`}>
-          <span className="live__dot" />
-          {status === "closed" ? "Voting paused" : "Live voting"}
+        <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
+          <div className={`live ${status === "closed" ? "live--closed" : ""}`}>
+            <span className="live__dot" />
+            {status === "closed" ? "Voting paused" : "Live voting"}
+          </div>
+          <FullscreenButton />
         </div>
       </header>
 

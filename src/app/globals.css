@@ -114,19 +114,16 @@ input {
     radial-gradient(75% 60% at 82% 12%, rgba(255, 68, 68, 0.16) 0%, transparent 62%),
     radial-gradient(90% 80% at 50% 120%, rgba(250, 249, 246, 0.08) 0%, transparent 60%),
     linear-gradient(170deg, var(--bg-2) 0%, var(--bg-1) 45%, var(--bg-0) 100%);
+  animation: aurora-breathe 14s ease-in-out infinite;
 }
+/* Cinematic vignette for depth (replaces the old grid lines). */
 .arcade-bg::after {
   content: "";
   position: absolute;
   inset: 0;
   z-index: 0;
   pointer-events: none;
-  background-image:
-    linear-gradient(rgba(250, 249, 246, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(250, 249, 246, 0.035) 1px, transparent 1px);
-  background-size: 64px 64px;
-  mask-image: radial-gradient(120% 100% at 50% 0%, #000 35%, transparent 85%);
-  -webkit-mask-image: radial-gradient(120% 100% at 50% 0%, #000 35%, transparent 85%);
+  background: radial-gradient(125% 95% at 50% 32%, transparent 52%, rgba(4, 8, 18, 0.55) 100%);
 }
 .screen > * {
   position: relative;
@@ -237,7 +234,7 @@ input {
   background: var(--yb-cream);
   color: var(--ink);
   border-radius: var(--radius);
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 /* ═══ Team cards (pick screen + board) ═══ */
@@ -252,7 +249,7 @@ input {
   border: 2px solid rgba(15, 27, 58, 0.1);
   background: var(--yb-cream);
   color: var(--ink);
-  box-shadow: 0 18px 44px rgba(7, 16, 31, 0.45);
+  box-shadow: 0 18px 44px rgba(7, 16, 31, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.7);
   padding: clamp(1rem, 3vw, 2.5rem);
   transition: transform 0.15s, box-shadow 0.2s, border-color 0.2s, background 0.2s;
   overflow: hidden;
@@ -551,6 +548,10 @@ input {
   0% { box-shadow: 0 0 0 0 var(--yb-red-glow); }
   70% { box-shadow: 0 0 0 12px transparent; }
   100% { box-shadow: 0 0 0 0 transparent; }
+}
+@keyframes aurora-breathe {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
 }
 @keyframes float {
   0%, 100% { transform: translateY(0); }

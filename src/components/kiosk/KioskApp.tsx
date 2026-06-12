@@ -13,6 +13,7 @@ import { SuccessScreen } from "./SuccessScreen";
 import { BaristaPanel } from "./BaristaPanel";
 import { Splash } from "@/components/Splash";
 import { useHydrated } from "@/lib/use-hydrated";
+import { FullscreenButton } from "@/components/FullscreenButton";
 
 type Phase = "attract" | "entry" | "pick" | "success";
 
@@ -123,25 +124,34 @@ export function KioskApp() {
         <p className="text-dim">This kiosk is built for landscape.</p>
       </div>
 
-      <button
-        onClick={() => setPanelOpen(true)}
-        aria-label="Barista controls"
+      <div
         style={{
           position: "absolute",
           top: "calc(env(safe-area-inset-top, 0px) + 10px)",
           left: "calc(env(safe-area-inset-left, 0px) + 10px)",
           zIndex: 30,
-          width: 44,
-          height: 44,
-          borderRadius: 12,
-          background: "rgba(250,249,246,0.06)",
-          border: "1px solid var(--line)",
-          fontSize: 20,
-          opacity: 0.45,
+          display: "flex",
+          flexDirection: "column",
+          gap: 8,
         }}
       >
-        ⚙️
-      </button>
+        <button
+          onClick={() => setPanelOpen(true)}
+          aria-label="Barista controls"
+          style={{
+            width: 44,
+            height: 44,
+            borderRadius: 12,
+            background: "rgba(250,249,246,0.06)",
+            border: "1px solid var(--line)",
+            fontSize: 20,
+            opacity: 0.45,
+          }}
+        >
+          ⚙️
+        </button>
+        <FullscreenButton />
+      </div>
 
       {phase === "attract" && (
         <AttractScreen match={match} status={status} onStart={startVote} />
