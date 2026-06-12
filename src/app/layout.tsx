@@ -18,7 +18,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "DAR × Yalla Bites — World Cup Vote",
+  title: "DAR × Yalla Bites × Haus of Design — World Cup Vote",
   description:
     "Vote your team head-to-head and enter to win free Yalla Bites — live at DAR Coffee.",
   manifest: "/manifest.json",

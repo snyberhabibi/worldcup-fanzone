@@ -77,7 +77,7 @@ export function AttractScreen({
       }}
     >
       <div style={{ textAlign: "center" }}>
-        <p className="eyebrow">DAR Coffee × Yalla Bites · {stageLabel(match)}</p>
+        <p className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design · {stageLabel(match)}</p>
         <p className="text-dim" style={{ marginTop: 6 }}>{full}</p>
       </div>
 

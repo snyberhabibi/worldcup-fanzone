@@ -16,7 +16,7 @@ export default function LauncherPage() {
         }}
       >
         <div style={{ textAlign: "center" }}>
-          <p className="eyebrow">DAR Coffee × Yalla Bites</p>
+          <p className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design</p>
           <h1
             className="display"
             style={{ fontSize: "clamp(2.4rem, 7vw, 5rem)", marginTop: "0.4rem" }}

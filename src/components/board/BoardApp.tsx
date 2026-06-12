@@ -75,7 +75,7 @@ export function BoardApp() {
         <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/yallabites-logo.svg" alt="Yalla Bites" style={{ height: 36 }} />
-          <span className="eyebrow">DAR Coffee × Yalla Bites</span>
+          <span className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design</span>
         </div>
         <div style={{ textAlign: "center" }}>
           <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>{stageLabel(match)}</p>
