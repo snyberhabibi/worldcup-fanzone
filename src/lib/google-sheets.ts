@@ -12,8 +12,11 @@ const SHEET_ID =
   process.env.GOOGLE_SHEET_ID || "10ch5yHsnDt_YNvf-D7LbFc_ZvaAfJksqFJ5kUo7zw68";
 
 function getAuth() {
-  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
-  const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY?.replace(/\\n/g, "\n");
+  // Defensively strip stray whitespace / escaped newlines from env values — a
+  // trailing "\n" on the email makes Google report "invalid_grant: account not
+  // found", and serverless env injection can re-wrap multiline keys.
+  const email = process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL?.replace(/\\n/g, "").trim();
+  const key = process.env.GOOGLE_SERVICE_ACCOUNT_KEY?.replace(/\\n/g, "\n").trim();
   if (!email || !key) {
     throw new Error("Missing Google service account credentials");
   }
