@@ -43,6 +43,20 @@ function TeamCard({
       <span className="team__flag">{t.flag}</span>
       <span className="team__name">{t.name}</span>
       <span className="team__code">{t.code}</span>
+      {pending === null && (
+        <span
+          className="pill"
+          style={{
+            marginTop: "0.7rem",
+            background: "color-mix(in srgb, var(--accent) 16%, transparent)",
+            color: "var(--accent)",
+            borderColor: "color-mix(in srgb, var(--accent) 45%, transparent)",
+            fontSize: "clamp(0.8rem, 1.4vw, 1rem)",
+          }}
+        >
+          👆 TAP TO VOTE
+        </span>
+      )}
     </button>
   );
 }
@@ -132,7 +146,7 @@ export function PickScreen({
         minHeight: 0,
       }}
     >
-      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem" }}>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", paddingLeft: "clamp(2.4rem, 5vw, 3.2rem)" }}>
         <div>
           <p className="eyebrow">{stageLabel(match)} · {full}</p>
           <h1 className="display" style={{ fontSize: "clamp(1.8rem, 5vw, 3rem)" }}>

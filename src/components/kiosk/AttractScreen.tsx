@@ -12,13 +12,28 @@ function TeamMini({ t }: { t: ResolvedTeam }) {
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
+        justifyContent: "center",
         gap: "0.4rem",
-        padding: "clamp(1.1rem, 3.5vw, 2.4rem)",
-        minWidth: "clamp(140px, 24vw, 280px)",
+        padding: "clamp(1.1rem, 3vw, 2.2rem)",
+        width: "clamp(230px, 30vw, 360px)",
+        minHeight: "clamp(220px, 34vh, 300px)",
+        flexShrink: 0,
       }}
     >
       <span className="team__flag anim-float">{t.flag}</span>
-      <span className="display" style={{ fontSize: "clamp(1.1rem, 3vw, 2.2rem)", textAlign: "center", color: "var(--navy)" }}>
+      <span
+        className="display"
+        style={{
+          fontSize: "clamp(1.1rem, 2.5vw, 2rem)",
+          textAlign: "center",
+          color: "var(--navy)",
+          lineHeight: 1.05,
+          display: "-webkit-box",
+          WebkitLineClamp: 2,
+          WebkitBoxOrient: "vertical",
+          overflow: "hidden",
+        }}
+      >
         {t.name}
       </span>
       <span

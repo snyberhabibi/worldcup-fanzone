@@ -219,7 +219,9 @@ input {
   width: 100%;
 }
 .btn:disabled {
-  opacity: 0.4;
+  background: rgba(250, 249, 246, 0.1);
+  color: rgba(250, 249, 246, 0.45);
+  box-shadow: none;
   pointer-events: none;
 }
 
@@ -264,9 +266,21 @@ input {
 .team__accent {
   position: absolute;
   inset: 0;
-  opacity: 0.16;
+  opacity: 0.22;
   z-index: 0;
-  background: radial-gradient(80% 60% at 50% 0%, var(--accent, var(--yb-gold)) 0%, transparent 70%);
+  background: radial-gradient(90% 55% at 50% 0%, var(--accent, var(--yb-gold)) 0%, transparent 72%);
+}
+/* Team-color top stripe so the cream cards carry the team identity. */
+.team::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  z-index: 1;
+  background: var(--accent, var(--yb-gold));
+  opacity: 0.9;
 }
 .team > * {
   position: relative;

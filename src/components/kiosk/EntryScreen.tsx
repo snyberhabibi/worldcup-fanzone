@@ -66,7 +66,7 @@ export function EntryScreen({
 
   return (
     <div style={{ flex: 1, display: "flex", flexDirection: "column", padding: "clamp(1rem, 3vw, 2rem)", gap: "1rem", minHeight: 0 }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingLeft: "clamp(2.4rem, 5vw, 3.2rem)" }}>
         <div>
           <p className="eyebrow">Step 1 of 2</p>
           <h1 className="display" style={{ fontSize: "clamp(1.6rem, 4vw, 2.6rem)" }}>
