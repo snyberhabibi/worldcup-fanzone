@@ -1,28 +1,18 @@
 {
-  "name": "World Cup Fanzone 2026 | DAR × Yalla × Haus",
-  "short_name": "Fanzone 2026",
-  "description": "Dallas's first World Cup fan zone. Vote, win raffles, and watch every match.",
+  "name": "DAR × Yalla Bites — World Cup Vote",
+  "short_name": "DAR Vote",
+  "description": "Vote your team and enter to win free Yalla Bites at DAR Coffee.",
   "start_url": "/",
-  "display": "standalone",
-  "background_color": "#F5F0E8",
-  "theme_color": "#F5F0E8",
-  "orientation": "portrait",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#160f0d",
+  "theme_color": "#160f0d",
   "scope": "/",
   "icons": [
-    {
-      "src": "/icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "/icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
   ],
-  "categories": ["sports", "entertainment"],
+  "categories": ["sports", "entertainment", "food"],
   "lang": "en",
   "dir": "ltr"
 }

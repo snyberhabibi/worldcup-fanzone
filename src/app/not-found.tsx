@@ -1,29 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 text-center">
-      <div className="relative w-40 h-40 mb-6">
-        <Image
-          src="/mascot/fan.png"
-          alt="Fan mascot looking confused"
-          fill
-          className="object-contain drop-shadow-lg"
-        />
+    <main className="screen arcade-bg safe" style={{ alignItems: "center", justifyContent: "center" }}>
+      <div style={{ textAlign: "center", display: "flex", flexDirection: "column", gap: "1.2rem", alignItems: "center", padding: "2rem" }}>
+        <span className="emoji" style={{ fontSize: "3.5rem" }}>🧭</span>
+        <h1 className="display" style={{ fontSize: "clamp(1.6rem, 5vw, 2.6rem)" }}>
+          Page not found
+        </h1>
+        <p className="text-dim" style={{ maxWidth: 380 }}>
+          That screen took a wrong turn. Back to the launcher.
+        </p>
+        <Link href="/" className="btn btn--red btn--lg">
+          Go home
+        </Link>
       </div>
-      <h1 className="text-2xl font-extrabold text-[#0F1B3A] mb-2">
-        Page Not Found
-      </h1>
-      <p className="text-[#0F1B3A]/50 text-sm max-w-xs mb-8">
-        Looks like this page took a wrong turn. Let&apos;s get you back to the fanzone.
-      </p>
-      <Link
-        href="/"
-        className="bg-[#9A7A30] text-white font-bold text-sm px-6 py-3 rounded-xl active:scale-[0.97] transition-transform"
-      >
-        Go Home
-      </Link>
-    </div>
+    </main>
   );
 }
