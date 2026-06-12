@@ -6,12 +6,27 @@ import type { SessionStatus } from "@/types";
 
 function TeamMini({ t }: { t: ResolvedTeam }) {
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem", minWidth: 0 }}>
+    <div
+      className="card-cream"
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        gap: "0.4rem",
+        padding: "clamp(1.1rem, 3.5vw, 2.4rem)",
+        minWidth: "clamp(140px, 24vw, 280px)",
+      }}
+    >
       <span className="team__flag anim-float">{t.flag}</span>
-      <span className="display" style={{ fontSize: "clamp(1.1rem, 3vw, 2.2rem)", textAlign: "center" }}>
+      <span className="display" style={{ fontSize: "clamp(1.1rem, 3vw, 2.2rem)", textAlign: "center", color: "var(--navy)" }}>
         {t.name}
       </span>
-      <span className="team__code">{t.code}</span>
+      <span
+        className="display"
+        style={{ color: "var(--yb-sage)", letterSpacing: "0.16em", fontSize: "clamp(0.8rem, 1.6vw, 1.1rem)" }}
+      >
+        {t.code}
+      </span>
     </div>
   );
 }
