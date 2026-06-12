@@ -11,6 +11,7 @@ import { SpinWheel } from "./SpinWheel";
 import { Splash } from "@/components/Splash";
 import { useHydrated } from "@/lib/use-hydrated";
 import { FullscreenButton } from "@/components/FullscreenButton";
+import { KickoffCountdown } from "./KickoffCountdown";
 
 export function BoardApp() {
   const mounted = useHydrated();
@@ -72,15 +73,27 @@ export function BoardApp() {
       className="screen arcade-bg safe"
       style={{ padding: "clamp(1rem, 2.5vw, 2rem)", gap: "clamp(0.75rem, 2vh, 1.5rem)" }}
     >
+      <div
+        aria-hidden
+        style={{
+          position: "absolute",
+          inset: 0,
+          zIndex: 0,
+          pointerEvents: "none",
+          background:
+            "radial-gradient(55% 60% at 16% 44%, rgba(255,68,68,0.16) 0%, transparent 62%), radial-gradient(55% 60% at 84% 44%, rgba(47,212,192,0.15) 0%, transparent 62%)",
+        }}
+      />
       <header style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "1rem", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "0.7rem" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src="/yallabites-logo.svg" alt="Yalla Bites" style={{ height: 36 }} />
           <span className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design</span>
         </div>
-        <div style={{ textAlign: "center" }}>
+        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
           <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>{stageLabel(match)}</p>
           <p className="text-dim" style={{ fontSize: "0.85rem" }}>{full}</p>
+          <KickoffCountdown match={match} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
           <div className={`live ${status === "closed" ? "live--closed" : ""}`}>

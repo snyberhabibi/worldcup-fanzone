@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { resolveTeam, type ResolvedTeam } from "@/lib/games";
 import { burstConfetti } from "@/lib/celebrate";
+import { useCountUp } from "@/lib/use-count-up";
 import type { Match } from "@/data/schedule";
 import type { Tally } from "@/types";
 
@@ -21,6 +22,7 @@ function TeamColumn({
 }) {
   const color = side === "home" ? "var(--home)" : "var(--away)";
   const glow = side === "home" ? "var(--home-glow)" : "var(--away-glow)";
+  const shown = useCountUp(count);
   return (
     <div
       style={{
@@ -42,7 +44,7 @@ function TeamColumn({
         className="display"
         style={{ fontSize: "clamp(2.6rem, 9vw, 7rem)", color, textShadow: `0 0 28px ${glow}`, lineHeight: 1 }}
       >
-        {count}
+        {shown}
       </span>
       {leading && <span className="pill pill--gold">LEADING</span>}
     </div>
@@ -55,6 +57,7 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
   const h = tally?.home ?? 0;
   const a = tally?.away ?? 0;
   const total = h + a;
+  const totalShown = useCountUp(total);
   const hp = total ? (h / total) * 100 : 50;
   const ap = 100 - hp;
 
@@ -128,7 +131,7 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
       </div>
 
       <p className="eyebrow" style={{ textAlign: "center" }}>
-        {total} {total === 1 ? "vote" : "votes"} · one vote per phone
+        {totalShown} {total === 1 ? "vote" : "votes"} · one vote per phone
       </p>
     </div>
   );

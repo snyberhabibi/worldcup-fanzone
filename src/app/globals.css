@@ -553,6 +553,18 @@ input {
   0%, 100% { opacity: 0.9; transform: scale(1); }
   50% { opacity: 1; transform: scale(1.05); }
 }
+@keyframes sparkle {
+  0%, 100% { opacity: 0; transform: scale(0.3); }
+  50% { opacity: 1; transform: scale(1); }
+}
+.sparkle {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, var(--yb-gold) 55%, transparent 72%);
+  animation: sparkle 3.5s ease-in-out infinite;
+  filter: drop-shadow(0 0 5px var(--yb-gold-glow));
+  pointer-events: none;
+}
 @keyframes float {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-12px); }

@@ -46,6 +46,35 @@ function TeamMini({ t }: { t: ResolvedTeam }) {
   );
 }
 
+const SPARKLES: { top: string; left: string; s: number; delay: string; dur: string }[] = [
+  { top: "14%", left: "7%", s: 9, delay: "0s", dur: "3.6s" },
+  { top: "24%", left: "93%", s: 6, delay: "1.2s", dur: "4.1s" },
+  { top: "68%", left: "5%", s: 7, delay: "0.6s", dur: "3.2s" },
+  { top: "82%", left: "91%", s: 10, delay: "2s", dur: "4.6s" },
+  { top: "16%", left: "68%", s: 5, delay: "1.8s", dur: "3.9s" },
+  { top: "58%", left: "80%", s: 6, delay: "0.3s", dur: "3.4s" },
+  { top: "42%", left: "3%", s: 5, delay: "2.4s", dur: "4.2s" },
+  { top: "9%", left: "44%", s: 5, delay: "1s", dur: "3.7s" },
+  { top: "88%", left: "38%", s: 7, delay: "0.9s", dur: "4s" },
+  { top: "52%", left: "96%", s: 5, delay: "1.5s", dur: "3.3s" },
+  { top: "30%", left: "18%", s: 4, delay: "2.7s", dur: "4.4s" },
+  { top: "75%", left: "62%", s: 6, delay: "0.5s", dur: "3.8s" },
+];
+
+function Sparkles() {
+  return (
+    <div aria-hidden style={{ position: "absolute", inset: 0, overflow: "hidden", pointerEvents: "none", zIndex: -1 }}>
+      {SPARKLES.map((sp, i) => (
+        <span
+          key={i}
+          className="sparkle"
+          style={{ top: sp.top, left: sp.left, width: sp.s, height: sp.s, animationDelay: sp.delay, animationDuration: sp.dur }}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function AttractScreen({
   match,
   status,
@@ -76,6 +105,7 @@ export function AttractScreen({
         cursor: closed ? "default" : "pointer",
       }}
     >
+      <Sparkles />
       <div style={{ textAlign: "center" }}>
         <p className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design · {stageLabel(match)}</p>
         <p className="text-dim" style={{ marginTop: 6 }}>{full}</p>
