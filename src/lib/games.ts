@@ -112,3 +112,55 @@ const STAGE_LABELS: Record<Match["stage"], string> = {
 export function stageLabel(match: Match): string {
   return match.group ? `Group ${match.group}` : STAGE_LABELS[match.stage];
 }
+
+// ── Today's slate (Central time) ──────────────────────────────
+// The calendar day a kickoff falls on in US Central. Precomputed once since
+// match datetimes are static, so the board can recompute "today" cheaply.
+function ctDayKey(d: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    timeZone: CT_ZONE,
+  }).format(d);
+}
+
+const MATCH_CT_DAY = new Map<number, string>(
+  BY_KICKOFF.map((m) => [m.id, ctDayKey(kickoff(m))])
+);
+
+export function matchStatus(match: Match, now: Date): "live" | "final" | "upcoming" {
+  if (isLive(match, now)) return "live";
+  if (hasEnded(match, now)) return "final";
+  return "upcoming";
+}
+
+/**
+ * Matches on "today" in Central time. If today has no games (a rest day),
+ * falls back to the next day that does, so the board panel is never empty.
+ */
+export function matchesOnDay(now: Date): {
+  isToday: boolean;
+  label: string;
+  matches: Match[];
+} {
+  const todayKey = ctDayKey(now);
+  let matches = BY_KICKOFF.filter((m) => MATCH_CT_DAY.get(m.id) === todayKey);
+  const isToday = matches.length > 0;
+  if (!isToday) {
+    const next = BY_KICKOFF.find((m) => kickoff(m).getTime() >= now.getTime());
+    if (next) {
+      const nextKey = MATCH_CT_DAY.get(next.id);
+      matches = BY_KICKOFF.filter((m) => MATCH_CT_DAY.get(m.id) === nextKey);
+    }
+  }
+  const label = matches.length
+    ? new Intl.DateTimeFormat("en-US", {
+        weekday: "long",
+        month: "short",
+        day: "numeric",
+        timeZone: CT_ZONE,
+      }).format(kickoff(matches[0]))
+    : "";
+  return { isToday, label, matches };
+}

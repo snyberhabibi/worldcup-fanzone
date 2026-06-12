@@ -5,7 +5,7 @@ import { usePoll } from "@/lib/use-poll";
 import { getMatch, pickDefaultMatchId, stageLabel, formatKickoffCT } from "@/lib/games";
 import type { SessionState, Tally, Entrant, DrawResult } from "@/types";
 import { VoteBars } from "./VoteBars";
-import { UpNext } from "./UpNext";
+import { TodaySchedule } from "./TodaySchedule";
 import { QrTile } from "./QrTile";
 import { SpinWheel } from "./SpinWheel";
 import { Splash } from "@/components/Splash";
@@ -63,6 +63,9 @@ export function BoardApp() {
 
   if (!mounted) return <Splash />;
 
+  // Fresh on each ~2s poll re-render → keeps live/final status + day rollover current.
+  const now = new Date();
+
   return (
     <main
       className="screen arcade-bg safe"
@@ -87,8 +90,8 @@ export function BoardApp() {
       <VoteBars match={match} tally={liveTally} />
 
       <footer style={{ display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", alignItems: "stretch", flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 360px", minWidth: 0 }}>
-          <UpNext currentId={matchId} />
+        <div style={{ flex: "1 1 520px", minWidth: 0 }}>
+          <TodaySchedule currentId={matchId} now={now} />
         </div>
         <QrTile />
       </footer>
