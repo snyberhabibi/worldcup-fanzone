@@ -2,15 +2,19 @@
 
 import { QRCodeSVG } from "qrcode.react";
 
-export function VoteQrTile() {
+export function VoteQrTile({ compact = false }: { compact?: boolean }) {
   const base = typeof window !== "undefined" ? window.location.origin : "https://fifa.yallabites.com";
   const url = `${base}/vote`;
+  const size = compact ? 116 : 140;
   return (
-    <div className="qr-tile" style={{ border: "2px solid var(--yb-gold)" }}>
-      <div className="qr-tile__qr">
+    <div
+      className="qr-tile"
+      style={{ border: "2px solid var(--yb-gold)", ...(compact ? { padding: "clamp(0.7rem, 1.4vw, 1rem)", gap: "clamp(0.7rem, 1.4vw, 1rem)" } : {}) }}
+    >
+      <div className="qr-tile__qr" style={compact ? { padding: 8 } : undefined}>
         <QRCodeSVG
           value={url}
-          size={140}
+          size={size}
           bgColor="#ffffff"
           fgColor="#0f1b3a"
           level="M"
@@ -19,15 +23,17 @@ export function VoteQrTile() {
         />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-        <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.3rem, 2.1vw, 1.8rem)", lineHeight: 1 }}>
+        <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.2rem, 2vw, 1.7rem)", lineHeight: 1 }}>
           📲 Scan to vote
         </p>
-        <p style={{ color: "var(--yb-cocoa)", fontWeight: 800, fontSize: "clamp(0.95rem, 1.5vw, 1.15rem)" }}>
+        <p style={{ color: "var(--yb-cocoa)", fontWeight: 800, fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)" }}>
           Can&apos;t reach the iPad? Vote from your phone.
         </p>
-        <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.78rem, 1.1vw, 0.92rem)" }}>
-          Pick your team &amp; enter to win free Yalla Bites
-        </p>
+        {!compact && (
+          <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.78rem, 1.1vw, 0.92rem)" }}>
+            Pick your team &amp; enter to win free Yalla Bites
+          </p>
+        )}
       </div>
     </div>
   );

@@ -14,19 +14,35 @@ import type { SessionState, SessionStatus, StoredSession } from "@/types";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const EMPTY: StoredSession = { pinnedMatchId: null, manualStatus: "", updatedAt: "", lastDraw: null };
+const EMPTY: StoredSession = {
+  pinnedMatchId: null,
+  manualStatus: "",
+  pinSticky: false,
+  updatedAt: "",
+  lastDraw: null,
+};
 
-// Derive the live slot + status from the clock, honouring a barista pin/pause
-// until that slot ends (then auto-progression resumes).
+// Derive the live slot + status. By default the slot is clock-derived and
+// auto-advances. A barista pin overrides that:
+//   • sticky pin (barista explicitly jumped to a game) — honoured until they
+//     press "Auto", even for a game whose slot has already ended (so they can
+//     go back and spin a finished game's raffle);
+//   • transient pin (auto-set when pausing voting) — honoured only until that
+//     slot ends, so a forgotten pause can't freeze auto-progression all day.
 async function effectiveSession(): Promise<SessionState> {
   const now = new Date();
   const stored = await cached("session-row", 1000, () => getSession());
 
+  const pinId = stored?.pinnedMatchId ?? null;
+  const honorPin =
+    !!(pinId && getMatch(pinId)) &&
+    (stored!.pinSticky || !isSlotEnded(pinId!, now));
+
   let games;
   let manual: SessionStatus | "" = "";
-  if (stored?.pinnedMatchId && getMatch(stored.pinnedMatchId) && !isSlotEnded(stored.pinnedMatchId, now)) {
-    games = slotGamesOf(stored.pinnedMatchId);
-    manual = stored.manualStatus || "";
+  if (honorPin) {
+    games = slotGamesOf(pinId!);
+    manual = stored!.manualStatus || "";
   } else {
     games = currentSlotGames(now);
   }
@@ -38,7 +54,7 @@ async function effectiveSession(): Promise<SessionState> {
   let lastDraw = stored?.lastDraw ?? null;
   if (lastDraw && !matchIds.includes(lastDraw.matchId)) lastDraw = null;
 
-  return { matchIds, status, updatedAt: stored?.updatedAt ?? "", lastDraw };
+  return { matchIds, status, pinned: honorPin, updatedAt: stored?.updatedAt ?? "", lastDraw };
 }
 
 export async function GET() {
@@ -49,6 +65,7 @@ export async function GET() {
     return NextResponse.json({
       matchIds: currentSlotGames(new Date()).map((g) => g.id),
       status: "open",
+      pinned: false,
       updatedAt: "",
       lastDraw: null,
     } satisfies SessionState);
@@ -64,24 +81,30 @@ export async function POST(req: NextRequest) {
     const cur = (await getSession()) ?? EMPTY;
     const next: StoredSession = { ...cur, updatedAt: now.toISOString() };
 
-    // Barista pins a game → feature its (1+ game) slot.
+    // Barista pins a game → feature its (1+ game) slot. Explicit = sticky.
     if (body.matchId != null) {
       const id = Number(body.matchId);
       if (!getMatch(id))
         return NextResponse.json({ error: "invalid matchId" }, { status: 400 });
       next.pinnedMatchId = id;
       next.manualStatus = "";
-      next.lastDraw = null;
+      next.pinSticky = true;
+      next.lastDraw = null; // re-pinning clears any prior draw so the wheel won't replay
     }
     // Resume automatic progression.
     if (body.clearPin || body.auto) {
       next.pinnedMatchId = null;
       next.manualStatus = "";
+      next.pinSticky = false;
     }
-    // Pause / resume voting (pins the current slot so the override sticks to it).
+    // Pause / resume voting. Scopes to the current slot via a TRANSIENT pin
+    // (auto-clears at slot end) — only if not already on an explicit sticky pin.
     if (body.status === "open" || body.status === "closed") {
       next.manualStatus = body.status;
-      if (next.pinnedMatchId == null) next.pinnedMatchId = currentSlotGames(now)[0]?.id ?? null;
+      if (next.pinnedMatchId == null) {
+        next.pinnedMatchId = currentSlotGames(now)[0]?.id ?? null;
+        next.pinSticky = false;
+      }
     }
     if (body.clearDraw) next.lastDraw = null;
 

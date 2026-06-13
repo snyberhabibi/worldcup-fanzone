@@ -249,6 +249,7 @@ export function MobileVote() {
         <BaristaPanel
           matchId={matchIds[0]}
           status={status}
+          pinned={session?.pinned ?? false}
           onChanged={refresh}
           onClose={() => setPanelOpen(false)}
           sound={sound}

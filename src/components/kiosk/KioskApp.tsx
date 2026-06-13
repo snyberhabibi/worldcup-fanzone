@@ -214,6 +214,7 @@ export function KioskApp() {
         <BaristaPanel
           matchId={slotIds[0]}
           status={status}
+          pinned={session?.pinned ?? false}
           onChanged={refresh}
           onClose={() => setPanelOpen(false)}
           sound={sound}

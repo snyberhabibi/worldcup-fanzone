@@ -51,7 +51,7 @@ const HEADERS: Record<string, string[]> = {
     "phone",
     "consent",
   ],
-  [TAB_SESSION]: ["matchId", "status", "updatedAt", "lastDraw"],
+  [TAB_SESSION]: ["matchId", "status", "updatedAt", "lastDraw", "pinSticky"],
   [TAB_WINNERS]: ["ts", "matchId", "matchup", "firstName", "phone"],
   [TAB_SMS]: ["ts", "phone", "type", "status", "detail"],
 };
@@ -203,7 +203,7 @@ export async function getSession(): Promise<StoredSession | null> {
   const sheets = getSheets();
   const res = await sheets.spreadsheets.values.get({
     spreadsheetId: SHEET_ID,
-    range: `${TAB_SESSION}!A2:D2`,
+    range: `${TAB_SESSION}!A2:E2`,
   });
   const r = res.data.values?.[0];
   if (!r || (!r[0] && !r[1] && !r[3])) return null;
@@ -220,6 +220,7 @@ export async function getSession(): Promise<StoredSession | null> {
     manualStatus: r[1] === "open" || r[1] === "closed" ? r[1] : "",
     updatedAt: r[2] || "",
     lastDraw,
+    pinSticky: String(r[4]).toUpperCase() === "TRUE",
   };
 }
 
@@ -228,7 +229,7 @@ export async function setSession(s: StoredSession): Promise<void> {
   const sheets = getSheets();
   await sheets.spreadsheets.values.update({
     spreadsheetId: SHEET_ID,
-    range: `${TAB_SESSION}!A2:D2`,
+    range: `${TAB_SESSION}!A2:E2`,
     valueInputOption: "RAW",
     requestBody: {
       values: [
@@ -237,6 +238,7 @@ export async function setSession(s: StoredSession): Promise<void> {
           s.manualStatus,
           s.updatedAt,
           s.lastDraw ? JSON.stringify(s.lastDraw) : "",
+          s.pinSticky ? "TRUE" : "",
         ],
       ],
     },

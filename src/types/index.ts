@@ -40,19 +40,26 @@ export interface DrawResult {
 }
 
 /** Live voting state shared with kiosk + board. matchIds = the current slot
- *  (1+ simultaneous games → stacked voting). */
+ *  (1+ simultaneous games → stacked voting). `pinned` = a barista manual
+ *  override is active (auto-progression paused until "Auto" is pressed). */
 export interface SessionState {
   matchIds: number[];
   status: SessionStatus;
+  pinned: boolean;
   updatedAt: string;
   lastDraw: DrawResult | null;
 }
 
 /** What's persisted in the KioskSession tab — just the barista override; the
- *  live slot + open/closed status are derived from the clock. */
+ *  live slot + open/closed status are derived from the clock.
+ *  `pinSticky` distinguishes an explicit game pin (barista jumped to a game —
+ *  persists until "Auto" is pressed, even past slot end) from a transient
+ *  pause-scope pin (auto-clears when its slot ends, so a forgotten pause can't
+ *  freeze auto-progression all day). */
 export interface StoredSession {
   pinnedMatchId: number | null;
   manualStatus: SessionStatus | "";
+  pinSticky: boolean;
   updatedAt: string;
   lastDraw: DrawResult | null;
 }

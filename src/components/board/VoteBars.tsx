@@ -33,16 +33,16 @@ function TeamColumn({
         minWidth: 0,
       }}
     >
-      <span className="team__flag" style={{ fontSize: "clamp(3rem, 9vw, 7rem)" }}>{t.flag}</span>
+      <span className="team__flag" style={{ fontSize: "clamp(2.4rem, 7.5vh, 5.5rem)" }}>{t.flag}</span>
       <span
         className="display"
-        style={{ fontSize: "clamp(1.3rem, 4vw, 3rem)", textAlign: align, lineHeight: 1 }}
+        style={{ fontSize: "clamp(1.2rem, 3.4vh, 2.4rem)", textAlign: align, lineHeight: 1 }}
       >
         {t.name}
       </span>
       <span
         className="display"
-        style={{ fontSize: "clamp(2.6rem, 9vw, 7rem)", color, textShadow: `0 0 28px ${glow}`, lineHeight: 1 }}
+        style={{ fontSize: "clamp(2.2rem, 7.5vh, 5.5rem)", color, textShadow: `0 0 28px ${glow}`, lineHeight: 1 }}
       >
         {shown}
       </span>
@@ -74,13 +74,13 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
-        gap: "clamp(1rem, 3vh, 2.5rem)",
+        gap: "clamp(0.6rem, 2vh, 1.6rem)",
         minHeight: 0,
       }}
     >
       <div style={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: "clamp(1rem, 3vw, 3rem)" }}>
         <TeamColumn t={home} count={h} side="home" leading={total > 0 && h >= a} align="left" />
-        <p className="display text-gold" style={{ fontSize: "clamp(2rem, 6vw, 4.5rem)", textAlign: "center" }}>VS</p>
+        <p className="display text-gold" style={{ fontSize: "clamp(1.8rem, 6vh, 4rem)", textAlign: "center" }}>VS</p>
         <TeamColumn t={away} count={a} side="away" leading={total > 0 && a > h} align="right" />
       </div>
 
@@ -88,7 +88,7 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
       <div
         style={{
           display: "flex",
-          height: "clamp(48px, 7vh, 84px)",
+          height: "clamp(38px, 5.5vh, 72px)",
           borderRadius: 16,
           overflow: "hidden",
           border: "1px solid var(--line)",

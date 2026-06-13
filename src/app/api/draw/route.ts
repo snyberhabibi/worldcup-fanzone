@@ -69,6 +69,7 @@ export async function POST(req: NextRequest) {
     await setSession({
       pinnedMatchId: cur?.pinnedMatchId ?? null,
       manualStatus: cur?.manualStatus ?? "",
+      pinSticky: cur?.pinSticky ?? false,
       updatedAt: ts,
       lastDraw: draw,
     });

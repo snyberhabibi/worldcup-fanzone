@@ -12,6 +12,7 @@ import {
   matchup as matchupOf,
   resolveTeam,
   isSlotOpen,
+  isSlotEnded,
   slotGamesOf,
 } from "@/lib/games";
 import { normalizePhone, isValidUSPhone, sanitizeFirstName } from "@/lib/format";
@@ -43,14 +44,17 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "invalid phone" }, { status: 400 });
 
     // Voting for this game is closed if its slot is past halftime (auto), unless
-    // the barista has a manual open/closed override on the pinned slot.
+    // the barista has a manual open/closed override on the pinned slot. The
+    // manual "open" override never reaches past a slot's full-time end, so a
+    // barista pinning a finished game to spin its raffle can't also collect
+    // stale late votes into the pool.
     const now = new Date();
     const stored = await cached("session-row", 1500, () => getSession());
     const inPinnedSlot =
       stored?.pinnedMatchId != null &&
       slotGamesOf(stored.pinnedMatchId).some((g) => g.id === matchId);
     const open =
-      inPinnedSlot && stored?.manualStatus
+      inPinnedSlot && stored?.manualStatus && !isSlotEnded(matchId, now)
         ? stored.manualStatus === "open"
         : isSlotOpen(matchId, now);
     if (!open)

@@ -85,7 +85,12 @@ export function BoardApp() {
   return (
     <main
       className="screen arcade-bg safe"
-      style={{ padding: "clamp(1rem, 2.5vw, 2rem)", gap: "clamp(0.75rem, 2vh, 1.5rem)" }}
+      style={{
+        padding: "clamp(0.75rem, 2vw, 1.5rem)",
+        gap: "clamp(0.6rem, 1.5vh, 1.1rem)",
+        height: "100svh",
+        overflow: "hidden",
+      }}
     >
       <div
         aria-hidden
@@ -132,12 +137,21 @@ export function BoardApp() {
         <GameTally match={primary} compact={false} />
       )}
 
-      <footer style={{ display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", alignItems: "stretch", flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 380px", minWidth: 0 }}>
+      <footer
+        style={{
+          display: "flex",
+          gap: "clamp(0.6rem, 1.4vw, 1.1rem)",
+          alignItems: "stretch",
+          flexWrap: "nowrap",
+          flexShrink: 0,
+          height: "clamp(150px, 23vh, 210px)",
+        }}
+      >
+        <div style={{ flex: "1 1 0", minWidth: 0, overflow: "hidden" }}>
           <TodaySchedule currentIds={matchIds} now={now} />
         </div>
-        <VoteQrTile />
-        <QrTile />
+        <VoteQrTile compact />
+        <QrTile compact />
       </footer>
 
       {draw && (

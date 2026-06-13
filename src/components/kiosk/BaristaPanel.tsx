@@ -17,12 +17,14 @@ const PIN_LEN = 4;
 export function BaristaPanel({
   matchId,
   status,
+  pinned,
   onChanged,
   onClose,
   sound,
 }: {
   matchId: number;
   status: SessionStatus;
+  pinned: boolean;
   onChanged: () => void;
   onClose: () => void;
   sound: SoundApi;
@@ -96,6 +98,12 @@ export function BaristaPanel({
     sound.play("select");
     setDrawMsg(null);
     control({ matchId: id });
+  };
+  // Hand control back to the clock: clear the pin so the live slot auto-advances.
+  const resumeAuto = () => {
+    sound.play("tap");
+    setDrawMsg(null);
+    control({ auto: true });
   };
   const setStatus = (s: SessionStatus) => {
     sound.play("tap");
@@ -204,7 +212,9 @@ export function BaristaPanel({
           <div style={{ display: "flex", flexDirection: "column", gap: "0.9rem", overflow: "hidden", minHeight: 0 }}>
             {/* Current game */}
             <div style={{ background: "#fff", borderRadius: 16, padding: "0.9rem 1rem", boxShadow: "0 4px 16px rgba(0,0,0,0.06)" }}>
-              <p className="eyebrow" style={{ color: "var(--yb-sage)" }}>Now voting</p>
+              <p className="eyebrow" style={{ color: pinned ? "var(--yb-red)" : "var(--yb-sage)" }}>
+                {pinned ? "⏸ Manual override · pinned" : "● Now voting · auto (live)"}
+              </p>
               <p className="display" style={{ fontSize: "1.4rem", color: "var(--yb-cocoa)" }}>
                 {current
                   ? `${resolveTeam(current.homeTeam).name} vs ${resolveTeam(current.awayTeam).name}`
@@ -215,9 +225,17 @@ export function BaristaPanel({
                 {status === "closed" ? " · PAUSED" : ""}
               </p>
               <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.7rem", flexWrap: "wrap" }}>
-                <button className="btn btn--ghost" style={ctrlBtn} onClick={() => nav(-1)} disabled={busy}>◀ Prev</button>
-                <button className="btn btn--ghost" style={ctrlBtn} onClick={() => selectMatch(defaultId)} disabled={busy}>● Now</button>
-                <button className="btn btn--ghost" style={ctrlBtn} onClick={() => nav(1)} disabled={busy}>Next ▶</button>
+                <button className="btn btn--ghost" style={ctrlBtn} onClick={() => nav(-1)} disabled={busy}>◀ Prev game</button>
+                <button className="btn btn--ghost" style={ctrlBtn} onClick={() => nav(1)} disabled={busy}>Next game ▶</button>
+                <button
+                  className="btn"
+                  style={{ ...ctrlBtn, background: pinned ? "var(--yb-gold)" : "rgba(74,55,40,0.06)", color: "var(--yb-cocoa)", opacity: pinned ? 1 : 0.55 }}
+                  onClick={resumeAuto}
+                  disabled={busy || !pinned}
+                  title="Resume automatic progression (jump to the live game)"
+                >
+                  🔴 Auto (live)
+                </button>
                 <button
                   className="btn"
                   style={{ ...ctrlBtn, background: status === "closed" ? "var(--yb-gold)" : "rgba(74,55,40,0.1)", color: "var(--yb-cocoa)" }}
@@ -227,6 +245,11 @@ export function BaristaPanel({
                   {status === "closed" ? "▶ Resume voting" : "⏸ Pause voting"}
                 </button>
               </div>
+              {pinned && (
+                <p style={{ color: "var(--yb-sage)", fontSize: "0.78rem", marginTop: "0.5rem" }}>
+                  Auto-progression is paused. Press <b>Auto (live)</b> to jump back to the live game and resume automatic switching.
+                </p>
+              )}
             </div>
 
             {/* Raffle draw */}
