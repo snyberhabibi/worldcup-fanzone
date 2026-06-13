@@ -14,6 +14,7 @@ import { maskPhone } from "@/lib/format";
 import { checkPin } from "@/lib/auth";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { sendSms, winnerSms } from "@/lib/quo";
+import { alertOps } from "@/lib/slack";
 import type { DrawResult, Winner } from "@/types";
 
 export const runtime = "nodejs";
@@ -77,24 +78,30 @@ export async function POST(req: NextRequest) {
     bust("votelog");
 
     // Winner SMS — once per phone ever (first win delivers the YALLA20 code).
-    // Subsequent wins (e.g. an in-person gift on another game) are recorded but
-    // don't re-text the same code. Never blocks the draw.
+    // Sent synchronously (not in after()) so the barista sees delivery status in
+    // the console and can read the code aloud / re-spin if it failed — this is
+    // the one message with real money attached. The board's wheel already spun
+    // off the session lastDraw written above, so this await never delays the
+    // on-screen reveal. Subsequent wins on an already-won phone aren't re-texted.
+    let smsStatus: "sent" | "failed" | "dry-run" | "skipped" = "skipped";
     if (!wonAnything.has(pick.phone)) {
-      after(async () => {
-        const r = await sendSms(pick.phone, winnerSms());
-        await appendSmsLog({
+      const r = await sendSms(pick.phone, winnerSms());
+      smsStatus = r.ok ? (r.skipped ? "dry-run" : "sent") : "failed";
+      after(() =>
+        appendSmsLog({
           ts: new Date().toISOString(),
           phone: pick.phone,
           type: "winner",
-          status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
+          status: smsStatus,
           detail: r.error || "",
-        }).catch(() => {});
-      });
+        }).catch(() => {})
+      );
     }
 
-    return NextResponse.json({ ok: true, draw });
+    return NextResponse.json({ ok: true, draw, smsStatus });
   } catch (e) {
     console.error("draw POST", e);
+    after(() => alertOps("a raffle draw failed"));
     return NextResponse.json({ error: "failed to draw" }, { status: 500 });
   }
 }

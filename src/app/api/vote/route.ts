@@ -16,18 +16,19 @@ import {
   slotGamesOf,
 } from "@/lib/games";
 import { normalizePhone, isValidUSPhone, sanitizeFirstName } from "@/lib/format";
-import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { sendSms, welcomeSms, repeatVoteSms } from "@/lib/quo";
-import { notifyCrm, signupMessage } from "@/lib/slack";
+import { notifyCrm, signupMessage, alertOps } from "@/lib/slack";
 import type { VoteRecord, Side } from "@/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: NextRequest) {
-  if (!rateLimit(`vote:${clientIp(req)}`, 15, 60_000)) {
-    return NextResponse.json({ error: "too_many_requests" }, { status: 429 });
-  }
+  // No vote-throttling by design: a single venue (100–200 attendees) all share
+  // the café's one NAT IP, so any per-IP cap would 429 legitimate voters. The
+  // real dedup is per-phone-per-game, enforced when tallying. (The PIN-guarded
+  // /api/draw and /api/admin/verify keep their limits — those guard the console,
+  // never customers.)
   try {
     const body = await req.json();
     const matchId = Number(body.matchId);
@@ -124,6 +125,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, tally });
   } catch (e) {
     console.error("vote POST", e);
+    after(() => alertOps("a vote failed to record (Sheets write)"));
     return NextResponse.json({ error: "failed to record vote" }, { status: 500 });
   }
 }

@@ -8,6 +8,10 @@ export async function notifyCrm(text: string): Promise<{ ok: boolean; error?: st
     console.warn("[slack] missing SLACK_BOT_TOKEN or SLACK_CRM_CHANNEL_ID");
     return { ok: false, error: "no-config" };
   }
+  // Mirror the SMS client's discipline: cap the request so a slow/black-holed
+  // Slack API can't keep the (after()-extended) serverless invocation alive.
+  const ctrl = new AbortController();
+  const timer = setTimeout(() => ctrl.abort(), 8000);
   try {
     const res = await fetch("https://slack.com/api/chat.postMessage", {
       method: "POST",
@@ -16,6 +20,7 @@ export async function notifyCrm(text: string): Promise<{ ok: boolean; error?: st
         "Content-Type": "application/json; charset=utf-8",
       },
       body: JSON.stringify({ channel, text }),
+      signal: ctrl.signal,
     });
     const data = (await res.json().catch(() => ({}))) as { ok?: boolean; error?: string };
     if (!data.ok) {
@@ -26,7 +31,22 @@ export async function notifyCrm(text: string): Promise<{ ok: boolean; error?: st
   } catch (e) {
     console.error("[slack] error", e);
     return { ok: false, error: "network" };
+  } finally {
+    clearTimeout(timer);
   }
+}
+
+// Lightweight ops alerting for the unattended always-on screens: route API
+// failures to the same Slack channel so a Sheets outage / token expiry mid-event
+// becomes a 30-second fix instead of a silent "board shows 0-0" until a customer
+// complains. Debounced per warm instance so a failing poll can't spam the channel.
+let lastAlertAt = 0;
+const ALERT_COOLDOWN_MS = 60_000;
+export async function alertOps(context: string): Promise<void> {
+  const now = Date.now();
+  if (now - lastAlertAt < ALERT_COOLDOWN_MS) return;
+  lastAlertAt = now;
+  await notifyCrm(`⚠️ FanZone API issue — ${context}. Check Vercel logs.`).catch(() => {});
 }
 
 export function signupMessage(firstName: string, phone: string, teamName: string, matchup: string): string {

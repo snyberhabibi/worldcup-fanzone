@@ -126,7 +126,17 @@ export function BaristaPanel({
       });
       const data = await res.json();
       if (data.ok) {
-        setDrawMsg(`🎉 ${data.draw.firstName} · ${data.draw.phoneMasked}`);
+        // Surface winner-SMS delivery so staff can read the code aloud / re-send
+        // if the text didn't go out (the draw response now carries smsStatus).
+        const smsTail =
+          data.smsStatus === "sent"
+            ? " · ✅ code texted"
+            : data.smsStatus === "failed"
+              ? " · ⚠️ TEXT FAILED — give them code YALLA20"
+              : data.smsStatus === "dry-run"
+                ? " · (test mode — no real text)"
+                : ""; // "skipped": already won before, already has their code
+        setDrawMsg(`🎉 ${data.draw.firstName} · ${data.draw.phoneMasked}${smsTail}`);
         sound.play("win");
         onChanged();
       } else if (data.reason === "no_entrants") {

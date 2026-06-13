@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextRequest, NextResponse, after } from "next/server";
 import { getSession, setSession } from "@/lib/google-sheets";
+import { alertOps } from "@/lib/slack";
 import { cached, bust } from "@/lib/cache";
 import {
   currentSlotGames,
@@ -69,6 +70,7 @@ export async function GET() {
     return NextResponse.json(await effectiveSession());
   } catch (e) {
     console.error("session GET", e);
+    after(() => alertOps("session read failed (Sheets) — board is on clock fallback"));
     return NextResponse.json({
       matchIds: currentSlotGames(new Date()).map((g) => g.id),
       status: "open",
