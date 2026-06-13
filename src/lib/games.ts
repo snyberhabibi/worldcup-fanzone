@@ -115,11 +115,11 @@ export function stageLabel(match: Match): string {
 
 // ── Auto-progression slots (Central time) ─────────────────────
 // A "slot" = games with the SAME kickoff (simultaneous) → stacked voting.
-// Voting opens until ~halftime, raffles run through the 2nd half, then the
-// slot auto-advances to the next at ~full time. Timing is estimated from the
-// scheduled kickoff (real stoppage varies; barista can override).
-export const VOTE_CLOSE_MIN = 60; // end of the 15-min halftime
-export const SLOT_END_MIN = 105; // full time + stoppage
+// Voting stays open for the ENTIRE game (~2h from kickoff: 90' + halftime +
+// stoppage), then the slot auto-advances to the next game. Timing is estimated
+// from the scheduled kickoff; the barista can still pause/advance manually.
+export const VOTE_CLOSE_MIN = 120; // whole game — kickoff to ~full time
+export const SLOT_END_MIN = 120; // advance to the next game at full time
 
 interface SlotDef {
   kickoff: Date;
