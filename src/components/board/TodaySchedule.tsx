@@ -69,7 +69,18 @@ export function TodaySchedule({
         </p>
       </div>
 
-      <div style={{ display: "flex", gap: "clamp(0.5rem, 1vw, 0.8rem)", flexWrap: "wrap", flex: 1 }}>
+      <div
+        style={{
+          display: "grid",
+          // Fit ALL of today's games: as many columns as fit, rows stretch to
+          // fill the panel so nothing is clipped no matter the game count.
+          gridTemplateColumns: "repeat(auto-fit, minmax(clamp(120px, 10vw, 175px), 1fr))",
+          gridAutoRows: "1fr",
+          gap: "clamp(0.4rem, 0.8vw, 0.7rem)",
+          flex: 1,
+          minHeight: 0,
+        }}
+      >
         {matches.map((m) => {
           const h = resolveTeam(m.homeTeam);
           const a = resolveTeam(m.awayTeam);
@@ -80,15 +91,17 @@ export function TodaySchedule({
             <div
               key={m.id}
               style={{
-                flex: "1 1 clamp(150px, 13vw, 220px)",
-                minWidth: 138,
+                minWidth: 0,
+                minHeight: 0,
+                overflow: "hidden",
                 borderRadius: 14,
-                padding: "clamp(0.5rem, 1vw, 0.8rem)",
+                padding: "clamp(0.45rem, 0.9vw, 0.75rem)",
                 background: isCurrent ? "rgba(253, 185, 19, 0.14)" : "rgba(0, 0, 0, 0.22)",
                 border: isCurrent ? "2px solid var(--yb-gold)" : "1px solid var(--line)",
                 display: "flex",
                 flexDirection: "column",
-                gap: "0.3rem",
+                justifyContent: "center",
+                gap: "0.25rem",
                 opacity: status === "final" && !isCurrent ? 0.65 : 1,
               }}
             >

@@ -9,7 +9,7 @@ export function VoteQrTile({ compact = false }: { compact?: boolean }) {
   return (
     <div
       className="qr-tile"
-      style={{ border: "2px solid var(--yb-gold)", ...(compact ? { padding: "clamp(0.7rem, 1.4vw, 1rem)", gap: "clamp(0.7rem, 1.4vw, 1rem)" } : {}) }}
+      style={{ border: "2px solid var(--yb-gold)", width: "100%", ...(compact ? { padding: "clamp(0.7rem, 1.4vw, 1rem)", gap: "clamp(0.7rem, 1.4vw, 1rem)" } : {}) }}
     >
       <div className="qr-tile__qr" style={compact ? { padding: 8 } : undefined}>
         <QRCodeSVG
@@ -22,14 +22,14 @@ export function VoteQrTile({ compact = false }: { compact?: boolean }) {
           aria-label="Scan this QR code to vote from your phone"
         />
       </div>
-      <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
-        <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.2rem, 2vw, 1.7rem)", lineHeight: 1 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: "0.25rem", minWidth: 0 }}>
+        <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.6rem, 2.7vw, 2.3rem)", lineHeight: 1 }}>
           📲 Scan to vote
         </p>
-        <p style={{ color: "var(--yb-cocoa)", fontWeight: 800, fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)" }}>
+        <p style={{ color: "var(--yb-cocoa)", fontWeight: 800, fontSize: "clamp(1.05rem, 1.7vw, 1.35rem)", lineHeight: 1.2 }}>
           Can&apos;t reach the iPad? Vote from your phone.
         </p>
-        <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.78rem, 1.1vw, 0.92rem)" }}>
+        <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.9rem, 1.3vw, 1.1rem)", lineHeight: 1.2 }}>
           Pick your team &amp; enter to win free Yalla Bites
         </p>
       </div>

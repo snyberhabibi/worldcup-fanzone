@@ -88,8 +88,8 @@ export function BoardApp() {
     <main
       className="screen arcade-bg safe"
       style={{
-        padding: "clamp(0.75rem, 2vw, 1.5rem)",
-        gap: "clamp(0.6rem, 1.5vh, 1.1rem)",
+        padding: "clamp(0.6rem, 1.6vw, 1.4rem)",
+        gap: "clamp(0.3rem, 1vh, 1rem)",
         // Phone/portrait: let the board grow and scroll. Projector/landscape:
         // lock to one fullscreen view with no scroll.
         ...(isNarrow
@@ -114,13 +114,6 @@ export function BoardApp() {
           <img src="/yallabites-logo.svg" alt="Yalla Bites" style={{ height: 36 }} />
           <span className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design</span>
         </div>
-        <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>
-            {multi ? `${slotMatches.length} games live` : stageLabel(primary)}
-          </p>
-          <p className="text-dim" style={{ fontSize: "0.85rem" }}>{full}</p>
-          <KickoffCountdown match={primary} />
-        </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
           <div className={`live ${status === "closed" ? "live--closed" : ""}`}>
             <span className="live__dot" />
@@ -129,6 +122,18 @@ export function BoardApp() {
           <FullscreenButton />
         </div>
       </header>
+
+      {/* Big, centered match info above the matchup — at a glance: what's on and
+          when it kicks off. Sits directly over the "VS" so it reads as a unit.
+          Sized in vh so it stays prominent on a tall screen but shrinks to keep
+          the whole board on ONE screen on a short (e.g. 720p) projector. */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", gap: "clamp(0.1rem, 0.6vh, 0.35rem)", flexShrink: 0 }}>
+        <p className="display text-gold" style={{ fontSize: "clamp(1.35rem, 4.8vh, 2.9rem)", lineHeight: 1, letterSpacing: "0.02em" }}>
+          {multi ? `${slotMatches.length} GAMES LIVE` : stageLabel(primary)}
+        </p>
+        <p className="text-dim" style={{ fontSize: "clamp(0.85rem, 2.1vh, 1.4rem)" }}>{full}</p>
+        <KickoffCountdown match={primary} big />
+      </div>
 
       {isNarrow ? (
         <div style={{ display: "flex", flexDirection: "column", gap: "clamp(0.6rem, 1.5vh, 1.1rem)" }}>
@@ -168,14 +173,20 @@ export function BoardApp() {
             alignItems: "stretch",
             flexWrap: "nowrap",
             flexShrink: 0,
-            height: "clamp(200px, 28vh, 290px)",
+            height: "clamp(200px, 27vh, 290px)",
           }}
         >
-          <div style={{ flex: "1 1 0", minWidth: 0, overflow: "hidden" }}>
+          {/* Schedule gets the lion's share of the width so every game fits;
+              the QR tiles are capped so they can't crush it on a low-res projector. */}
+          <div style={{ flex: "1.9 1 0", minWidth: 0, display: "flex" }}>
             <TodaySchedule currentIds={matchIds} now={now} />
           </div>
-          <VoteQrTile compact />
-          <QrTile compact />
+          <div style={{ flex: "1 1 0", minWidth: 0, maxWidth: 360, display: "flex" }}>
+            <VoteQrTile compact />
+          </div>
+          <div style={{ flex: "1 1 0", minWidth: 0, maxWidth: 360, display: "flex" }}>
+            <QrTile compact />
+          </div>
         </footer>
       )}
 

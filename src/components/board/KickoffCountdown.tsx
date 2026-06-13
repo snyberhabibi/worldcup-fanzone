@@ -14,7 +14,7 @@ function fmt(ms: number): string {
   return `${sec}s`;
 }
 
-export function KickoffCountdown({ match }: { match: Match }) {
+export function KickoffCountdown({ match, big = false }: { match: Match; big?: boolean }) {
   const [, tick] = useReducer((c) => c + 1, 0);
   useEffect(() => {
     const id = setInterval(() => tick(), 1000);
@@ -48,9 +48,9 @@ export function KickoffCountdown({ match }: { match: Match }) {
     fontWeight: 800,
     letterSpacing: "0.04em",
     borderRadius: 999,
-    padding: "0.35em 0.95em",
-    fontSize: "clamp(0.8rem, 1.5vw, 1.05rem)",
-    marginTop: "0.2rem",
+    padding: big ? "0.4em 1.1em" : "0.35em 0.95em",
+    fontSize: big ? "clamp(1rem, 3vh, 1.9rem)" : "clamp(0.8rem, 1.5vw, 1.05rem)",
+    marginTop: big ? "0.1rem" : "0.2rem",
   };
   const toneStyle: React.CSSProperties =
     tone === "live"
