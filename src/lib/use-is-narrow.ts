@@ -3,22 +3,23 @@
 import { useEffect, useState } from "react";
 
 /**
- * True on narrow viewports (phones / portrait). SSR-safe: defaults to false
- * (the wide projector layout) and corrects on mount, so there's no flash since
- * callers gate rendering on hydration anyway.
+ * True when the board should use the scrollable, stacked layout instead of the
+ * fixed one-screen projector layout: any narrow screen OR any portrait screen
+ * (a projector is landscape + wide, so it keeps the fixed layout; phones and
+ * portrait tablets stack and scroll, which always fits). SSR-safe: defaults to
+ * false and corrects on mount; callers gate on hydration so there's no flash.
  */
-export function useIsNarrow(maxWidth = 760): boolean {
+export function useIsNarrow(maxWidth = 900): boolean {
+  const query = `(max-width: ${maxWidth}px), (orientation: portrait)`;
   const [narrow, setNarrow] = useState(() =>
-    typeof window !== "undefined"
-      ? window.matchMedia(`(max-width: ${maxWidth}px)`).matches
-      : false
+    typeof window !== "undefined" ? window.matchMedia(query).matches : false
   );
   useEffect(() => {
-    const mq = window.matchMedia(`(max-width: ${maxWidth}px)`);
+    const mq = window.matchMedia(query);
     const onChange = () => setNarrow(mq.matches);
     onChange();
     mq.addEventListener("change", onChange);
     return () => mq.removeEventListener("change", onChange);
-  }, [maxWidth]);
+  }, [query]);
   return narrow;
 }

@@ -54,11 +54,13 @@ export function TodaySchedule({
     <div
       className="panel"
       style={{
-        padding: "clamp(0.7rem, 1.4vw, 1.1rem)",
+        padding: "clamp(0.6rem, 1.4vh, 1rem)",
         display: "flex",
         flexDirection: "column",
-        gap: "clamp(0.5rem, 1vw, 0.8rem)",
+        gap: "clamp(0.35rem, 0.9vh, 0.7rem)",
         minWidth: 0,
+        width: "100%",
+        flex: 1,
         height: "100%",
       }}
     >
@@ -95,30 +97,30 @@ export function TodaySchedule({
                 minHeight: 0,
                 overflow: "hidden",
                 borderRadius: 14,
-                padding: "clamp(0.45rem, 0.9vw, 0.75rem)",
+                padding: "clamp(0.38rem, 0.85vh, 0.7rem)",
                 background: isCurrent ? "rgba(253, 185, 19, 0.14)" : "rgba(0, 0, 0, 0.22)",
                 border: isCurrent ? "2px solid var(--yb-gold)" : "1px solid var(--line)",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "center",
-                gap: "0.25rem",
+                gap: "clamp(0.08rem, 0.4vh, 0.2rem)",
                 opacity: status === "final" && !isCurrent ? 0.65 : 1,
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.3rem", minWidth: 0, overflow: "hidden" }}>
-                <span className="display text-gold" style={{ fontSize: "clamp(0.85rem, 1.4vw, 1.2rem)", flexShrink: 0 }}>
+                <span className="display text-gold" style={{ fontSize: "clamp(0.8rem, 1.6vh, 1.2rem)", flexShrink: 0 }}>
                   {ck.time.replace(" CT", "")}
                 </span>
                 <StatusBadge status={status} isCurrent={isCurrent} />
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.22rem", fontSize: "clamp(0.74rem, 1.15vw, 1rem)", minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.22rem", fontSize: "clamp(0.72rem, 1.45vh, 1rem)", minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" }}>
                 <span className="emoji" style={{ flexShrink: 0 }}>{h.flag}</span>
                 <span className="display">{m.homeTeam}</span>
                 <span className="text-dim">v</span>
                 <span className="display">{m.awayTeam}</span>
                 <span className="emoji" style={{ flexShrink: 0 }}>{a.flag}</span>
               </div>
-              <span className="text-dim" style={{ fontSize: "clamp(0.68rem, 1.05vw, 0.82rem)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: "100%" }}>
+              <span className="text-dim" style={{ fontSize: "clamp(0.64rem, 1.25vh, 0.82rem)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: "100%" }}>
                 {stageLabel(m)} · {m.city.split(",")[0]}
               </span>
             </div>
