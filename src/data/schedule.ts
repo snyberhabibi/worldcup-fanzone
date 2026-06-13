@@ -14,6 +14,8 @@
  * For UTC, add 4 hours (EDT = UTC-4 during summer).
  */
 
+import knockoutOverrides from "./knockout-overrides.json";
+
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
@@ -179,7 +181,7 @@ export const VENUES = {
 // Matches (all 104)
 // ---------------------------------------------------------------------------
 
-export const MATCHES: Match[] = [
+const RAW_MATCHES: Match[] = [
   // =========================================================================
   // GROUP STAGE — 72 matches (June 11 - June 27)
   // =========================================================================
@@ -328,6 +330,19 @@ export const MATCHES: Match[] = [
   // --- Final ---
   { id: 104, date: "2026-07-19T19:00:00Z", time: "3:00 PM",  time_utc: "19:00", homeTeam: "W101", awayTeam: "W102",          group: null, venue: "MetLife Stadium",          city: "East Rutherford, NJ",      stage: "final" },
 ];
+
+// The raw fixtures above keep knockout team slots as placeholders (2A, W74,
+// 3ABCD…). A nightly cron resolves them from the live bracket and commits the
+// id→team mapping to knockout-overrides.json (see /api/cron/refresh-schedule),
+// which we merge here. So the board/voting show real teams as rounds complete
+// with zero code change. Empty overrides = nothing resolved yet → placeholders.
+export const RAW_MATCHES_REF: Match[] = RAW_MATCHES;
+const OVERRIDES = knockoutOverrides as Record<string, { homeTeam?: string; awayTeam?: string }>;
+export const MATCHES: Match[] = RAW_MATCHES.map((m) => {
+  const o = OVERRIDES[String(m.id)];
+  if (!o) return m;
+  return { ...m, homeTeam: o.homeTeam || m.homeTeam, awayTeam: o.awayTeam || m.awayTeam };
+});
 
 // ---------------------------------------------------------------------------
 // Round of 32 bracket mapping (for reference)

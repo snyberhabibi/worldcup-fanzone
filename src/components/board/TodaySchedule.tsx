@@ -74,7 +74,7 @@ export function TodaySchedule({
           display: "grid",
           // Fit ALL of today's games: as many columns as fit, rows stretch to
           // fill the panel so nothing is clipped no matter the game count.
-          gridTemplateColumns: "repeat(auto-fit, minmax(clamp(120px, 10vw, 175px), 1fr))",
+          gridTemplateColumns: "repeat(auto-fit, minmax(clamp(150px, 13vw, 200px), 1fr))",
           gridAutoRows: "1fr",
           gap: "clamp(0.4rem, 0.8vw, 0.7rem)",
           flex: 1,
@@ -105,20 +105,20 @@ export function TodaySchedule({
                 opacity: status === "final" && !isCurrent ? 0.65 : 1,
               }}
             >
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.4rem" }}>
-                <span className="display text-gold" style={{ fontSize: "clamp(1rem, 1.8vw, 1.4rem)" }}>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "0.3rem", minWidth: 0, overflow: "hidden" }}>
+                <span className="display text-gold" style={{ fontSize: "clamp(0.85rem, 1.4vw, 1.2rem)", flexShrink: 0 }}>
                   {ck.time.replace(" CT", "")}
                 </span>
                 <StatusBadge status={status} isCurrent={isCurrent} />
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: "0.35rem", fontSize: "clamp(0.9rem, 1.5vw, 1.15rem)" }}>
-                <span className="emoji">{h.flag}</span>
+              <div style={{ display: "flex", alignItems: "center", gap: "0.22rem", fontSize: "clamp(0.74rem, 1.15vw, 1rem)", minWidth: 0, overflow: "hidden", whiteSpace: "nowrap" }}>
+                <span className="emoji" style={{ flexShrink: 0 }}>{h.flag}</span>
                 <span className="display">{m.homeTeam}</span>
                 <span className="text-dim">v</span>
                 <span className="display">{m.awayTeam}</span>
-                <span className="emoji">{a.flag}</span>
+                <span className="emoji" style={{ flexShrink: 0 }}>{a.flag}</span>
               </div>
-              <span className="text-dim" style={{ fontSize: "clamp(0.7rem, 1.1vw, 0.85rem)" }}>
+              <span className="text-dim" style={{ fontSize: "clamp(0.68rem, 1.05vw, 0.82rem)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", display: "block", maxWidth: "100%" }}>
                 {stageLabel(m)} · {m.city.split(",")[0]}
               </span>
             </div>
