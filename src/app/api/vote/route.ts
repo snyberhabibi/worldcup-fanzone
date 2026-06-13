@@ -7,10 +7,17 @@ import {
   appendSmsLog,
 } from "@/lib/google-sheets";
 import { cached, bust } from "@/lib/cache";
-import { getMatch, matchup as matchupOf, resolveTeam } from "@/lib/games";
+import {
+  getMatch,
+  matchup as matchupOf,
+  resolveTeam,
+  isSlotOpen,
+  slotGamesOf,
+} from "@/lib/games";
 import { normalizePhone, isValidUSPhone, sanitizeFirstName } from "@/lib/format";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { sendSms, welcomeSms } from "@/lib/quo";
+import { notifyCrm, signupMessage } from "@/lib/slack";
 import type { VoteRecord, Side } from "@/types";
 
 export const runtime = "nodejs";
@@ -35,16 +42,24 @@ export async function POST(req: NextRequest) {
     if (!isValidUSPhone(phone))
       return NextResponse.json({ error: "invalid phone" }, { status: 400 });
 
-    // Respect a paused/closed session (barista hit "pause voting").
-    const session = await cached("session-row", 1500, () => getSession());
-    if (session?.status === "closed") {
+    // Voting for this game is closed if its slot is past halftime (auto), unless
+    // the barista has a manual open/closed override on the pinned slot.
+    const now = new Date();
+    const stored = await cached("session-row", 1500, () => getSession());
+    const inPinnedSlot =
+      stored?.pinnedMatchId != null &&
+      slotGamesOf(stored.pinnedMatchId).some((g) => g.id === matchId);
+    const open =
+      inPinnedSlot && stored?.manualStatus
+        ? stored.manualStatus === "open"
+        : isSlotOpen(matchId, now);
+    if (!open)
       return NextResponse.json({ error: "voting_closed" }, { status: 400 });
-    }
 
     const teamCode = side === "home" ? match.homeTeam : match.awayTeam;
     const teamName = resolveTeam(teamCode).name;
     const record: VoteRecord = {
-      ts: new Date().toISOString(),
+      ts: now.toISOString(),
       matchId,
       matchup: matchupOf(match),
       side,
@@ -61,12 +76,12 @@ export async function POST(req: NextRequest) {
     const log = await getVoteLog();
     const tally = tallyFromLog(log, matchId);
 
-    // Welcome SMS only on this phone's FIRST-EVER vote — dedup so repeat voters
-    // never get re-texted. Runs after the response; can never block/fail a vote.
+    // First-ever vote for this phone = a new sign-up: welcome SMS + Slack CRM
+    // ping. Deduped (repeat voters don't retrigger). Never blocks the vote.
     const firstEver = log.filter((v) => v.phone === phone).length === 1;
     if (firstEver) {
       after(async () => {
-        const r = await sendSms(phone, welcomeSms(teamName));
+        const r = await sendSms(phone, welcomeSms());
         await appendSmsLog({
           ts: new Date().toISOString(),
           phone,
@@ -74,6 +89,9 @@ export async function POST(req: NextRequest) {
           status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
           detail: r.error || "",
         }).catch(() => {});
+        await notifyCrm(
+          signupMessage(firstName, phone, teamName, matchupOf(match))
+        ).catch(() => {});
       });
     }
 

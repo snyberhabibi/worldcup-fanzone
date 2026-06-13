@@ -41,10 +41,10 @@ function StatusBadge({
 }
 
 export function TodaySchedule({
-  currentId,
+  currentIds,
   now,
 }: {
-  currentId: number;
+  currentIds: number[];
   now: Date;
 }) {
   const { isToday, label, matches } = matchesOnDay(now);
@@ -75,7 +75,7 @@ export function TodaySchedule({
           const a = resolveTeam(m.awayTeam);
           const ck = formatKickoffCT(m);
           const status = matchStatus(m, now);
-          const isCurrent = m.id === currentId;
+          const isCurrent = currentIds.includes(m.id);
           return (
             <div
               key={m.id}

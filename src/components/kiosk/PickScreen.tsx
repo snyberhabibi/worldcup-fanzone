@@ -63,11 +63,17 @@ function TeamCard({
 
 export function PickScreen({
   match,
+  gameIndex = 0,
+  gameCount = 1,
+  canCancel = true,
   onCommit,
   onCancel,
   onActivity,
 }: {
   match: Match;
+  gameIndex?: number;
+  gameCount?: number;
+  canCancel?: boolean;
   onCommit: (side: Side) => Promise<boolean>;
   onCancel: () => void;
   onActivity: () => void;
@@ -148,12 +154,40 @@ export function PickScreen({
     >
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "1rem", paddingLeft: "clamp(2.4rem, 5vw, 3.2rem)" }}>
         <div>
-          <p className="eyebrow">{stageLabel(match)} · {full}</p>
+          <p className="eyebrow">
+            {gameCount > 1 ? `Game ${gameIndex + 1} of ${gameCount} · ` : ""}
+            {stageLabel(match)} · {full}
+          </p>
           <h1 className="display" style={{ fontSize: "clamp(1.8rem, 5vw, 3rem)" }}>
-            {pending ? "Lock in your pick" : "WHO YA GOT?"}
+            {pending
+              ? "Lock in your pick"
+              : gameCount > 1
+                ? "WHO YA GOT? Vote each game"
+                : "WHO YA GOT?"}
           </h1>
+          {gameCount > 1 && (
+            <div style={{ display: "flex", gap: 6, marginTop: 8 }} aria-hidden>
+              {Array.from({ length: gameCount }).map((_, i) => (
+                <span
+                  key={i}
+                  style={{
+                    width: i === gameIndex ? 26 : 10,
+                    height: 10,
+                    borderRadius: 999,
+                    background:
+                      i < gameIndex
+                        ? "var(--accent)"
+                        : i === gameIndex
+                          ? "var(--yb-gold)"
+                          : "var(--line)",
+                    transition: "width 0.2s, background 0.2s",
+                  }}
+                />
+              ))}
+            </div>
+          )}
         </div>
-        {!pending && (
+        {!pending && canCancel && (
           <button className="btn btn--ghost" onClick={onCancel} aria-label="Back">✕</button>
         )}
       </div>

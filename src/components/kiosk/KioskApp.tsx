@@ -1,11 +1,12 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getMatch, pickDefaultMatchId } from "@/lib/games";
 import { usePoll } from "@/lib/use-poll";
 import { useSound } from "@/lib/use-sound";
 import { burstConfetti } from "@/lib/celebrate";
 import type { SessionState, Side } from "@/types";
+import type { Match } from "@/data/schedule";
 import { AttractScreen } from "./AttractScreen";
 import { EntryScreen } from "./EntryScreen";
 import { PickScreen } from "./PickScreen";
@@ -26,10 +27,14 @@ export function KioskApp() {
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const consent = true; // voting = consent (disclosed on the entry screen)
-  const [committedSide, setCommittedSide] = useState<Side | null>(null);
-  // The game the current customer is voting on, pinned when they start so a
-  // barista game-switch mid-flow can't reattribute their vote.
-  const [activeMatchId, setActiveMatchId] = useState<number | null>(null);
+
+  // A customer's run is pinned to the slot they started on, so a barista
+  // game-switch mid-flow can't reattribute their picks. With stacked voting a
+  // slot holds 1+ simultaneous games; the customer picks a winner for each, one
+  // game at a time. runIds = pinned slot; pickIndex = which game; picks = locked.
+  const [runIds, setRunIds] = useState<number[] | null>(null);
+  const [pickIndex, setPickIndex] = useState(0);
+  const [picks, setPicks] = useState<{ match: Match; side: Side }[]>([]);
   const [panelOpen, setPanelOpen] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -38,11 +43,19 @@ export function KioskApp() {
     4000
   );
 
-  const matchId = session?.matchId ?? pickDefaultMatchId(new Date());
-  const match = getMatch(matchId) ?? getMatch(pickDefaultMatchId(new Date()))!;
+  const slotIds = useMemo(
+    () => (session?.matchIds?.length ? session.matchIds : [pickDefaultMatchId(new Date())]),
+    [session]
+  );
+  const slotMatches = slotIds.map((id) => getMatch(id)).filter(Boolean) as Match[];
   const status = session?.status ?? "open";
-  // Attract shows the live game; once a customer starts, the flow is pinned.
-  const votingMatch = getMatch(activeMatchId ?? matchId) ?? match;
+
+  // Before a run starts the flow tracks the live slot; once started it's pinned.
+  const activeMatches = (runIds ?? slotIds)
+    .map((id) => getMatch(id))
+    .filter(Boolean) as Match[];
+  const gameCount = activeMatches.length;
+  const votingMatch = activeMatches[pickIndex] ?? activeMatches[0] ?? slotMatches[0];
 
   const showToast = useCallback((msg: string) => {
     setToast(msg);
@@ -52,8 +65,9 @@ export function KioskApp() {
   const resetToAttract = useCallback(() => {
     setFirstName("");
     setPhone("");
-    setCommittedSide(null);
-    setActiveMatchId(null);
+    setRunIds(null);
+    setPickIndex(0);
+    setPicks([]);
     setPhase("attract");
   }, []);
 
@@ -81,25 +95,39 @@ export function KioskApp() {
 
   const startVote = useCallback(() => {
     if (status === "closed") return;
-    setActiveMatchId(matchId); // pin the game for this customer's session
+    setRunIds(slotIds); // pin this slot's game(s) for the customer's session
+    setPickIndex(0);
+    setPicks([]);
     sound.play("coin");
     sound.vibrate(15);
     setPhase("entry");
-  }, [status, sound, matchId]);
+  }, [status, sound, slotIds]);
 
+  // Commit the current game's pick, then either advance to the next game in the
+  // slot (stacked voting) or finish. Each game is an independent vote POST so a
+  // hiccup on game 2 never loses game 1.
   const submitVote = useCallback(
     async (side: Side): Promise<boolean> => {
+      const match = activeMatches[pickIndex];
+      if (!match) return false;
       try {
         const res = await fetch("/api/vote", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ matchId: votingMatch.id, side, firstName, phone, consent }),
+          body: JSON.stringify({ matchId: match.id, side, firstName, phone, consent }),
         });
         if (!res.ok) {
           const data = await res.json().catch(() => ({}));
           throw new Error(data?.error || "vote failed");
         }
-        setCommittedSide(side);
+        setPicks((p) => [...p, { match, side }]);
+        if (pickIndex + 1 < gameCount) {
+          // More games kicking off at the same time → vote the next one.
+          sound.play("coin");
+          sound.vibrate(12);
+          setPickIndex((i) => i + 1);
+          return true; // PickScreen remounts (keyed by match id) for the next game
+        }
         sound.play("win");
         burstConfetti();
         setPhase("success");
@@ -110,7 +138,7 @@ export function KioskApp() {
         return false;
       }
     },
-    [votingMatch, firstName, phone, consent, sound, showToast]
+    [activeMatches, pickIndex, gameCount, firstName, phone, consent, sound, showToast]
   );
 
   if (!mounted) return <Splash />;
@@ -153,7 +181,7 @@ export function KioskApp() {
       </div>
 
       {phase === "attract" && (
-        <AttractScreen match={match} status={status} onStart={startVote} />
+        <AttractScreen matches={slotMatches} status={status} onStart={startVote} />
       )}
       {phase === "entry" && (
         <EntryScreen
@@ -166,26 +194,25 @@ export function KioskApp() {
           onActivity={bumpIdle}
         />
       )}
-      {phase === "pick" && (
+      {phase === "pick" && votingMatch && (
         <PickScreen
+          key={votingMatch.id}
           match={votingMatch}
+          gameIndex={pickIndex}
+          gameCount={gameCount}
+          canCancel={pickIndex === 0}
           onCommit={submitVote}
           onCancel={() => setPhase("entry")}
           onActivity={bumpIdle}
         />
       )}
-      {phase === "success" && committedSide && (
-        <SuccessScreen
-          match={votingMatch}
-          side={committedSide}
-          firstName={firstName}
-          onDone={resetToAttract}
-        />
+      {phase === "success" && picks.length > 0 && (
+        <SuccessScreen picks={picks} firstName={firstName} onDone={resetToAttract} />
       )}
 
       {panelOpen && (
         <BaristaPanel
-          matchId={matchId}
+          matchId={slotIds[0]}
           status={status}
           onChanged={refresh}
           onClose={() => setPanelOpen(false)}

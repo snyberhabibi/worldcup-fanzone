@@ -52,8 +52,8 @@ export async function sendSms(toDigits10: string, content: string): Promise<SmsR
 }
 
 // ── Locked message copy (includes sender ID + STOP per the user's decision) ──
-export function welcomeSms(teamName: string): string {
-  return `You voted for ${teamName}! Welcome to the Fan Zone, sponsored by Yalla Bites. Download our app on the App Store or Google Play, and visit yallabites.com. Yalla Bites is the UberEats for HOMEMADE food — 100+ local chefs cooking near you! Reply STOP to opt out.`;
+export function welcomeSms(): string {
+  return `Welcome to the Fan Zone raffle, sponsored by Yalla Bites — the UberEats for homemade food! Stick around to see if you win! Download Yalla Bites on the App Store today: www.yallabites.com. Reply STOP to opt out.`;
 }
 
 export function winnerSms(): string {

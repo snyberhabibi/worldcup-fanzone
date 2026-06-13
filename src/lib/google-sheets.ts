@@ -3,7 +3,7 @@ import type {
   VoteRecord,
   Tally,
   Side,
-  SessionState,
+  StoredSession,
   Winner,
   DrawResult,
 } from "@/types";
@@ -196,7 +196,9 @@ export function entrantsFromLog(
 }
 
 // ── Session ─────────────────────────────────────────
-export async function getSession(): Promise<SessionState | null> {
+// Column A reused as the barista's pinned matchId, B as the manual status
+// override ("" = auto). The live slot + open/closed are derived from the clock.
+export async function getSession(): Promise<StoredSession | null> {
   await ensureTabs();
   const sheets = getSheets();
   const res = await sheets.spreadsheets.values.get({
@@ -204,7 +206,7 @@ export async function getSession(): Promise<SessionState | null> {
     range: `${TAB_SESSION}!A2:D2`,
   });
   const r = res.data.values?.[0];
-  if (!r || !r[0]) return null;
+  if (!r || (!r[0] && !r[1] && !r[3])) return null;
   let lastDraw: DrawResult | null = null;
   if (r[3]) {
     try {
@@ -214,14 +216,14 @@ export async function getSession(): Promise<SessionState | null> {
     }
   }
   return {
-    matchId: Number(r[0]) || 0,
-    status: r[1] === "closed" ? "closed" : "open",
+    pinnedMatchId: r[0] ? Number(r[0]) || null : null,
+    manualStatus: r[1] === "open" || r[1] === "closed" ? r[1] : "",
     updatedAt: r[2] || "",
     lastDraw,
   };
 }
 
-export async function setSession(s: SessionState): Promise<void> {
+export async function setSession(s: StoredSession): Promise<void> {
   await ensureTabs();
   const sheets = getSheets();
   await sheets.spreadsheets.values.update({
@@ -231,8 +233,8 @@ export async function setSession(s: SessionState): Promise<void> {
     requestBody: {
       values: [
         [
-          String(s.matchId),
-          s.status,
+          s.pinnedMatchId != null ? String(s.pinnedMatchId) : "",
+          s.manualStatus,
           s.updatedAt,
           s.lastDraw ? JSON.stringify(s.lastDraw) : "",
         ],

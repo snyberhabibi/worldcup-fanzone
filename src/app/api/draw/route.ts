@@ -9,12 +9,12 @@ import {
   appendSmsLog,
 } from "@/lib/google-sheets";
 import { bust } from "@/lib/cache";
-import { getMatch, matchup as matchupOf, pickDefaultMatchId } from "@/lib/games";
+import { getMatch, matchup as matchupOf } from "@/lib/games";
 import { maskPhone } from "@/lib/format";
 import { checkPin } from "@/lib/auth";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { sendSms, winnerSms } from "@/lib/quo";
-import type { DrawResult, SessionState, Winner } from "@/types";
+import type { DrawResult, Winner } from "@/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -65,17 +65,10 @@ export async function POST(req: NextRequest) {
       poolSize: entrants.length,
     };
 
-    const cur =
-      (await getSession()) ??
-      ({
-        matchId: pickDefaultMatchId(new Date()),
-        status: "open",
-        updatedAt: "",
-        lastDraw: null,
-      } satisfies SessionState);
+    const cur = await getSession();
     await setSession({
-      matchId: cur.matchId,
-      status: cur.status,
+      pinnedMatchId: cur?.pinnedMatchId ?? null,
+      manualStatus: cur?.manualStatus ?? "",
       updatedAt: ts,
       lastDraw: draw,
     });

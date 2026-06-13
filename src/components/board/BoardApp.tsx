@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { usePoll } from "@/lib/use-poll";
 import { getMatch, pickDefaultMatchId, stageLabel, formatKickoffCT } from "@/lib/games";
 import type { SessionState, Tally, Entrant, DrawResult } from "@/types";
+import type { Match } from "@/data/schedule";
 import { VoteBars } from "./VoteBars";
 import { TodaySchedule } from "./TodaySchedule";
 import { QrTile } from "./QrTile";
@@ -14,6 +15,23 @@ import { useHydrated } from "@/lib/use-hydrated";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { KickoffCountdown } from "./KickoffCountdown";
 
+// One game's live tally. Each slot game polls independently so simultaneous
+// (stacked) games each animate their own bar.
+function GameTally({ match, compact }: { match: Match; compact: boolean }) {
+  const { data: tally } = usePoll<Tally>(
+    () => fetch(`/api/tally?matchId=${match.id}`).then((r) => r.json()),
+    2000
+  );
+  const live = tally && tally.matchId === match.id ? tally : null;
+  if (!compact) return <VoteBars match={match} tally={live} />;
+  return (
+    <div className="panel" style={{ flex: 1, display: "flex", flexDirection: "column", minHeight: 0, padding: "clamp(0.75rem, 2vw, 1.5rem)" }}>
+      <p className="eyebrow text-gold" style={{ textAlign: "center" }}>{stageLabel(match)}</p>
+      <VoteBars match={match} tally={live} />
+    </div>
+  );
+}
+
 export function BoardApp() {
   const mounted = useHydrated();
 
@@ -22,17 +40,12 @@ export function BoardApp() {
     2500
   );
 
-  const matchId = session?.matchId ?? pickDefaultMatchId(new Date());
-  const match = getMatch(matchId) ?? getMatch(pickDefaultMatchId(new Date()))!;
+  const matchIds = session?.matchIds?.length ? session.matchIds : [pickDefaultMatchId(new Date())];
+  const slotMatches = matchIds.map((id) => getMatch(id)).filter(Boolean) as Match[];
+  const primary = slotMatches[0] ?? getMatch(pickDefaultMatchId(new Date()))!;
+  const multi = slotMatches.length > 1;
   const status = session?.status ?? "open";
-  const { full } = formatKickoffCT(match);
-
-  const { data: tally } = usePoll<Tally>(
-    () => fetch(`/api/tally?matchId=${matchId}`).then((r) => r.json()),
-    2000
-  );
-  // Ignore a tally that belongs to a just-switched match until the next poll.
-  const liveTally = tally && tally.matchId === matchId ? tally : null;
+  const { full } = formatKickoffCT(primary);
 
   // Detect a fresh draw broadcast via the session and trigger the wheel.
   const [draw, setDraw] = useState<DrawResult | null>(null);
@@ -92,9 +105,11 @@ export function BoardApp() {
           <span className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design</span>
         </div>
         <div style={{ textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-          <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>{stageLabel(match)}</p>
+          <p className="display" style={{ fontSize: "clamp(1rem, 2.4vw, 1.6rem)" }}>
+            {multi ? `${slotMatches.length} games live` : stageLabel(primary)}
+          </p>
           <p className="text-dim" style={{ fontSize: "0.85rem" }}>{full}</p>
-          <KickoffCountdown match={match} />
+          <KickoffCountdown match={primary} />
         </div>
         <div style={{ display: "flex", alignItems: "center", gap: "0.9rem" }}>
           <div className={`live ${status === "closed" ? "live--closed" : ""}`}>
@@ -105,11 +120,21 @@ export function BoardApp() {
         </div>
       </header>
 
-      <VoteBars match={match} tally={liveTally} />
+      {multi ? (
+        <div style={{ flex: 1, display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", minHeight: 0, flexWrap: "wrap" }}>
+          {slotMatches.map((m) => (
+            <div key={m.id} style={{ flex: "1 1 360px", display: "flex", minWidth: 0, minHeight: 0 }}>
+              <GameTally match={m} compact />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <GameTally match={primary} compact={false} />
+      )}
 
       <footer style={{ display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", alignItems: "stretch", flexWrap: "wrap" }}>
         <div style={{ flex: "1 1 380px", minWidth: 0 }}>
-          <TodaySchedule currentId={matchId} now={now} />
+          <TodaySchedule currentIds={matchIds} now={now} />
         </div>
         <VoteQrTile />
         <QrTile />
@@ -117,7 +142,7 @@ export function BoardApp() {
 
       {draw && (
         <SpinWheel
-          match={getMatch(draw.matchId) ?? match}
+          match={getMatch(draw.matchId) ?? primary}
           pool={pool}
           draw={draw}
           onClose={() => setDraw(null)}

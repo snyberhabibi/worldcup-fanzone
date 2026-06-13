@@ -113,6 +113,65 @@ export function stageLabel(match: Match): string {
   return match.group ? `Group ${match.group}` : STAGE_LABELS[match.stage];
 }
 
+// ── Auto-progression slots (Central time) ─────────────────────
+// A "slot" = games with the SAME kickoff (simultaneous) → stacked voting.
+// Voting opens until ~halftime, raffles run through the 2nd half, then the
+// slot auto-advances to the next at ~full time. Timing is estimated from the
+// scheduled kickoff (real stoppage varies; barista can override).
+export const VOTE_CLOSE_MIN = 60; // end of the 15-min halftime
+export const SLOT_END_MIN = 105; // full time + stoppage
+
+interface SlotDef {
+  kickoff: Date;
+  games: Match[];
+}
+
+const SLOTS: SlotDef[] = (() => {
+  const map = new Map<string, Match[]>();
+  for (const g of BY_KICKOFF) {
+    const arr = map.get(g.date);
+    if (arr) arr.push(g);
+    else map.set(g.date, [g]);
+  }
+  return Array.from(map.values())
+    .map((games) => ({ kickoff: kickoff(games[0]), games }))
+    .sort((a, b) => a.kickoff.getTime() - b.kickoff.getTime());
+})();
+
+function slotEnded(s: SlotDef, now: Date): boolean {
+  return now.getTime() >= s.kickoff.getTime() + SLOT_END_MIN * 60_000;
+}
+
+function slotDefOf(matchId: number): SlotDef | undefined {
+  return SLOTS.find((s) => s.games.some((g) => g.id === matchId));
+}
+
+/** The active slot's games by clock: the first slot not yet ended (auto-advances). */
+export function currentSlotGames(now: Date): Match[] {
+  const s = SLOTS.find((x) => !slotEnded(x, now)) ?? SLOTS[SLOTS.length - 1];
+  return s.games;
+}
+
+/** The other games kicking off at the same time as `matchId` (incl. itself). */
+export function slotGamesOf(matchId: number): Match[] {
+  const s = slotDefOf(matchId);
+  if (s) return s.games;
+  const m = getMatch(matchId);
+  return m ? [m] : [];
+}
+
+export function isSlotOpen(matchId: number, now: Date): boolean {
+  const s = slotDefOf(matchId);
+  if (!s) return true;
+  return now.getTime() < s.kickoff.getTime() + VOTE_CLOSE_MIN * 60_000;
+}
+
+export function isSlotEnded(matchId: number, now: Date): boolean {
+  const s = slotDefOf(matchId);
+  if (!s) return false;
+  return slotEnded(s, now);
+}
+
 // ── Today's slate (Central time) ──────────────────────────────
 // The calendar day a kickoff falls on in US Central. Precomputed once since
 // match datetimes are static, so the board can recompute "today" cheaply.

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { usePoll } from "@/lib/use-poll";
 import { useHydrated } from "@/lib/use-hydrated";
+import { useSound } from "@/lib/use-sound";
 import {
   getMatch,
   pickDefaultMatchId,
@@ -14,7 +15,9 @@ import {
 import { isValidUSPhone, formatPhone, normalizePhone } from "@/lib/format";
 import { burstConfetti } from "@/lib/celebrate";
 import { Splash } from "@/components/Splash";
+import { BaristaPanel } from "@/components/kiosk/BaristaPanel";
 import type { SessionState, Side } from "@/types";
+import type { Match } from "@/data/schedule";
 
 function TeamPick({
   t,
@@ -39,14 +42,14 @@ function TeamPick({
         flexDirection: "column",
         alignItems: "center",
         gap: "0.3rem",
-        padding: "1rem 0.5rem",
+        padding: "0.85rem 0.5rem",
         border: selected ? `3px solid ${accent}` : "3px solid transparent",
         boxShadow: selected ? `0 0 0 4px ${accent}, 0 14px 36px rgba(0,0,0,0.4)` : "0 14px 36px rgba(0,0,0,0.4)",
         transition: "border-color 0.15s, box-shadow 0.2s",
       }}
     >
-      <span className="team__flag" style={{ fontSize: "clamp(2.4rem, 14vw, 3.4rem)" }}>{t.flag}</span>
-      <span className="display" style={{ color: "var(--navy)", fontSize: "clamp(0.95rem, 4.5vw, 1.3rem)", textAlign: "center", lineHeight: 1.05 }}>
+      <span className="team__flag" style={{ fontSize: "clamp(2.2rem, 12vw, 3.2rem)" }}>{t.flag}</span>
+      <span className="display" style={{ color: "var(--navy)", fontSize: "clamp(0.9rem, 4.2vw, 1.25rem)", textAlign: "center", lineHeight: 1.05 }}>
         {t.name}
       </span>
       <span className="display" style={{ color: "var(--yb-sage)", letterSpacing: "0.14em", fontSize: "0.8rem" }}>{t.code}</span>
@@ -56,49 +59,61 @@ function TeamPick({
 
 export function MobileVote() {
   const hydrated = useHydrated();
-  const { data: session } = usePoll<SessionState>(
+  const sound = useSound();
+  const { data: session, refresh } = usePoll<SessionState>(
     () => fetch("/api/session").then((r) => r.json()),
     5000
   );
 
-  const matchId = session?.matchId ?? pickDefaultMatchId(new Date());
-  const match = getMatch(matchId) ?? getMatch(pickDefaultMatchId(new Date()))!;
+  const matchIds = session?.matchIds?.length ? session.matchIds : [pickDefaultMatchId(new Date())];
+  const matches = matchIds.map((id) => getMatch(id)).filter(Boolean) as Match[];
+  const primary = matches[0] ?? getMatch(pickDefaultMatchId(new Date()))!;
+  const multi = matches.length > 1;
   const status = session?.status ?? "open";
 
-  const [side, setSide] = useState<Side | null>(null);
+  const [picks, setPicks] = useState<Record<number, Side>>({});
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
   const [stage, setStage] = useState<"form" | "submitting" | "done" | "error">("form");
   const [errMsg, setErrMsg] = useState("");
+  const [panelOpen, setPanelOpen] = useState(false);
 
   if (!hydrated) return <Splash />;
 
-  const home = resolveTeam(match.homeTeam);
-  const away = resolveTeam(match.awayTeam);
-  const ck = formatKickoffCT(match);
-  const valid = side !== null && firstName.trim().length > 0 && isValidUSPhone(phone);
-  const pickedTeam = side === "home" ? home : side === "away" ? away : null;
+  const ck = formatKickoffCT(primary);
+  const pickedCount = Object.keys(picks).length;
+  const valid = pickedCount > 0 && firstName.trim().length > 0 && isValidUSPhone(phone);
+  // Picks in the slot's game order, for the confirmation screen.
+  const pickedList = matches
+    .filter((m) => picks[m.id])
+    .map((m) => ({ match: m, team: resolveTeam(picks[m.id] === "home" ? m.homeTeam : m.awayTeam) }));
 
   const submit = async () => {
     if (!valid || stage === "submitting") return;
     setStage("submitting");
     try {
-      const res = await fetch("/api/vote", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ matchId: match.id, side, firstName, phone, consent: true }),
-      });
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) {
-        setErrMsg(
-          data.error === "voting_closed"
-            ? "Voting is paused right now — check the big screen for the next game."
-            : data.error === "too_many_requests"
-              ? "Too many tries — give it a moment."
-              : "Couldn't save your vote. Please try again."
-        );
-        setStage("error");
-        return;
+      // Submit each game's vote sequentially (not in parallel) so the first vote
+      // alone triggers the welcome SMS + CRM ping — later games are the same phone.
+      for (const m of matches) {
+        const side = picks[m.id];
+        if (!side) continue;
+        const res = await fetch("/api/vote", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ matchId: m.id, side, firstName, phone, consent: true }),
+        });
+        if (!res.ok) {
+          const data = await res.json().catch(() => ({}));
+          setErrMsg(
+            data.error === "voting_closed"
+              ? "Voting is paused right now — check the big screen for the next game."
+              : data.error === "too_many_requests"
+                ? "Too many tries — give it a moment."
+                : "Couldn't save your vote. Please try again."
+          );
+          setStage("error");
+          return;
+        }
       }
       burstConfetti();
       setStage("done");
@@ -116,7 +131,7 @@ export function MobileVote() {
           📲 Vote from your phone
         </h1>
         <p className="text-dim" style={{ marginTop: "0.3rem", fontSize: "0.85rem" }}>
-          {stageLabel(match)} · {ck.full}
+          {multi ? `${matches.length} games kicking off` : stageLabel(primary)} · {ck.full}
         </p>
       </div>
 
@@ -131,13 +146,15 @@ export function MobileVote() {
           <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.6rem, 8vw, 2.2rem)", marginTop: "0.3rem" }}>
             You&apos;re in{firstName.trim() ? `, ${firstName.trim()}` : ""}!
           </p>
-          {pickedTeam && (
-            <p style={{ color: "var(--yb-cocoa)", fontWeight: 700, fontSize: "1.1rem", marginTop: "0.4rem" }}>
-              You backed {pickedTeam.flag} {pickedTeam.name}
-            </p>
-          )}
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.3rem", marginTop: "0.5rem" }}>
+            {pickedList.map(({ match, team }) => (
+              <p key={match.id} style={{ color: "var(--yb-cocoa)", fontWeight: 700, fontSize: "1.05rem" }}>
+                You backed {team.flag} {team.name}
+              </p>
+            ))}
+          </div>
           <p style={{ color: "var(--yb-sage)", marginTop: "0.75rem", fontSize: "0.95rem" }}>
-            You&apos;re entered to win free Yalla Bites — winners are drawn on the big screen. Good luck! 🍽️
+            You&apos;re entered to win free Yalla Bites — winners are drawn on the big screen. Stick around! 🍽️
           </p>
           <a href="https://yallabites.com/" target="_blank" rel="noopener noreferrer" className="btn btn--red" style={{ marginTop: "1.1rem", display: "inline-flex" }}>
             Get Yalla Bites →
@@ -146,12 +163,27 @@ export function MobileVote() {
       ) : (
         <>
           <p className="display text-cream" style={{ textAlign: "center", fontSize: "clamp(1.2rem, 6vw, 1.6rem)" }}>
-            WHO YA GOT?
+            {multi ? "Pick a winner for each game" : "WHO YA GOT?"}
           </p>
-          <div style={{ display: "flex", gap: "0.75rem" }}>
-            <TeamPick t={home} selected={side === "home"} accent="var(--home)" onSelect={() => setSide("home")} />
-            <TeamPick t={away} selected={side === "away"} accent="var(--away)" onSelect={() => setSide("away")} />
-          </div>
+
+          {matches.map((m) => {
+            const home = resolveTeam(m.homeTeam);
+            const away = resolveTeam(m.awayTeam);
+            const sel = picks[m.id] ?? null;
+            return (
+              <div key={m.id} style={{ display: "flex", flexDirection: "column", gap: "0.45rem" }}>
+                {multi && (
+                  <p className="eyebrow" style={{ textAlign: "center" }}>
+                    {stageLabel(m)} · {home.code} v {away.code}
+                  </p>
+                )}
+                <div style={{ display: "flex", gap: "0.75rem" }}>
+                  <TeamPick t={home} selected={sel === "home"} accent="var(--home)" onSelect={() => setPicks((p) => ({ ...p, [m.id]: "home" }))} />
+                  <TeamPick t={away} selected={sel === "away"} accent="var(--away)" onSelect={() => setPicks((p) => ({ ...p, [m.id]: "away" }))} />
+                </div>
+              </div>
+            );
+          })}
 
           <input
             value={firstName}
@@ -182,9 +214,45 @@ export function MobileVote() {
           )}
 
           <button className="btn btn--gold btn--block btn--lg" onClick={submit} disabled={!valid || stage === "submitting"}>
-            {stage === "submitting" ? "Submitting…" : "🗳️ Submit my vote"}
+            {stage === "submitting"
+              ? "Submitting…"
+              : multi
+                ? `🗳️ Submit ${pickedCount === 1 ? "my pick" : `my ${pickedCount} picks`}`
+                : "🗳️ Submit my vote"}
           </button>
         </>
+      )}
+
+      {/* Discreet barista access — PIN-gated. Lets staff pause/advance voting and
+          spin the raffle wheel straight from their phone. */}
+      <button
+        onClick={() => setPanelOpen(true)}
+        aria-label="Barista controls"
+        style={{
+          position: "fixed",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 12px)",
+          right: "calc(env(safe-area-inset-right, 0px) + 12px)",
+          zIndex: 40,
+          width: 44,
+          height: 44,
+          borderRadius: 12,
+          background: "rgba(250,249,246,0.06)",
+          border: "1px solid var(--line)",
+          fontSize: 20,
+          opacity: 0.4,
+        }}
+      >
+        ⚙️
+      </button>
+
+      {panelOpen && (
+        <BaristaPanel
+          matchId={matchIds[0]}
+          status={status}
+          onChanged={refresh}
+          onClose={() => setPanelOpen(false)}
+          sound={sound}
+        />
       )}
     </main>
   );

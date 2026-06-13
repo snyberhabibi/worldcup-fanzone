@@ -75,19 +75,46 @@ function Sparkles() {
   );
 }
 
+function MatchRow({ m }: { m: Match }) {
+  const h = resolveTeam(m.homeTeam);
+  const a = resolveTeam(m.awayTeam);
+  return (
+    <div
+      className="card-cream"
+      style={{
+        display: "grid",
+        gridTemplateColumns: "1fr auto 1fr",
+        alignItems: "center",
+        gap: "clamp(0.6rem, 2.5vw, 1.6rem)",
+        padding: "clamp(0.6rem, 1.8vw, 1.1rem) clamp(0.9rem, 3vw, 1.8rem)",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: "0.5rem", minWidth: 0 }}>
+        <span className="display" style={{ color: "var(--navy)", fontSize: "clamp(0.95rem, 2.2vw, 1.7rem)", lineHeight: 1.05, textAlign: "right", overflow: "hidden", textOverflow: "ellipsis" }}>{h.name}</span>
+        <span className="team__flag" style={{ fontSize: "clamp(1.6rem, 4vw, 2.6rem)" }}>{h.flag}</span>
+      </div>
+      <span className="display text-gold" style={{ fontSize: "clamp(0.9rem, 2.2vw, 1.5rem)" }}>VS</span>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-start", gap: "0.5rem", minWidth: 0 }}>
+        <span className="team__flag" style={{ fontSize: "clamp(1.6rem, 4vw, 2.6rem)" }}>{a.flag}</span>
+        <span className="display" style={{ color: "var(--navy)", fontSize: "clamp(0.95rem, 2.2vw, 1.7rem)", lineHeight: 1.05, overflow: "hidden", textOverflow: "ellipsis" }}>{a.name}</span>
+      </div>
+    </div>
+  );
+}
+
 export function AttractScreen({
-  match,
+  matches,
   status,
   onStart,
 }: {
-  match: Match;
+  matches: Match[];
   status: SessionStatus;
   onStart: () => void;
 }) {
-  const home = resolveTeam(match.homeTeam);
-  const away = resolveTeam(match.awayTeam);
-  const { full } = formatKickoffCT(match);
+  const primary = matches[0];
+  const multi = matches.length > 1;
   const closed = status === "closed";
+  const { full } = primary ? formatKickoffCT(primary) : { full: "" };
 
   return (
     <div
@@ -107,15 +134,33 @@ export function AttractScreen({
     >
       <Sparkles />
       <div style={{ textAlign: "center" }}>
-        <p className="eyebrow">DAR Coffee × Yalla Bites × Haus of Design · {stageLabel(match)}</p>
+        <p className="eyebrow">
+          DAR Coffee × Yalla Bites × Haus of Design ·{" "}
+          {multi ? `${matches.length} games kicking off` : primary ? stageLabel(primary) : ""}
+        </p>
         <p className="text-dim" style={{ marginTop: 6 }}>{full}</p>
       </div>
 
-      <div style={{ display: "flex", alignItems: "center", gap: "clamp(1rem, 5vw, 3.5rem)" }}>
-        <TeamMini t={home} />
-        <span className="display text-gold" style={{ fontSize: "clamp(1.6rem, 5vw, 3.2rem)" }}>VS</span>
-        <TeamMini t={away} />
-      </div>
+      {multi ? (
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            gap: "clamp(0.5rem, 1.6vh, 1rem)",
+            width: "min(920px, 94vw)",
+          }}
+        >
+          {matches.map((m) => (
+            <MatchRow key={m.id} m={m} />
+          ))}
+        </div>
+      ) : primary ? (
+        <div style={{ display: "flex", alignItems: "center", gap: "clamp(1rem, 5vw, 3.5rem)" }}>
+          <TeamMini t={resolveTeam(primary.homeTeam)} />
+          <span className="display text-gold" style={{ fontSize: "clamp(1.6rem, 5vw, 3.2rem)" }}>VS</span>
+          <TeamMini t={resolveTeam(primary.awayTeam)} />
+        </div>
+      ) : null}
 
       {closed ? (
         <div className="panel" style={{ padding: "1.5rem 2rem", textAlign: "center" }}>
@@ -134,7 +179,8 @@ export function AttractScreen({
             className="display text-cream anim-blink"
             style={{ fontSize: "clamp(1rem, 2.6vw, 1.6rem)", textAlign: "center" }}
           >
-            Pick your team · Enter to win <span className="text-red">FREE Yalla Bites</span> 🎟️
+            {multi ? "Pick a winner for each game" : "Pick your team"} · Enter to win{" "}
+            <span className="text-red">FREE Yalla Bites</span> 🎟️
           </p>
         </>
       )}

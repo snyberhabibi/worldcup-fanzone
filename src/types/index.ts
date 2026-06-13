@@ -39,10 +39,20 @@ export interface DrawResult {
   poolSize: number;
 }
 
-/** Shared control state set by the barista on the kiosk, mirrored on the board. */
+/** Live voting state shared with kiosk + board. matchIds = the current slot
+ *  (1+ simultaneous games → stacked voting). */
 export interface SessionState {
-  matchId: number;
+  matchIds: number[];
   status: SessionStatus;
+  updatedAt: string;
+  lastDraw: DrawResult | null;
+}
+
+/** What's persisted in the KioskSession tab — just the barista override; the
+ *  live slot + open/closed status are derived from the clock. */
+export interface StoredSession {
+  pinnedMatchId: number | null;
+  manualStatus: SessionStatus | "";
   updatedAt: string;
   lastDraw: DrawResult | null;
 }
