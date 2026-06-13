@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { CopyVoteLink } from "@/components/CopyVoteLink";
 
 export default function LauncherPage() {
   return (
@@ -36,6 +37,15 @@ export default function LauncherPage() {
             width: "100%",
           }}
         >
+          <Link href="/vote" className="panel" style={launchCardStyle}>
+            <span style={{ fontSize: "3rem" }} className="emoji">📲</span>
+            <span className="display" style={{ fontSize: "1.8rem" }}>Fan Voting</span>
+            <span className="text-dim" style={{ textAlign: "center" }}>
+              Phone voting page. Share this link so fans can vote from their seat.
+            </span>
+            <span className="btn btn--gold" style={{ marginTop: "0.5rem" }}>Open vote page →</span>
+          </Link>
+
           <Link href="/kiosk" className="panel" style={launchCardStyle}>
             <span style={{ fontSize: "3rem" }} className="emoji">🕹️</span>
             <span className="display" style={{ fontSize: "1.8rem" }}>Voting Kiosk</span>
@@ -54,6 +64,8 @@ export default function LauncherPage() {
             <span className="btn btn--gold" style={{ marginTop: "0.5rem" }}>Launch board →</span>
           </Link>
         </div>
+
+        <CopyVoteLink />
 
         <p className="text-dim" style={{ fontSize: "0.85rem", textAlign: "center", maxWidth: 620 }}>
           Tip: on the iPad, add this to the Home Screen and turn on Guided Access
