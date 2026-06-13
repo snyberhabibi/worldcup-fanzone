@@ -6,7 +6,7 @@ export function QrTile() {
   return (
     <div className="qr-tile">
       <div className="qr-tile__qr">
-        <QRCodeSVG value="https://yallabites.com/" size={132} bgColor="#ffffff" fgColor="#4A3728" level="M" />
+        <QRCodeSVG value="https://yallabites.com/" size={132} bgColor="#ffffff" fgColor="#4A3728" level="M" role="img" aria-label="Scan to download the Yalla Bites app" />
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: "0.2rem" }}>
         <p className="display" style={{ color: "var(--yb-red)", fontSize: "clamp(1.2rem, 2vw, 1.7rem)", lineHeight: 1 }}>

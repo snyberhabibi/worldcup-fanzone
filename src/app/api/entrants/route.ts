@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   if (!idParam || !getMatch(matchId))
     return NextResponse.json({ error: "valid matchId required" }, { status: 400 });
   try {
-    const log = await cached("votelog", 1500, () => getVoteLog());
+    const log = await cached("votelog", 3000, () => getVoteLog());
     const entrants: Entrant[] = entrantsFromLog(log, matchId).map((e) => ({
       firstName: e.firstName,
       phoneMasked: maskPhone(e.phone),

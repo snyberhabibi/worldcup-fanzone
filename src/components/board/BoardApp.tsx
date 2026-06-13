@@ -7,6 +7,7 @@ import type { SessionState, Tally, Entrant, DrawResult } from "@/types";
 import { VoteBars } from "./VoteBars";
 import { TodaySchedule } from "./TodaySchedule";
 import { QrTile } from "./QrTile";
+import { VoteQrTile } from "./VoteQrTile";
 import { SpinWheel } from "./SpinWheel";
 import { Splash } from "@/components/Splash";
 import { useHydrated } from "@/lib/use-hydrated";
@@ -107,9 +108,10 @@ export function BoardApp() {
       <VoteBars match={match} tally={liveTally} />
 
       <footer style={{ display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", alignItems: "stretch", flexWrap: "wrap" }}>
-        <div style={{ flex: "1 1 520px", minWidth: 0 }}>
+        <div style={{ flex: "1 1 380px", minWidth: 0 }}>
           <TodaySchedule currentId={matchId} now={now} />
         </div>
+        <VoteQrTile />
         <QrTile />
       </footer>
 

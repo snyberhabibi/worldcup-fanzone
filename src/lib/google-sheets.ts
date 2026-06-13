@@ -37,6 +37,7 @@ function getSheets() {
 const TAB_VOTES = "KioskVotes";
 const TAB_SESSION = "KioskSession";
 const TAB_WINNERS = "KioskWinners";
+const TAB_SMS = "KioskSms";
 
 const HEADERS: Record<string, string[]> = {
   [TAB_VOTES]: [
@@ -52,6 +53,7 @@ const HEADERS: Record<string, string[]> = {
   ],
   [TAB_SESSION]: ["matchId", "status", "updatedAt", "lastDraw"],
   [TAB_WINNERS]: ["ts", "matchId", "matchup", "firstName", "phone"],
+  [TAB_SMS]: ["ts", "phone", "type", "status", "detail"],
 };
 
 // Idempotent, memoized per warm instance: create the kiosk tabs + headers if missing.
@@ -251,5 +253,40 @@ export async function appendWinner(w: Winner): Promise<void> {
     requestBody: {
       values: [[w.ts, String(w.matchId), w.matchup, w.firstName, w.phone]],
     },
+  });
+}
+
+/** All winners across all games (matchId + phone) — for per-game draw dedup. */
+export async function getAllWinners(): Promise<{ matchId: number; phone: string }[]> {
+  await ensureTabs();
+  const sheets = getSheets();
+  const res = await sheets.spreadsheets.values.get({
+    spreadsheetId: SHEET_ID,
+    range: `${TAB_WINNERS}!A2:E`,
+  });
+  const rows = res.data.values || [];
+  return rows
+    .filter((r) => r && r[1] && r[4])
+    .map((r) => ({ matchId: Number(r[1]) || 0, phone: r[4] || "" }));
+}
+
+// ── SMS audit log ───────────────────────────────────
+export interface SmsLogRow {
+  ts: string;
+  phone: string;
+  type: string;
+  status: string;
+  detail: string;
+}
+
+export async function appendSmsLog(r: SmsLogRow): Promise<void> {
+  await ensureTabs();
+  const sheets = getSheets();
+  await sheets.spreadsheets.values.append({
+    spreadsheetId: SHEET_ID,
+    range: `${TAB_SMS}!A:E`,
+    valueInputOption: "RAW",
+    insertDataOption: "INSERT_ROWS",
+    requestBody: { values: [[r.ts, r.phone, r.type, r.status, r.detail]] },
   });
 }

@@ -13,20 +13,16 @@ const activeRing: React.CSSProperties = {
 export function EntryScreen({
   firstName,
   phone,
-  consent,
   setFirstName,
   setPhone,
-  setConsent,
   onContinue,
   onCancel,
   onActivity,
 }: {
   firstName: string;
   phone: string;
-  consent: boolean;
   setFirstName: (v: string) => void;
   setPhone: (v: string) => void;
-  setConsent: (v: boolean) => void;
   onContinue: () => void;
   onCancel: () => void;
   onActivity: () => void;
@@ -134,22 +130,10 @@ export function EntryScreen({
             maxLength={24}
           />
           <div style={{ height: 2, background: nameActive ? "var(--yb-gold)" : "var(--line)", transition: "background 0.2s" }} />
-          <button
-            type="button"
-            onClick={() => {
-              onActivity();
-              sound.play("tap");
-              setConsent(!consent);
-            }}
-            style={{ display: "flex", alignItems: "flex-start", gap: "0.75rem", textAlign: "left", marginTop: "auto" }}
-          >
-            <span className={`switch ${consent ? "is-on" : ""}`} aria-hidden>
-              <span className="switch__knob" />
-            </span>
-            <span className="text-dim" style={{ fontSize: "0.85rem", lineHeight: 1.35 }}>
-              Text me about my prize &amp; the occasional Yalla Bites offer. Msg &amp; data rates may apply.
-            </span>
-          </button>
+          <p className="text-dim" style={{ fontSize: "0.8rem", lineHeight: 1.4, marginTop: "auto" }}>
+            By entering, you agree to receive texts from Yalla Bites about your pick &amp; offers.
+            Msg &amp; data rates may apply. Reply <b style={{ color: "var(--cream-soft)" }}>STOP</b> to opt out.
+          </p>
         </div>
 
         {/* Phone + keypad */}

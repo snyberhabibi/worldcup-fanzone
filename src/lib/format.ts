@@ -40,6 +40,8 @@ export function maskPhone(input: string): string {
 export function sanitizeFirstName(input: string): string {
   return (input || "")
     .replace(/[\x00-\x1f\x7f]/g, "")
+    // Strip leading =,+,-,@ so a name can't inject a formula into Google Sheets.
+    .replace(/^[=+\-@\t\r]+/, "")
     .replace(/\s+/g, " ")
     .trim()
     .slice(0, 24);

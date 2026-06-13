@@ -25,7 +25,7 @@ export function KioskApp() {
   const [phase, setPhase] = useState<Phase>("attract");
   const [firstName, setFirstName] = useState("");
   const [phone, setPhone] = useState("");
-  const [consent, setConsent] = useState(true);
+  const consent = true; // voting = consent (disclosed on the entry screen)
   const [committedSide, setCommittedSide] = useState<Side | null>(null);
   // The game the current customer is voting on, pinned when they start so a
   // barista game-switch mid-flow can't reattribute their vote.
@@ -52,7 +52,6 @@ export function KioskApp() {
   const resetToAttract = useCallback(() => {
     setFirstName("");
     setPhone("");
-    setConsent(true);
     setCommittedSide(null);
     setActiveMatchId(null);
     setPhase("attract");
@@ -160,10 +159,8 @@ export function KioskApp() {
         <EntryScreen
           firstName={firstName}
           phone={phone}
-          consent={consent}
           setFirstName={setFirstName}
           setPhone={setPhone}
-          setConsent={setConsent}
           onContinue={() => setPhase("pick")}
           onCancel={resetToAttract}
           onActivity={bumpIdle}

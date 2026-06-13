@@ -124,6 +124,9 @@ export function BaristaPanel({
       } else if (data.reason === "no_entrants") {
         setDrawMsg("No entries yet for this game.");
         sound.play("error");
+      } else if (data.reason === "all_won") {
+        setDrawMsg("Everyone in this game has already won 🎉");
+        sound.play("error");
       } else {
         setDrawMsg("Draw failed.");
       }
