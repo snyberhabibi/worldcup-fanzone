@@ -17,7 +17,7 @@ import {
 } from "@/lib/games";
 import { normalizePhone, isValidUSPhone, sanitizeFirstName } from "@/lib/format";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
-import { sendSms, welcomeSms } from "@/lib/quo";
+import { sendSms, welcomeSms, repeatVoteSms } from "@/lib/quo";
 import { notifyCrm, signupMessage } from "@/lib/slack";
 import type { VoteRecord, Side } from "@/types";
 
@@ -80,22 +80,38 @@ export async function POST(req: NextRequest) {
     const log = await getVoteLog();
     const tally = tallyFromLog(log, matchId);
 
-    // First-ever vote for this phone = a new sign-up: welcome SMS + Slack CRM
-    // ping. Deduped (repeat voters don't retrigger). Never blocks the vote.
-    const firstEver = log.filter((v) => v.phone === phone).length === 1;
-    if (firstEver) {
+    // SMS policy — text at most once per voting slot per phone, never blocks:
+    //  • first vote EVER  → full welcome SMS + Slack CRM "new sign-up" ping
+    //  • returning voter  → short "your vote is IN" confirmation
+    //  • extra games in the same slot (stacked voting) → no extra text
+    const phoneVotes = log.filter((v) => v.phone === phone);
+    const firstEver = phoneVotes.length === 1;
+    const slotIds = slotGamesOf(matchId).map((g) => g.id);
+    const firstInSlot = phoneVotes.filter((v) => slotIds.includes(v.matchId)).length === 1;
+    if (firstInSlot) {
       after(async () => {
-        const r = await sendSms(phone, welcomeSms());
-        await appendSmsLog({
-          ts: new Date().toISOString(),
-          phone,
-          type: "welcome",
-          status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
-          detail: r.error || "",
-        }).catch(() => {});
-        await notifyCrm(
-          signupMessage(firstName, phone, teamName, matchupOf(match))
-        ).catch(() => {});
+        if (firstEver) {
+          const r = await sendSms(phone, welcomeSms());
+          await appendSmsLog({
+            ts: new Date().toISOString(),
+            phone,
+            type: "welcome",
+            status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
+            detail: r.error || "",
+          }).catch(() => {});
+          await notifyCrm(
+            signupMessage(firstName, phone, teamName, matchupOf(match))
+          ).catch(() => {});
+        } else {
+          const r = await sendSms(phone, repeatVoteSms(teamName));
+          await appendSmsLog({
+            ts: new Date().toISOString(),
+            phone,
+            type: "repeat",
+            status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
+            detail: r.error || "",
+          }).catch(() => {});
+        }
       });
     }
 

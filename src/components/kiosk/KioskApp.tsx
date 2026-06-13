@@ -156,7 +156,7 @@ export function KioskApp() {
           position: "absolute",
           top: "calc(env(safe-area-inset-top, 0px) + 10px)",
           left: "calc(env(safe-area-inset-left, 0px) + 10px)",
-          zIndex: 30,
+          zIndex: 90, // above the portrait rotate-hint (z-80) so staff can open barista controls without rotating
           display: "flex",
           flexDirection: "column",
           gap: 8,

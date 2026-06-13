@@ -5,7 +5,7 @@ import { QRCodeSVG } from "qrcode.react";
 export function VoteQrTile({ compact = false }: { compact?: boolean }) {
   const base = typeof window !== "undefined" ? window.location.origin : "https://fifa.yallabites.com";
   const url = `${base}/vote`;
-  const size = compact ? 116 : 140;
+  const size = compact ? 162 : 140;
   return (
     <div
       className="qr-tile"
@@ -29,11 +29,9 @@ export function VoteQrTile({ compact = false }: { compact?: boolean }) {
         <p style={{ color: "var(--yb-cocoa)", fontWeight: 800, fontSize: "clamp(0.9rem, 1.4vw, 1.1rem)" }}>
           Can&apos;t reach the iPad? Vote from your phone.
         </p>
-        {!compact && (
-          <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.78rem, 1.1vw, 0.92rem)" }}>
-            Pick your team &amp; enter to win free Yalla Bites
-          </p>
-        )}
+        <p style={{ color: "var(--yb-sage)", fontSize: "clamp(0.78rem, 1.1vw, 0.92rem)" }}>
+          Pick your team &amp; enter to win free Yalla Bites
+        </p>
       </div>
     </div>
   );

@@ -56,6 +56,12 @@ export function welcomeSms(): string {
   return `Welcome to the Fan Zone raffle, sponsored by Yalla Bites — the UberEats for homemade food! Stick around to see if you win! Download Yalla Bites on the App Store today: www.yallabites.com. Reply STOP to opt out.`;
 }
 
+// A returning voter (already got the full welcome at an earlier match) gets a
+// short confirmation instead — just enough to keep them around for the draw.
+export function repeatVoteSms(teamName: string): string {
+  return `Your vote for ${teamName} is IN! 🎉 Stick around to see if you win! Reply STOP to opt out.`;
+}
+
 export function winnerSms(): string {
   return `CONGRATS! You won the Fan Zone raffle! Use code YALLA20 at checkout on the Yalla Bites app for $20 off your first order + FREE DELIVERY. Download: yallabites.com. Reply STOP to opt out.`;
 }

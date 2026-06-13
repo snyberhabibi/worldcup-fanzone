@@ -59,6 +59,10 @@ export default function LauncherPage() {
           Tip: on the iPad, add this to the Home Screen and turn on Guided Access
           (triple-click the side button) to lock customers into the kiosk.
         </p>
+
+        <Link href="/barista" className="text-dim" style={{ fontSize: "0.9rem", fontWeight: 700, color: "var(--yb-gold)" }}>
+          ⚙️ Barista console (phone-friendly) →
+        </Link>
       </div>
     </main>
   );

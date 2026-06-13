@@ -144,7 +144,7 @@ export function BoardApp() {
           alignItems: "stretch",
           flexWrap: "nowrap",
           flexShrink: 0,
-          height: "clamp(150px, 23vh, 210px)",
+          height: "clamp(200px, 28vh, 290px)",
         }}
       >
         <div style={{ flex: "1 1 0", minWidth: 0, overflow: "hidden" }}>
