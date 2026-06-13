@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
     bust("session-row");
     bust("votelog");
 
-    // Winner SMS — once per phone ever (first win delivers the YALLA20 code).
+    // Winner SMS — once per phone ever (first win delivers the YALLA10 code).
     // Sent synchronously (not in after()) so the barista sees delivery status in
     // the console and can read the code aloud / re-spin if it failed — this is
     // the one message with real money attached. The board's wheel already spun

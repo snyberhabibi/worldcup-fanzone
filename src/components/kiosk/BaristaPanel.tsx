@@ -132,7 +132,7 @@ export function BaristaPanel({
           data.smsStatus === "sent"
             ? " · ✅ code texted"
             : data.smsStatus === "failed"
-              ? " · ⚠️ TEXT FAILED — give them code YALLA20"
+              ? " · ⚠️ TEXT FAILED — give them code YALLA10"
               : data.smsStatus === "dry-run"
                 ? " · (test mode — no real text)"
                 : ""; // "skipped": already won before, already has their code

@@ -63,5 +63,5 @@ export function repeatVoteSms(teamName: string): string {
 }
 
 export function winnerSms(): string {
-  return `CONGRATS! You won the Fan Zone raffle! Use code YALLA20 at checkout on the Yalla Bites app for $20 off your first order + FREE DELIVERY. Download: yallabites.com. Reply STOP to opt out.`;
+  return `CONGRATS! You won the Fan Zone raffle! Use code YALLA10 at checkout on the Yalla Bites app for $10 off your first order + FREE DELIVERY. Download: yallabites.com. Reply STOP to opt out.`;
 }
