@@ -61,6 +61,13 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
   const hp = total ? (h / total) * 100 : 50;
   const ap = 100 - hp;
 
+  // DAR Pick: the leading team, and its vote count IS the live % discount off a
+  // DAR Coffee order (capped at 100%). Rises as votes come in.
+  const leader = total > 0 ? (h >= a ? home : away) : null;
+  const tie = total > 0 && h === a;
+  const pct = Math.min(Math.max(h, a), 100);
+  const pctShown = useCountUp(pct, 800, true);
+
   // Celebrate every 25 votes — but only on genuine forward progress. Track the
   // running peak (not the last value) so a stale/lower poll dipping then
   // recovering past a /25 boundary can't re-fire confetti. Resets on game
@@ -133,6 +140,42 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
             </span>
           )}
         </div>
+      </div>
+
+      {/* DAR Pick — the leading team, and the live % off a DAR Coffee order. */}
+      <div
+        style={{
+          alignSelf: "center",
+          maxWidth: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "0.4em",
+          flexWrap: "wrap",
+          textAlign: "center",
+          background: "color-mix(in srgb, var(--yb-gold) 16%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--yb-gold) 55%, transparent)",
+          borderRadius: 999,
+          padding: "clamp(0.3rem, 0.9vh, 0.6rem) clamp(0.8rem, 1.8vw, 1.5rem)",
+          fontFamily: "var(--font-display)",
+          fontWeight: 800,
+          lineHeight: 1.12,
+          fontSize: "clamp(0.78rem, 2vh, 1.5rem)",
+        }}
+      >
+        {total === 0 ? (
+          <span className="text-gold">☕ DAR Pick — the first vote starts the discount</span>
+        ) : tie ? (
+          <span>
+            🤝 <span className="text-gold">DAR Pick: TIE</span> ·{" "}
+            <span style={{ color: "var(--yb-red)" }}>{pctShown}% off</span> — vote to pick the team!
+          </span>
+        ) : (
+          <span>
+            ☕ <span className="text-gold">DAR Pick:</span> {leader!.flag} {leader!.name} ·{" "}
+            <span style={{ color: "var(--yb-red)" }}>{pctShown}% OFF</span> your next DAR order
+          </span>
+        )}
       </div>
 
       <p className="eyebrow" style={{ textAlign: "center" }}>
