@@ -113,13 +113,14 @@ export function stageLabel(match: Match): string {
   return match.group ? `Group ${match.group}` : STAGE_LABELS[match.stage];
 }
 
-// ── Auto-progression slots (Central time) ─────────────────────
+// ── Featured slot + voting window (Central time) ──────────────
 // A "slot" = games with the SAME kickoff (simultaneous) → stacked voting.
-// Voting stays open for the ENTIRE game (~2h from kickoff: 90' + halftime +
-// stoppage), then the slot auto-advances to the next game. Timing is estimated
-// from the scheduled kickoff; the barista can still pause/advance manually.
-export const VOTE_CLOSE_MIN = 120; // whole game — kickoff to ~full time
-export const SLOT_END_MIN = 120; // advance to the next game at full time
+// Voting stays OPEN before, during, AND after a match: a game is the featured,
+// votable slot from its kickoff until the NEXT game kicks off — capped at
+// MAX_FEATURE_MIN so a late game doesn't linger overnight. This adapts to the
+// schedule's varying gaps (as little as 2.5h) without ever overlapping the next
+// game. The barista can still pause/advance manually.
+const MAX_FEATURE_MIN = 240; // a game stays featured/votable at most 4h past kickoff (unless the next game starts sooner)
 
 interface SlotDef {
   kickoff: Date;
@@ -138,18 +139,37 @@ const SLOTS: SlotDef[] = (() => {
     .sort((a, b) => a.kickoff.getTime() - b.kickoff.getTime());
 })();
 
-function slotEnded(s: SlotDef, now: Date): boolean {
-  return now.getTime() >= s.kickoff.getTime() + SLOT_END_MIN * 60_000;
-}
-
 function slotDefOf(matchId: number): SlotDef | undefined {
   return SLOTS.find((s) => s.games.some((g) => g.id === matchId));
 }
 
-/** The active slot's games by clock: the first slot not yet ended (auto-advances). */
+function nextSlotAfter(s: SlotDef): SlotDef | undefined {
+  return SLOTS[SLOTS.indexOf(s) + 1];
+}
+
+// Single source of truth: a slot is votable from before kickoff until the NEXT
+// slot kicks off (so people vote during AND after the match), capped so it can't
+// linger for days once a slot is the last before a long gap / overnight.
+function slotVotingOpen(s: SlotDef, now: Date): boolean {
+  const t = now.getTime();
+  const next = nextSlotAfter(s);
+  if (next && t >= next.kickoff.getTime()) return false; // the next game has started → this one's window is over
+  return t < s.kickoff.getTime() + MAX_FEATURE_MIN * 60_000;
+}
+
+/** The featured slot: the most recently kicked-off slot while it's still in its
+ *  window (stays put after the match until the next game starts), else the next
+ *  upcoming, else the last. */
 export function currentSlotGames(now: Date): Match[] {
-  const s = SLOTS.find((x) => !slotEnded(x, now)) ?? SLOTS[SLOTS.length - 1];
-  return s.games;
+  const t = now.getTime();
+  let latest: SlotDef | undefined;
+  for (const s of SLOTS) {
+    if (s.kickoff.getTime() <= t) latest = s; // SLOTS sorted ascending → keep the last one at/under now
+    else break;
+  }
+  if (latest && slotVotingOpen(latest, now)) return latest.games;
+  const next = SLOTS.find((s) => s.kickoff.getTime() > t);
+  return (next ?? SLOTS[SLOTS.length - 1]).games;
 }
 
 /** The other games kicking off at the same time as `matchId` (incl. itself). */
@@ -163,13 +183,13 @@ export function slotGamesOf(matchId: number): Match[] {
 export function isSlotOpen(matchId: number, now: Date): boolean {
   const s = slotDefOf(matchId);
   if (!s) return true;
-  return now.getTime() < s.kickoff.getTime() + VOTE_CLOSE_MIN * 60_000;
+  return slotVotingOpen(s, now);
 }
 
 export function isSlotEnded(matchId: number, now: Date): boolean {
   const s = slotDefOf(matchId);
   if (!s) return false;
-  return slotEnded(s, now);
+  return !slotVotingOpen(s, now);
 }
 
 // ── Today's slate (Central time) ──────────────────────────────
