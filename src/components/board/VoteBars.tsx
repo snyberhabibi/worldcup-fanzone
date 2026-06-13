@@ -61,12 +61,12 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
   const hp = total ? (h / total) * 100 : 50;
   const ap = 100 - hp;
 
-  // DAR Pick: the leading team, and its vote count IS the live % discount off a
-  // DAR Coffee order (capped at 100%). Rises as votes come in.
-  const leader = total > 0 ? (h >= a ? home : away) : null;
-  const tie = total > 0 && h === a;
-  const pct = Math.min(Math.max(h, a), 100);
-  const pctShown = useCountUp(pct, 800, true);
+  // DAR Pick discount — DISABLED per owner. To re-enable, uncomment these
+  // lines and the banner block in the render below.
+  // const leader = total > 0 ? (h >= a ? home : away) : null;
+  // const tie = total > 0 && h === a;
+  // const pct = Math.min(Math.max(h, a), 100);
+  // const pctShown = useCountUp(pct, 800, true);
 
   // Celebrate every 25 votes — but only on genuine forward progress. Track the
   // running peak (not the last value) so a stale/lower poll dipping then
@@ -142,7 +142,8 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
         </div>
       </div>
 
-      {/* DAR Pick — the leading team, and the live % off a DAR Coffee order. */}
+      {/* DAR Pick discount banner — DISABLED per owner; uncomment to restore
+          (also uncomment the pct computation above):
       <div
         style={{
           alignSelf: "center",
@@ -177,6 +178,7 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
           </span>
         )}
       </div>
+      */}
 
       <p className="eyebrow" style={{ textAlign: "center" }}>
         {totalShown} {total === 1 ? "vote" : "votes"} · one vote per phone
