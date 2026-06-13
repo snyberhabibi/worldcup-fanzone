@@ -33,6 +33,49 @@ function getSheets() {
   return google.sheets({ version: "v4", auth: getAuth() });
 }
 
+// ── Transient-failure retry ─────────────────────────
+// Google Sheets enforces per-minute quotas (~60 writes/min on a single service
+// account). A matchday vote burst can briefly exceed that and get HTTP 429,
+// which would otherwise 500 the vote and silently drop a sign-up. Retry the
+// quota/5xx/network class with jittered exponential backoff so short spikes ride
+// over the per-minute boundary instead of failing the customer.
+const RETRYABLE_NET = new Set([
+  "ECONNRESET",
+  "ETIMEDOUT",
+  "ECONNREFUSED",
+  "EAI_AGAIN",
+  "ENOTFOUND",
+]);
+
+function isRetryable(e: unknown): boolean {
+  const err = e as {
+    code?: number | string;
+    status?: number;
+    response?: { status?: number };
+  };
+  const status =
+    typeof err?.code === "number" ? err.code : err?.status ?? err?.response?.status;
+  if (typeof status === "number") return status === 429 || (status >= 500 && status < 600);
+  if (typeof err?.code === "string") return RETRYABLE_NET.has(err.code);
+  return false;
+}
+
+async function withRetry<T>(label: string, fn: () => Promise<T>, attempts = 4): Promise<T> {
+  let lastErr: unknown;
+  for (let i = 0; i < attempts; i++) {
+    try {
+      return await fn();
+    } catch (e) {
+      lastErr = e;
+      if (i === attempts - 1 || !isRetryable(e)) throw e;
+      const delay = Math.min(2000, 250 * 2 ** i) + Math.floor(Math.random() * 120);
+      console.warn(`[sheets] ${label} retryable failure (attempt ${i + 1}), backoff ${delay}ms`);
+      await new Promise((r) => setTimeout(r, delay));
+    }
+  }
+  throw lastErr;
+}
+
 // ── Tabs ────────────────────────────────────────────
 const TAB_VOTES = "KioskVotes";
 const TAB_SESSION = "KioskSession";
@@ -103,36 +146,40 @@ async function doEnsure(): Promise<void> {
 export async function appendVote(v: VoteRecord): Promise<void> {
   await ensureTabs();
   const sheets = getSheets();
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_VOTES}!A:I`,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS",
-    requestBody: {
-      values: [
-        [
-          v.ts,
-          String(v.matchId),
-          v.matchup,
-          v.side,
-          v.teamCode,
-          v.teamName,
-          v.firstName,
-          v.phone,
-          v.consent ? "TRUE" : "FALSE",
+  await withRetry("appendVote", () =>
+    sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_VOTES}!A:I`,
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: {
+        values: [
+          [
+            v.ts,
+            String(v.matchId),
+            v.matchup,
+            v.side,
+            v.teamCode,
+            v.teamName,
+            v.firstName,
+            v.phone,
+            v.consent ? "TRUE" : "FALSE",
+          ],
         ],
-      ],
-    },
-  });
+      },
+    })
+  );
 }
 
 export async function getVoteLog(): Promise<VoteRecord[]> {
   await ensureTabs();
   const sheets = getSheets();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_VOTES}!A2:I`,
-  });
+  const res = await withRetry("getVoteLog", () =>
+    sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_VOTES}!A2:I`,
+    })
+  );
   const rows = res.data.values || [];
   return rows
     .filter((r) => r && r.length && r[0])
@@ -201,10 +248,12 @@ export function entrantsFromLog(
 export async function getSession(): Promise<StoredSession | null> {
   await ensureTabs();
   const sheets = getSheets();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_SESSION}!A2:E2`,
-  });
+  const res = await withRetry("getSession", () =>
+    sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_SESSION}!A2:E2`,
+    })
+  );
   const r = res.data.values?.[0];
   if (!r || (!r[0] && !r[1] && !r[3])) return null;
   let lastDraw: DrawResult | null = null;
@@ -227,47 +276,53 @@ export async function getSession(): Promise<StoredSession | null> {
 export async function setSession(s: StoredSession): Promise<void> {
   await ensureTabs();
   const sheets = getSheets();
-  await sheets.spreadsheets.values.update({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_SESSION}!A2:E2`,
-    valueInputOption: "RAW",
-    requestBody: {
-      values: [
-        [
-          s.pinnedMatchId != null ? String(s.pinnedMatchId) : "",
-          s.manualStatus,
-          s.updatedAt,
-          s.lastDraw ? JSON.stringify(s.lastDraw) : "",
-          s.pinSticky ? "TRUE" : "",
+  await withRetry("setSession", () =>
+    sheets.spreadsheets.values.update({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_SESSION}!A2:E2`,
+      valueInputOption: "RAW",
+      requestBody: {
+        values: [
+          [
+            s.pinnedMatchId != null ? String(s.pinnedMatchId) : "",
+            s.manualStatus,
+            s.updatedAt,
+            s.lastDraw ? JSON.stringify(s.lastDraw) : "",
+            s.pinSticky ? "TRUE" : "",
+          ],
         ],
-      ],
-    },
-  });
+      },
+    })
+  );
 }
 
 // ── Winners ─────────────────────────────────────────
 export async function appendWinner(w: Winner): Promise<void> {
   await ensureTabs();
   const sheets = getSheets();
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_WINNERS}!A:E`,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS",
-    requestBody: {
-      values: [[w.ts, String(w.matchId), w.matchup, w.firstName, w.phone]],
-    },
-  });
+  await withRetry("appendWinner", () =>
+    sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_WINNERS}!A:E`,
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: {
+        values: [[w.ts, String(w.matchId), w.matchup, w.firstName, w.phone]],
+      },
+    })
+  );
 }
 
 /** All winners across all games (matchId + phone) — for per-game draw dedup. */
 export async function getAllWinners(): Promise<{ matchId: number; phone: string }[]> {
   await ensureTabs();
   const sheets = getSheets();
-  const res = await sheets.spreadsheets.values.get({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_WINNERS}!A2:E`,
-  });
+  const res = await withRetry("getAllWinners", () =>
+    sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_WINNERS}!A2:E`,
+    })
+  );
   const rows = res.data.values || [];
   return rows
     .filter((r) => r && r[1] && r[4])
@@ -286,11 +341,13 @@ export interface SmsLogRow {
 export async function appendSmsLog(r: SmsLogRow): Promise<void> {
   await ensureTabs();
   const sheets = getSheets();
-  await sheets.spreadsheets.values.append({
-    spreadsheetId: SHEET_ID,
-    range: `${TAB_SMS}!A:E`,
-    valueInputOption: "RAW",
-    insertDataOption: "INSERT_ROWS",
-    requestBody: { values: [[r.ts, r.phone, r.type, r.status, r.detail]] },
-  });
+  await withRetry("appendSmsLog", () =>
+    sheets.spreadsheets.values.append({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_SMS}!A:E`,
+      valueInputOption: "RAW",
+      insertDataOption: "INSERT_ROWS",
+      requestBody: { values: [[r.ts, r.phone, r.type, r.status, r.detail]] },
+    })
+  );
 }

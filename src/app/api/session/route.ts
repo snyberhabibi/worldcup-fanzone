@@ -49,7 +49,14 @@ async function effectiveSession(): Promise<SessionState> {
 
   const matchIds = games.map((g) => g.id);
   const autoStatus: SessionStatus = matchIds.length && isSlotOpen(matchIds[0], now) ? "open" : "closed";
-  const status: SessionStatus = manual || autoStatus;
+  // A sticky pin keeps FEATURING a finished game's slot (so the barista can spin
+  // its raffle), but voting for it is genuinely closed. The /api/vote route
+  // ignores a manual "open" once the slot has ended, so clamp the reported
+  // status the same way — otherwise the board/kiosk would advertise "VOTE NOW"
+  // while every submission silently bounces with voting_closed.
+  const manualUsable =
+    manual && matchIds.length > 0 && !isSlotEnded(matchIds[0], now) ? manual : "";
+  const status: SessionStatus = manualUsable || autoStatus;
 
   let lastDraw = stored?.lastDraw ?? null;
   if (lastDraw && !matchIds.includes(lastDraw.matchId)) lastDraw = null;

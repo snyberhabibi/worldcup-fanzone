@@ -22,7 +22,7 @@ function TeamColumn({
 }) {
   const color = side === "home" ? "var(--home)" : "var(--away)";
   const glow = side === "home" ? "var(--home-glow)" : "var(--away-glow)";
-  const shown = useCountUp(count);
+  const shown = useCountUp(count, 800, true);
   return (
     <div
       style={{
@@ -57,14 +57,19 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
   const h = tally?.home ?? 0;
   const a = tally?.away ?? 0;
   const total = h + a;
-  const totalShown = useCountUp(total);
+  const totalShown = useCountUp(total, 800, true);
   const hp = total ? (h / total) * 100 : 50;
   const ap = 100 - hp;
 
-  const prev = useRef(0);
+  // Celebrate every 25 votes — but only on genuine forward progress. Track the
+  // running peak (not the last value) so a stale/lower poll dipping then
+  // recovering past a /25 boundary can't re-fire confetti. Resets on game
+  // change via the keyed remount in BoardApp.
+  const peak = useRef(0);
   useEffect(() => {
-    if (total > 0 && Math.floor(total / 25) > Math.floor(prev.current / 25)) burstConfetti();
-    prev.current = total;
+    if (total <= peak.current) return;
+    if (Math.floor(total / 25) > Math.floor(peak.current / 25)) burstConfetti();
+    peak.current = total;
   }, [total]);
 
   return (

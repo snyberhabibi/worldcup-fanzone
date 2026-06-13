@@ -147,7 +147,11 @@ export function BoardApp() {
           ))}
         </div>
       ) : (
-        <GameTally match={primary} compact={false} />
+        // Key by match id so a slot rollover mounts a fresh tally (and a fresh
+        // count-up baseline) instead of animating the old game's total DOWN to
+        // the new game's on the projector. The multi/narrow branches already
+        // remount via their keyed wrapper divs.
+        <GameTally key={primary.id} match={primary} compact={false} />
       )}
 
       {isNarrow ? (
@@ -176,7 +180,13 @@ export function BoardApp() {
       )}
 
       {draw && (
+        // Key by the draw nonce so each spin (baristas draw multiple prizes per
+        // game) mounts a fresh wheel — re-running the spin/celebrate effect and
+        // resetting reel offset + landed state. Without this, a second draw
+        // while the first wheel is still up would reuse stale state and never
+        // animate.
         <SpinWheel
+          key={draw.nonce}
           match={getMatch(draw.matchId) ?? primary}
           pool={pool}
           draw={draw}

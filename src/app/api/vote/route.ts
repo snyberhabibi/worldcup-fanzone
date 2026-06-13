@@ -6,7 +6,7 @@ import {
   getSession,
   appendSmsLog,
 } from "@/lib/google-sheets";
-import { cached, bust } from "@/lib/cache";
+import { cached } from "@/lib/cache";
 import {
   getMatch,
   matchup as matchupOf,
@@ -75,8 +75,14 @@ export async function POST(req: NextRequest) {
     };
 
     await appendVote(record);
-    bust("votelog");
 
+    // Read the log fresh ONCE for this response — it must reflect the row we
+    // just appended so the returned tally and the once-per-slot SMS gate below
+    // are accurate (esp. stacked voting, where a phone votes for 2+ games in
+    // seconds). We intentionally do NOT bust the shared "votelog" cache here:
+    // the projector's /api/tally and /api/entrants polls reconcile within their
+    // own ~3s TTL, so a single goal-celebration burst no longer forces every
+    // board poll into an uncached full-sheet re-read on top of the vote writes.
     const log = await getVoteLog();
     const tally = tallyFromLog(log, matchId);
 
