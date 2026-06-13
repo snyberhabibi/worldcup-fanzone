@@ -12,6 +12,7 @@ import { VoteQrTile } from "./VoteQrTile";
 import { SpinWheel } from "./SpinWheel";
 import { Splash } from "@/components/Splash";
 import { useHydrated } from "@/lib/use-hydrated";
+import { useIsNarrow } from "@/lib/use-is-narrow";
 import { FullscreenButton } from "@/components/FullscreenButton";
 import { KickoffCountdown } from "./KickoffCountdown";
 
@@ -34,6 +35,7 @@ function GameTally({ match, compact }: { match: Match; compact: boolean }) {
 
 export function BoardApp() {
   const mounted = useHydrated();
+  const isNarrow = useIsNarrow();
 
   const { data: session } = usePoll<SessionState>(
     () => fetch("/api/session").then((r) => r.json()),
@@ -88,8 +90,11 @@ export function BoardApp() {
       style={{
         padding: "clamp(0.75rem, 2vw, 1.5rem)",
         gap: "clamp(0.6rem, 1.5vh, 1.1rem)",
-        height: "100svh",
-        overflow: "hidden",
+        // Phone/portrait: let the board grow and scroll. Projector/landscape:
+        // lock to one fullscreen view with no scroll.
+        ...(isNarrow
+          ? { height: "auto", minHeight: "100svh", overflowY: "auto", overflowX: "hidden" }
+          : { height: "100svh", overflow: "hidden" }),
       }}
     >
       <div
@@ -125,7 +130,15 @@ export function BoardApp() {
         </div>
       </header>
 
-      {multi ? (
+      {isNarrow ? (
+        <div style={{ display: "flex", flexDirection: "column", gap: "clamp(0.6rem, 1.5vh, 1.1rem)" }}>
+          {slotMatches.map((m) => (
+            <div key={m.id} style={{ display: "flex", minHeight: 340 }}>
+              <GameTally match={m} compact />
+            </div>
+          ))}
+        </div>
+      ) : multi ? (
         <div style={{ flex: 1, display: "flex", gap: "clamp(0.75rem, 2vw, 1.5rem)", minHeight: 0, flexWrap: "wrap" }}>
           {slotMatches.map((m) => (
             <div key={m.id} style={{ flex: "1 1 360px", display: "flex", minWidth: 0, minHeight: 0 }}>
@@ -137,22 +150,30 @@ export function BoardApp() {
         <GameTally match={primary} compact={false} />
       )}
 
-      <footer
-        style={{
-          display: "flex",
-          gap: "clamp(0.6rem, 1.4vw, 1.1rem)",
-          alignItems: "stretch",
-          flexWrap: "nowrap",
-          flexShrink: 0,
-          height: "clamp(200px, 28vh, 290px)",
-        }}
-      >
-        <div style={{ flex: "1 1 0", minWidth: 0, overflow: "hidden" }}>
+      {isNarrow ? (
+        <footer style={{ display: "flex", flexDirection: "column", gap: "clamp(0.6rem, 1.5vh, 1.1rem)", flexShrink: 0 }}>
+          <VoteQrTile compact />
+          <QrTile compact />
           <TodaySchedule currentIds={matchIds} now={now} />
-        </div>
-        <VoteQrTile compact />
-        <QrTile compact />
-      </footer>
+        </footer>
+      ) : (
+        <footer
+          style={{
+            display: "flex",
+            gap: "clamp(0.6rem, 1.4vw, 1.1rem)",
+            alignItems: "stretch",
+            flexWrap: "nowrap",
+            flexShrink: 0,
+            height: "clamp(200px, 28vh, 290px)",
+          }}
+        >
+          <div style={{ flex: "1 1 0", minWidth: 0, overflow: "hidden" }}>
+            <TodaySchedule currentIds={matchIds} now={now} />
+          </div>
+          <VoteQrTile compact />
+          <QrTile compact />
+        </footer>
+      )}
 
       {draw && (
         <SpinWheel

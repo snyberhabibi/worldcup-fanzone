@@ -135,6 +135,26 @@ export function MobileVote() {
         </p>
       </div>
 
+      <div
+        style={{
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "0.5rem",
+          textAlign: "center",
+          background: "color-mix(in srgb, var(--yb-gold) 14%, transparent)",
+          border: "1px solid color-mix(in srgb, var(--yb-gold) 45%, transparent)",
+          color: "var(--cream-soft)",
+          borderRadius: 16,
+          padding: "0.6rem 0.9rem",
+          fontWeight: 700,
+          fontSize: "clamp(0.9rem, 3.8vw, 1.05rem)",
+          lineHeight: 1.25,
+        }}
+      >
+        🎟️ Every vote enters you to win <span className="text-gold">FREE Yalla Bites</span> — winners drawn on the big screen!
+      </div>
+
       {status === "closed" ? (
         <div className="panel anim-rise" style={{ padding: "1.5rem", textAlign: "center", marginTop: "1rem" }}>
           <p className="display" style={{ fontSize: "1.4rem" }}>Voting is paused</p>
