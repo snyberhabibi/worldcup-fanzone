@@ -21,7 +21,7 @@ import { KickoffCountdown } from "./KickoffCountdown";
 function GameTally({ match, compact }: { match: Match; compact: boolean }) {
   const { data: tally } = usePoll<Tally>(
     () => fetch(`/api/tally?matchId=${match.id}`).then((r) => r.json()),
-    2000
+    5000
   );
   const live = tally && tally.matchId === match.id ? tally : null;
   if (!compact) return <VoteBars match={match} tally={live} />;
@@ -39,7 +39,7 @@ export function BoardApp() {
 
   const { data: session } = usePoll<SessionState>(
     () => fetch("/api/session").then((r) => r.json()),
-    2500
+    5000
   );
 
   const matchIds = session?.matchIds?.length ? session.matchIds : [pickDefaultMatchId(new Date())];

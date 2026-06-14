@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { getVoteLog, tallyFromLog } from "@/lib/google-sheets";
-import { cached } from "@/lib/cache";
+import { cached, VOTELOG_TTL_MS } from "@/lib/cache";
 import { getMatch } from "@/lib/games";
 import { alertOps } from "@/lib/slack";
 
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   if (!idParam || !getMatch(matchId))
     return NextResponse.json({ error: "valid matchId required" }, { status: 400 });
   try {
-    const log = await cached("votelog", 3000, () => getVoteLog());
+    const log = await cached("votelog", VOTELOG_TTL_MS, () => getVoteLog());
     return NextResponse.json(tallyFromLog(log, matchId));
   } catch (e) {
     console.error("tally GET", e);

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getVoteLog, entrantsFromLog } from "@/lib/google-sheets";
-import { cached } from "@/lib/cache";
+import { cached, VOTELOG_TTL_MS } from "@/lib/cache";
 import { getMatch } from "@/lib/games";
 import { maskPhone } from "@/lib/format";
 import type { Entrant } from "@/types";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   if (!idParam || !getMatch(matchId))
     return NextResponse.json({ error: "valid matchId required" }, { status: 400 });
   try {
-    const log = await cached("votelog", 3000, () => getVoteLog());
+    const log = await cached("votelog", VOTELOG_TTL_MS, () => getVoteLog());
     const entrants: Entrant[] = entrantsFromLog(log, matchId).map((e) => ({
       firstName: e.firstName,
       phoneMasked: maskPhone(e.phone),

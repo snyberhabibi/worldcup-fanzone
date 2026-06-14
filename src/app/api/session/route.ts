@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import { getSession, setSession } from "@/lib/google-sheets";
 import { alertOps } from "@/lib/slack";
-import { cached, bust } from "@/lib/cache";
+import { cached, bust, SESSION_TTL_MS } from "@/lib/cache";
 import {
   currentSlotGames,
   slotGamesOf,
@@ -32,7 +32,7 @@ const EMPTY: StoredSession = {
 //     slot ends, so a forgotten pause can't freeze auto-progression all day.
 async function effectiveSession(): Promise<SessionState> {
   const now = new Date();
-  const stored = await cached("session-row", 1000, () => getSession());
+  const stored = await cached("session-row", SESSION_TTL_MS, () => getSession());
 
   const pinId = stored?.pinnedMatchId ?? null;
   const honorPin =

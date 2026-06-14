@@ -6,7 +6,7 @@ import {
   getSession,
   appendSmsLog,
 } from "@/lib/google-sheets";
-import { cached } from "@/lib/cache";
+import { cached, VOTELOG_TTL_MS, SESSION_TTL_MS } from "@/lib/cache";
 import {
   getMatch,
   matchup as matchupOf,
@@ -50,7 +50,7 @@ export async function POST(req: NextRequest) {
     // barista pinning a finished game to spin its raffle can't also collect
     // stale late votes into the pool.
     const now = new Date();
-    const stored = await cached("session-row", 1500, () => getSession());
+    const stored = await cached("session-row", SESSION_TTL_MS, () => getSession());
     const inPinnedSlot =
       stored?.pinnedMatchId != null &&
       slotGamesOf(stored.pinnedMatchId).some((g) => g.id === matchId);
@@ -77,14 +77,17 @@ export async function POST(req: NextRequest) {
 
     await appendVote(record);
 
-    // Read the log fresh ONCE for this response — it must reflect the row we
-    // just appended so the returned tally and the once-per-slot SMS gate below
-    // are accurate (esp. stacked voting, where a phone votes for 2+ games in
-    // seconds). We intentionally do NOT bust the shared "votelog" cache here:
-    // the projector's /api/tally and /api/entrants polls reconcile within their
-    // own ~3s TTL, so a single goal-celebration burst no longer forces every
-    // board poll into an uncached full-sheet re-read on top of the vote writes.
-    const log = await getVoteLog();
+    // Under load the Sheets API throttles hard (multi-second reads), so we must
+    // NOT read the full log fresh on every vote — that was making each vote take
+    // 5-12s and cascading the whole app down. Read via the shared cache and fold
+    // in THIS vote optimistically for the response; the board's tally polls
+    // converge from the same cache within its TTL.
+    const base = await cached("votelog", VOTELOG_TTL_MS, () => getVoteLog());
+    const log = base.some(
+      (v) => v.ts === record.ts && v.phone === record.phone && v.matchId === matchId
+    )
+      ? base
+      : base.concat(record);
     const tally = tallyFromLog(log, matchId);
 
     // SMS policy — text at most once per voting slot per phone, never blocks:

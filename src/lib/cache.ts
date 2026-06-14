@@ -5,6 +5,13 @@ type Entry = { exp: number; val: unknown };
 
 const store = new Map<string, Entry>();
 
+// Shared TTLs. Tuned UP after a live-event overload: Google Sheets throttles
+// under load (multi-second reads), so we read it as rarely as possible and
+// serve everything else from cache. Freshness trade-off (board lags a few
+// seconds) is well worth keeping the app responsive.
+export const VOTELOG_TTL_MS = 8000;
+export const SESSION_TTL_MS = 5000;
+
 export async function cached<T>(
   key: string,
   ttlMs: number,
