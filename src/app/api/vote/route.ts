@@ -76,22 +76,24 @@ export async function POST(req: NextRequest) {
       consent: true, // voting = consent (disclosed at entry, opt-out via STOP)
     };
 
+    // SMS gate — read counts BEFORE the upsert. With one row per phone+game, a
+    // re-vote doesn't add a row, so post-upsert counts can't tell a new voter
+    // from a re-voter; the prior count can. firstEver = no prior votes anywhere;
+    // firstInSlot = no prior vote among the current slot's games (so stacked
+    // voting + re-votes never re-trigger the text).
+    const slotIds = slotGamesOf(matchId).map((g) => g.id);
+    const [priorTotal, priorInSlot] = await Promise.all([
+      countPhoneVotes(phone),
+      countPhoneVotesInMatches(phone, slotIds),
+    ]);
+
     await appendVote(record); // UPSERT — latest pick per phone+game, no write cap
 
     // Tally straight from Postgres, scoped + indexed to this match — fast even
     // under a 300-voter surge (no full-log read).
     const tally = await getTally(matchId);
-
-    // SMS policy — at most once per voting slot per phone, never blocks. Counts
-    // are read post-upsert: firstEver = this phone's only row anywhere;
-    // firstInSlot = its only row among the current slot's games.
-    const slotIds = slotGamesOf(matchId).map((g) => g.id);
-    const [totalForPhone, inSlotForPhone] = await Promise.all([
-      countPhoneVotes(phone),
-      countPhoneVotesInMatches(phone, slotIds),
-    ]);
-    const firstEver = totalForPhone === 1;
-    const firstInSlot = inSlotForPhone === 1;
+    const firstEver = priorTotal === 0;
+    const firstInSlot = priorInSlot === 0;
     if (firstInSlot) {
       after(async () => {
         if (firstEver) {
