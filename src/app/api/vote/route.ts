@@ -4,6 +4,8 @@ import {
   getSession,
   countPhoneVotes,
   countPhoneVotesInMatches,
+  hasSeenWelcome,
+  appendSmsLog,
 } from "@/lib/db";
 import { cached, SESSION_TTL_MS } from "@/lib/cache";
 import {
@@ -99,11 +101,24 @@ export async function POST(req: NextRequest) {
     // entirely (also lets us load-test with synthetic voters firing no texts).
     if (firstInSlot && !isTestPhone(phone)) {
       after(async () => {
-        if (firstEver) {
-          await sendSms(phone, welcomeSms());
-          await notifyCrm(
-            signupMessage(firstName, phone, teamName, matchupOf(match))
-          ).catch(() => {});
+        // Double gate on the welcome: vote-count says firstEver AND the durable
+        // sms_log has no prior welcome for this phone. The sms_log check is the
+        // safety net that survives any future reset of the votes table (e.g. the
+        // empty-Supabase cutover that caused this incident) — without it, a
+        // returning voter whose count reads 0 gets re-welcomed. We also LOG the
+        // welcome here so the gate has data going forward (previously welcomes
+        // were never logged, so the log was blind to them).
+        if (firstEver && !(await hasSeenWelcome(phone))) {
+          const r = await sendSms(phone, welcomeSms());
+          const status = r.ok ? (r.skipped ? "dry-run" : "sent") : "failed";
+          await appendSmsLog({ phone, type: "welcome", status, detail: r.error || "" }).catch(
+            () => {}
+          );
+          if (r.ok) {
+            await notifyCrm(
+              signupMessage(firstName, phone, teamName, matchupOf(match))
+            ).catch(() => {});
+          }
         } else {
           await sendSms(phone, repeatVoteSms(teamName));
         }

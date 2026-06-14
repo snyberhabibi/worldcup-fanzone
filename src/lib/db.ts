@@ -103,6 +103,142 @@ export async function countPhoneVotesInMatches(phone: string, matchIds: number[]
   return count ?? 0;
 }
 
+/** Has this phone EVER been sent a 'welcome' SMS? Durable, append-only audit
+ *  trail (sms_log) — survives any reset of the votes table, so it's the
+ *  belt-and-suspenders gate that stops a re-welcome even if vote counts are
+ *  ever 0 again. Returns false on query error so a genuine first-timer is
+ *  never silently denied their welcome. */
+export async function hasSeenWelcome(phone: string): Promise<boolean> {
+  const { count, error } = await sb()
+    .from("sms_log")
+    .select("*", { count: "exact", head: true })
+    .eq("phone", phone)
+    .eq("type", "welcome");
+  if (error) {
+    console.error(`hasSeenWelcome: ${error.message}`);
+    return false; // fail-open: don't suppress a legit first welcome on a read error
+  }
+  return (count ?? 0) > 0;
+}
+
+// ── One-time backfill (data recovery after the Supabase cutover) ────────────
+// Replays pre-cutover votes from Google Sheets KioskVotes into Supabase.
+// Idempotent + safe to re-run + safe to run mid-event:
+//   • Caller MUST pass phones already normalized (10-digit) and 555/test rows
+//     filtered out — see /api/admin/backfill-votes.
+//   • created_at is set to each row's ORIGINAL ts on INSERT only, so the wheel's
+//     first-seen ordering matches reality.
+//   • We pre-read the existing (phone,match_id) pairs in ONE query and skip any
+//     that already exist — this NEVER overwrites a row a live vote already wrote
+//     post-cutover (so we can't clobber a voter's current pick or move their
+//     first-seen time), and makes re-runs free.
+export async function existingVoteKeys(): Promise<Set<string>> {
+  const rows = await fetchAllRows<{ phone: string; match_id: number }>(
+    "votes",
+    "phone, match_id",
+    "created_at"
+  );
+  return new Set(rows.map((r) => `${r.phone}|${r.match_id}`));
+}
+
+export async function backfillVotes(
+  records: VoteRecord[]
+): Promise<{ inserted: number; skipped: number; total: number }> {
+  if (!records.length) return { inserted: 0, skipped: 0, total: 0 };
+
+  const have = await existingVoteKeys();
+
+  // Collapse duplicate (phone,match_id) the Sheet may hold (re-votes were
+  // append-only there) → keep the EARLIEST ts so first-seen ordering is right.
+  const earliest = new Map<string, VoteRecord>();
+  for (const v of records) {
+    const key = `${v.phone}|${v.matchId}`;
+    if (have.has(key)) continue; // already in Supabase (post-cutover live row) → skip
+    const prev = earliest.get(key);
+    if (!prev || v.ts < prev.ts) earliest.set(key, v);
+  }
+
+  const toInsert = [...earliest.values()];
+  const skipped = records.length - toInsert.length;
+  if (!toInsert.length) return { inserted: 0, skipped, total: records.length };
+
+  const payload = toInsert.map((v) => ({
+    match_id: v.matchId,
+    phone: v.phone,
+    side: v.side,
+    team_code: v.teamCode,
+    team_name: v.teamName,
+    first_name: v.firstName,
+    matchup: v.matchup,
+    consent: v.consent,
+    created_at: v.ts, // CRITICAL: preserve original first-seen time for the wheel
+    updated_at: v.ts,
+  }));
+
+  // Chunked plain INSERT (not upsert): every key is known-absent, so there is no
+  // conflict to resolve. If a concurrent live vote races in a matching key, the
+  // UNIQUE(phone,match_id) constraint rejects only that one row of the chunk —
+  // we use ignoreDuplicates so the rest of the chunk still lands.
+  let inserted = 0;
+  const CHUNK = 500;
+  for (let i = 0; i < payload.length; i += CHUNK) {
+    const slice = payload.slice(i, i + CHUNK);
+    const { error } = await sb()
+      .from("votes")
+      .upsert(slice, { onConflict: "phone,match_id", ignoreDuplicates: true });
+    if (error) throw new Error(`backfillVotes chunk ${i}: ${error.message}`);
+    inserted += slice.length;
+  }
+  return { inserted, skipped, total: records.length };
+}
+
+// Backfill pre-cutover raffle winners so the draw dedup (getAllWinners) knows
+// about them — otherwise re-drawing an old game could re-pick a prior winner
+// and re-send a YALLA10 ($10) code. Dedup on (match_id, phone); skip-on-conflict
+// so it can't double-insert and is safe to re-run. created_at is left to default
+// (winner order doesn't matter for dedup).
+export async function backfillWinners(
+  records: Winner[]
+): Promise<{ inserted: number; skipped: number; total: number }> {
+  if (!records.length) return { inserted: 0, skipped: 0, total: 0 };
+
+  const existing = await fetchAllRows<{ match_id: number; phone: string }>(
+    "winners",
+    "match_id, phone",
+    "created_at"
+  );
+  const have = new Set(existing.map((r) => `${r.phone}|${r.match_id}`));
+
+  const dedup = new Map<string, Winner>();
+  for (const w of records) {
+    const key = `${w.phone}|${w.matchId}`;
+    if (have.has(key) || dedup.has(key)) continue;
+    dedup.set(key, w);
+  }
+  const toInsert = [...dedup.values()];
+  const skipped = records.length - toInsert.length;
+  if (!toInsert.length) return { inserted: 0, skipped, total: records.length };
+
+  const payload = toInsert.map((w) => ({
+    match_id: w.matchId,
+    phone: w.phone,
+    first_name: w.firstName,
+    matchup: w.matchup,
+  }));
+  // Plain INSERT (the winners table has no unique constraint — appendVote upserts
+  // but appendWinner inserts). We've already filtered out existing keys, so there
+  // is no conflict to resolve.
+  let inserted = 0;
+  const CHUNK = 500;
+  for (let i = 0; i < payload.length; i += CHUNK) {
+    const slice = payload.slice(i, i + CHUNK);
+    const { error } = await sb().from("winners").insert(slice);
+    if (error) throw new Error(`backfillWinners chunk ${i}: ${error.message}`);
+    inserted += slice.length;
+  }
+  return { inserted, skipped, total: records.length };
+}
+
 // ── Session (single row, id=1) ──────────────────────
 export async function getSession(): Promise<StoredSession | null> {
   const { data, error } = await sb()

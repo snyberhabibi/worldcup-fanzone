@@ -332,6 +332,30 @@ export async function getAllWinners(): Promise<{ matchId: number; phone: string 
     .map((r) => ({ matchId: Number(r[1]) || 0, phone: r[4] || "" }));
 }
 
+/** Full pre-cutover winners (ts, matchId, matchup, firstName, phone) — the
+ *  source for the one-time winners backfill so Supabase's draw dedup knows about
+ *  raffles drawn before the cutover (else an old-game re-draw could re-pay). */
+export async function getAllWinnersFull(): Promise<Winner[]> {
+  await ensureTabs();
+  const sheets = getSheets();
+  const res = await withRetry("getAllWinnersFull", () =>
+    sheets.spreadsheets.values.get({
+      spreadsheetId: SHEET_ID,
+      range: `${TAB_WINNERS}!A2:E`,
+    })
+  );
+  const rows = res.data.values || [];
+  return rows
+    .filter((r) => r && r[1] && r[4])
+    .map((r) => ({
+      ts: r[0] || "",
+      matchId: Number(r[1]) || 0,
+      matchup: r[2] || "",
+      firstName: r[3] || "",
+      phone: r[4] || "",
+    }));
+}
+
 // ── SMS audit log ───────────────────────────────────
 export interface SmsLogRow {
   ts: string;
