@@ -30,10 +30,10 @@ export function KickoffCountdown({ match, big = false }: { match: Match; big?: b
     content = "Full time";
   } else if (isLive(match, now)) {
     tone = "live";
-    const mins = Math.floor((now.getTime() - kickoff(match).getTime()) / 60000);
+    // No live minute — it can't account for halftime/stoppage and would mislead.
     content = (
       <>
-        <span className="live__dot" /> LIVE · {mins}&apos;
+        <span className="live__dot" /> LIVE
       </>
     );
   } else {
