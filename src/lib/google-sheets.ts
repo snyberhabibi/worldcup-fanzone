@@ -81,6 +81,7 @@ const TAB_VOTES = "KioskVotes";
 const TAB_SESSION = "KioskSession";
 const TAB_WINNERS = "KioskWinners";
 const TAB_SMS = "KioskSms";
+const TAB_UNIQUE = "UniqueVoters";
 
 const HEADERS: Record<string, string[]> = {
   [TAB_VOTES]: [
@@ -97,6 +98,8 @@ const HEADERS: Record<string, string[]> = {
   [TAB_SESSION]: ["matchId", "status", "updatedAt", "lastDraw", "pinSticky"],
   [TAB_WINNERS]: ["ts", "matchId", "matchup", "firstName", "phone"],
   [TAB_SMS]: ["ts", "phone", "type", "status", "detail"],
+  // Distinct voters across the whole tournament — row count = total unique users.
+  [TAB_UNIQUE]: ["phone", "firstName", "gamesVoted", "firstVoteAt", "lastVoteAt"],
 };
 
 // Idempotent, memoized per warm instance: create the kiosk tabs + headers if missing.
@@ -390,4 +393,9 @@ export async function mirrorWinnersToSheet(winners: Winner[]): Promise<void> {
     TAB_WINNERS,
     winners.map((w) => [w.ts, String(w.matchId), w.matchup, w.firstName, w.phone])
   );
+}
+
+/** Pre-built rows (phone, firstName, gamesVoted, firstVoteAt, lastVoteAt). */
+export async function mirrorUniqueVotersToSheet(rows: string[][]): Promise<void> {
+  await replaceTab(TAB_UNIQUE, rows);
 }
