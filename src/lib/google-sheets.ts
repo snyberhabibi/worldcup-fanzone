@@ -351,3 +351,43 @@ export async function appendSmsLog(r: SmsLogRow): Promise<void> {
     })
   );
 }
+
+// ── Sheet mirror ────────────────────────────────────
+// Supabase is the source of truth; the periodic cron (/api/cron/mirror-to-sheet)
+// snapshots the current votes + winners here so results stay readable in the
+// Sheet. Each mirror is at most 2 write calls per tab (clear + one bulk update)
+// regardless of row count — never per-row, so the Sheets write quota is a non-issue.
+async function replaceTab(tab: string, rows: string[][]): Promise<void> {
+  await ensureTabs();
+  const sheets = getSheets();
+  await withRetry(`clear:${tab}`, () =>
+    sheets.spreadsheets.values.clear({ spreadsheetId: SHEET_ID, range: `${tab}!A2:Z` })
+  );
+  if (rows.length) {
+    await withRetry(`mirror:${tab}`, () =>
+      sheets.spreadsheets.values.update({
+        spreadsheetId: SHEET_ID,
+        range: `${tab}!A2`,
+        valueInputOption: "RAW",
+        requestBody: { values: rows },
+      })
+    );
+  }
+}
+
+export async function mirrorVotesToSheet(votes: VoteRecord[]): Promise<void> {
+  await replaceTab(
+    TAB_VOTES,
+    votes.map((v) => [
+      v.ts, String(v.matchId), v.matchup, v.side, v.teamCode, v.teamName,
+      v.firstName, v.phone, v.consent ? "TRUE" : "FALSE",
+    ])
+  );
+}
+
+export async function mirrorWinnersToSheet(winners: Winner[]): Promise<void> {
+  await replaceTab(
+    TAB_WINNERS,
+    winners.map((w) => [w.ts, String(w.matchId), w.matchup, w.firstName, w.phone])
+  );
+}

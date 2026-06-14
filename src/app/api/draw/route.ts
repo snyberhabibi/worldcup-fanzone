@@ -1,13 +1,12 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import {
-  getVoteLog,
-  entrantsFromLog,
+  getEntrants,
   appendWinner,
   getAllWinners,
   getSession,
   setSession,
   appendSmsLog,
-} from "@/lib/google-sheets";
+} from "@/lib/db";
 import { bust } from "@/lib/cache";
 import { getMatch, matchup as matchupOf } from "@/lib/games";
 import { maskPhone } from "@/lib/format";
@@ -38,8 +37,7 @@ export async function POST(req: NextRequest) {
     if (!match)
       return NextResponse.json({ error: "invalid matchId" }, { status: 400 });
 
-    const log = await getVoteLog();
-    const entrants = entrantsFromLog(log, matchId);
+    const entrants = await getEntrants(matchId); // first-seen order → stable wheel index
     if (entrants.length === 0)
       return NextResponse.json({ ok: false, reason: "no_entrants" });
 
@@ -91,7 +89,6 @@ export async function POST(req: NextRequest) {
       smsStatus = r.ok ? (r.skipped ? "dry-run" : "sent") : "failed";
       after(() =>
         appendSmsLog({
-          ts: new Date().toISOString(),
           phone: pick.phone,
           type: "winner",
           status: smsStatus,

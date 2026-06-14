@@ -5,11 +5,10 @@ type Entry = { exp: number; val: unknown };
 
 const store = new Map<string, Entry>();
 
-// Shared TTLs. Tuned UP after a live-event overload: Google Sheets throttles
-// under load (multi-second reads), so we read it as rarely as possible and
-// serve everything else from cache. Freshness trade-off (board lags a few
-// seconds) is well worth keeping the app responsive.
-export const VOTELOG_TTL_MS = 8000;
+// Shared TTLs. Reads now hit Supabase (Postgres, fast + no throttle), so these
+// are short — the cache mainly coalesces the board's per-game polls to keep DB
+// request volume down, not to dodge a throttle like the old Sheets path did.
+export const TALLY_TTL_MS = 3000; // per-match tally + entrants
 export const SESSION_TTL_MS = 5000;
 
 // In-flight loads per key, so concurrent cache misses share ONE underlying

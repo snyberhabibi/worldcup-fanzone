@@ -4,6 +4,10 @@
     {
       "path": "/api/cron/refresh-schedule",
       "schedule": "0 9 * * *"
+    },
+    {
+      "path": "/api/cron/mirror-to-sheet",
+      "schedule": "*/10 * * * *"
     }
   ]
 }

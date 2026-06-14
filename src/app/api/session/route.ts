@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse, after } from "next/server";
-import { getSession, setSession } from "@/lib/google-sheets";
+import { getSession, setSession } from "@/lib/db";
 import { alertOps } from "@/lib/slack";
 import { cached, bust, SESSION_TTL_MS } from "@/lib/cache";
 import {

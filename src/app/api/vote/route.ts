@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import {
   appendVote,
-  getVoteLog,
-  tallyFromLog,
+  getTally,
   getSession,
-} from "@/lib/google-sheets";
-import { cached, VOTELOG_TTL_MS, SESSION_TTL_MS } from "@/lib/cache";
+  countPhoneVotes,
+  countPhoneVotesInMatches,
+} from "@/lib/db";
+import { cached, SESSION_TTL_MS } from "@/lib/cache";
 import {
   getMatch,
   matchup as matchupOf,
@@ -75,36 +76,24 @@ export async function POST(req: NextRequest) {
       consent: true, // voting = consent (disclosed at entry, opt-out via STOP)
     };
 
-    await appendVote(record);
+    await appendVote(record); // UPSERT — latest pick per phone+game, no write cap
 
-    // Under load the Sheets API throttles hard (multi-second reads), so we must
-    // NOT read the full log fresh on every vote — that was making each vote take
-    // 5-12s and cascading the whole app down. Read via the shared cache and fold
-    // in THIS vote optimistically for the response; the board's tally polls
-    // converge from the same cache within its TTL.
-    const base = await cached("votelog", VOTELOG_TTL_MS, () => getVoteLog());
-    const log = base.some(
-      (v) => v.ts === record.ts && v.phone === record.phone && v.matchId === matchId
-    )
-      ? base
-      : base.concat(record);
-    const tally = tallyFromLog(log, matchId);
+    // Tally straight from Postgres, scoped + indexed to this match — fast even
+    // under a 300-voter surge (no full-log read).
+    const tally = await getTally(matchId);
 
-    // SMS policy — text at most once per voting slot per phone, never blocks:
-    //  • first vote EVER  → full welcome SMS + Slack CRM "new sign-up" ping
-    //  • returning voter  → short "your vote is IN" confirmation
-    //  • extra games in the same slot (stacked voting) → no extra text
-    const phoneVotes = log.filter((v) => v.phone === phone);
-    const firstEver = phoneVotes.length === 1;
+    // SMS policy — at most once per voting slot per phone, never blocks. Counts
+    // are read post-upsert: firstEver = this phone's only row anywhere;
+    // firstInSlot = its only row among the current slot's games.
     const slotIds = slotGamesOf(matchId).map((g) => g.id);
-    const firstInSlot = phoneVotes.filter((v) => slotIds.includes(v.matchId)).length === 1;
+    const [totalForPhone, inSlotForPhone] = await Promise.all([
+      countPhoneVotes(phone),
+      countPhoneVotesInMatches(phone, slotIds),
+    ]);
+    const firstEver = totalForPhone === 1;
+    const firstInSlot = inSlotForPhone === 1;
     if (firstInSlot) {
       after(async () => {
-        // The KioskSms audit-row write was removed from the hot path to protect
-        // the Sheets WRITE quota under load (it competed 1:1 with vote appends
-        // and pushed a burst past ~60 writes/min). SMS still sends; the Slack
-        // CRM ping still fires. Restore appendSmsLog from git if the audit trail
-        // is needed once write throughput is no longer the bottleneck.
         if (firstEver) {
           await sendSms(phone, welcomeSms());
           await notifyCrm(
@@ -119,7 +108,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, tally });
   } catch (e) {
     console.error("vote POST", e);
-    after(() => alertOps("a vote failed to record (Sheets write)"));
+    after(() => alertOps("a vote failed to record (Supabase write)"));
     return NextResponse.json({ error: "failed to record vote" }, { status: 500 });
   }
 }
