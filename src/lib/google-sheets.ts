@@ -402,7 +402,32 @@ async function replaceTab(tab: string, rows: string[][]): Promise<void> {
   }
 }
 
+/** Count the data rows (non-empty col A, from row 2) currently in a tab. */
+async function countSheetDataRows(tab: string): Promise<number> {
+  await ensureTabs();
+  const sheets = getSheets();
+  const res = await withRetry(`count:${tab}`, () =>
+    sheets.spreadsheets.values.get({ spreadsheetId: SHEET_ID, range: `${tab}!A2:A` })
+  );
+  return (res.data.values || []).filter((r) => r && r[0]).length;
+}
+
 export async function mirrorVotesToSheet(votes: VoteRecord[]): Promise<void> {
+  // GUARD: the mirror does a full clear+rewrite, so a smaller Supabase snapshot
+  // would TRUNCATE the Sheet — and KioskVotes is the only copy of pre-cutover
+  // history (the source the re-welcome backfill depended on). If the incoming
+  // snapshot has FEWER rows than the Sheet already holds, that's an empty/partial
+  // source (a bad deploy, a reset, a future migration), NOT real growth — refuse
+  // and let the cron alert. A skipped mirror is harmless (the Sheet keeps its last
+  // good snapshot); a wrongful wipe is irreversible. "Skip only if empty" is
+  // insufficient — a partial snapshot is non-empty yet still destroys history.
+  const existing = await countSheetDataRows(TAB_VOTES);
+  if (votes.length < existing) {
+    throw new Error(
+      `mirror guard tripped: Supabase returned ${votes.length} votes but KioskVotes already holds ${existing} — ` +
+        `refusing to overwrite (looks like a truncated/empty source, not growth). Sheet history preserved.`
+    );
+  }
   await replaceTab(
     TAB_VOTES,
     votes.map((v) => [
