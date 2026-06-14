@@ -36,6 +36,7 @@ export function BaristaConsole() {
         onChanged={refresh}
         onClose={() => router.push("/")}
         sound={sound}
+        context="console"
       />
     </main>
   );

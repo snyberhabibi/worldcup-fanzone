@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { usePoll } from "@/lib/use-poll";
 import { useHydrated } from "@/lib/use-hydrated";
 import { useSound } from "@/lib/use-sound";
@@ -123,6 +124,14 @@ export function MobileVote() {
     }
   };
 
+  // Let a fan vote the next (stacked / upcoming) game without re-typing their
+  // details — clears the picks but keeps name + phone, so it's two taps.
+  const voteAgain = () => {
+    setPicks({});
+    setErrMsg("");
+    setStage("form");
+  };
+
   return (
     <main className="screen arcade-bg safe" style={{ padding: "1.25rem", gap: "1rem", justifyContent: "flex-start" }}>
       <div style={{ textAlign: "center", marginTop: "0.5rem" }}>
@@ -176,9 +185,21 @@ export function MobileVote() {
           <p style={{ color: "var(--yb-sage)", marginTop: "0.75rem", fontSize: "0.95rem" }}>
             You&apos;re entered to win free Yalla Bites — winners are drawn on the big screen. Stick around! 🍽️
           </p>
-          <a href="https://yallabites.com/" target="_blank" rel="noopener noreferrer" className="btn btn--red" style={{ marginTop: "1.1rem", display: "inline-flex" }}>
-            Get Yalla Bites →
-          </a>
+          <div style={{ display: "flex", flexDirection: "column", gap: "0.6rem", marginTop: "1.1rem", alignItems: "stretch" }}>
+            <Link href="/board" className="btn btn--gold" style={{ display: "inline-flex", justifyContent: "center" }}>
+              📺 Watch the live results &amp; raffle →
+            </Link>
+            <a href="https://yallabites.com/" target="_blank" rel="noopener noreferrer" className="btn btn--red" style={{ display: "inline-flex", justifyContent: "center" }}>
+              Get Yalla Bites →
+            </a>
+            <button
+              type="button"
+              onClick={voteAgain}
+              style={{ marginTop: "0.1rem", color: "var(--yb-sage)", fontWeight: 700, fontSize: "0.9rem" }}
+            >
+              ↺ Vote another game
+            </button>
+          </div>
         </div>
       ) : (
         <>
@@ -273,6 +294,7 @@ export function MobileVote() {
           onChanged={refresh}
           onClose={() => setPanelOpen(false)}
           sound={sound}
+          context="locked"
         />
       )}
     </main>

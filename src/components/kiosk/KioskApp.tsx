@@ -218,6 +218,7 @@ export function KioskApp() {
           onChanged={refresh}
           onClose={() => setPanelOpen(false)}
           sound={sound}
+          context="locked"
         />
       )}
 

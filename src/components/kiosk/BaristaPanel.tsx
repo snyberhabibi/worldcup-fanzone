@@ -11,6 +11,7 @@ import {
 } from "@/lib/games";
 import type { SessionStatus } from "@/types";
 import type { SoundApi } from "@/lib/use-sound";
+import { StaffNav } from "@/components/StaffNav";
 
 const PIN_LEN = 4;
 
@@ -21,6 +22,11 @@ export function BaristaPanel({
   onChanged,
   onClose,
   sound,
+  // Where this panel is mounted, which decides what staff navigation is safe to
+  // show once unlocked. Defaults to "locked" (the restrictive, customer-safe
+  // mode) so a caller that forgets to set it can never expose an escape hatch.
+  // Only the barista's own phone console passes "console".
+  context = "locked",
 }: {
   matchId: number;
   status: SessionStatus;
@@ -28,6 +34,7 @@ export function BaristaPanel({
   onChanged: () => void;
   onClose: () => void;
   sound: SoundApi;
+  context?: "console" | "locked";
 }) {
   const [pin, setPin] = useState("");
   const [unlocked, setUnlocked] = useState(false);
@@ -343,9 +350,7 @@ export function BaristaPanel({
                 <span className={`switch ${!sound.muted ? "is-on" : ""}`}><span className="switch__knob" /></span>
                 {sound.muted ? "Sound off" : "Sound on"}
               </button>
-              <a href="/board" target="_blank" rel="noopener noreferrer" style={{ color: "var(--yb-red)", fontWeight: 700 }}>
-                Open projector board ↗
-              </a>
+              <StaffNav context={context} onClose={onClose} />
             </div>
             {err && <p style={{ color: "var(--yb-red)", fontWeight: 700 }}>{err}</p>}
           </div>
