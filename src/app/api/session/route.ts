@@ -71,7 +71,7 @@ export async function GET() {
     return NextResponse.json(await effectiveSession());
   } catch (e) {
     console.error("session GET", e);
-    after(() => alertOps("session read failed (Sheets) — board is on clock fallback"));
+    after(() => alertOps("session read failed (Supabase) — board is on clock fallback"));
     return NextResponse.json({
       matchIds: currentSlotGames(new Date()).map((g) => g.id),
       status: "open",

@@ -17,6 +17,13 @@ export function isValidUSPhone(input: string): boolean {
   return /^[2-9]\d{2}[2-9]\d{6}$/.test(d);
 }
 
+/** A reserved/fictional NANP number (555 exchange, e.g. 469-555-0123). These
+ *  never reach a real handset, so we never send SMS or fire a CRM notification
+ *  for them — which also makes them safe synthetic voters for load testing. */
+export function isTestPhone(input: string): boolean {
+  return normalizePhone(input).slice(3, 6) === "555";
+}
+
 /** Progressive display formatting: (469) 555-1234 */
 export function formatPhone(input: string): string {
   const d = normalizePhone(input);

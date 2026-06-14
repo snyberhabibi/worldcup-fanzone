@@ -44,20 +44,22 @@ export async function appendVote(v: VoteRecord): Promise<void> {
   if (error) throw new Error(`appendVote: ${error.message}`);
 }
 
-/** Live tally for one match — distinct voters (one row per phone via the upsert). */
+/** Live tally for one match — distinct voters (one row per phone via the upsert).
+ *  Uses exact COUNT per side (head requests, no row transfer) rather than
+ *  selecting and counting rows in JS: it's cheaper AND correct at any size.
+ *  (Selecting rows is silently capped by Supabase's "Max rows" API setting —
+ *  1000 by default — so a game with >1000 votes would otherwise undercount.) */
 export async function getTally(matchId: number): Promise<Tally> {
-  const { data, error } = await sb()
-    .from("votes")
-    .select("side")
-    .eq("match_id", matchId)
-    .limit(50000);
-  if (error) throw new Error(`getTally: ${error.message}`);
-  let home = 0;
-  let away = 0;
-  for (const r of (data ?? []) as { side: Side }[]) {
-    if (r.side === "home") home++;
-    else away++;
-  }
+  const countSide = async (side: Side) => {
+    const { count, error } = await sb()
+      .from("votes")
+      .select("*", { count: "exact", head: true })
+      .eq("match_id", matchId)
+      .eq("side", side);
+    if (error) throw new Error(`getTally(${side}): ${error.message}`);
+    return count ?? 0;
+  };
+  const [home, away] = await Promise.all([countSide("home"), countSide("away")]);
   return { matchId, home, away, total: home + away };
 }
 

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse, after } from "next/server";
 import {
   appendVote,
-  getTally,
   getSession,
   countPhoneVotes,
   countPhoneVotesInMatches,
@@ -15,7 +14,7 @@ import {
   isSlotEnded,
   slotGamesOf,
 } from "@/lib/games";
-import { normalizePhone, isValidUSPhone, sanitizeFirstName } from "@/lib/format";
+import { normalizePhone, isValidUSPhone, sanitizeFirstName, isTestPhone } from "@/lib/format";
 import { sendSms, welcomeSms, repeatVoteSms } from "@/lib/quo";
 import { notifyCrm, signupMessage, alertOps } from "@/lib/slack";
 import type { VoteRecord, Side } from "@/types";
@@ -89,12 +88,16 @@ export async function POST(req: NextRequest) {
 
     await appendVote(record); // UPSERT — latest pick per phone+game, no write cap
 
-    // Tally straight from Postgres, scoped + indexed to this match — fast even
-    // under a 300-voter surge (no full-log read).
-    const tally = await getTally(matchId);
+    // No tally read here on purpose: no client consumes it (the board polls
+    // /api/tally on its own, the kiosk/mobile only check res.ok), and a per-vote
+    // getTally was a full per-match scan on the hot path — the dominant cost
+    // under a concurrent surge. Dropping it keeps each vote to one upsert + two
+    // indexed counts.
     const firstEver = priorTotal === 0;
     const firstInSlot = priorInSlot === 0;
-    if (firstInSlot) {
+    // Reserved/fictional 555 numbers never reach a handset → skip SMS + CRM
+    // entirely (also lets us load-test with synthetic voters firing no texts).
+    if (firstInSlot && !isTestPhone(phone)) {
       after(async () => {
         if (firstEver) {
           await sendSms(phone, welcomeSms());
@@ -107,7 +110,7 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    return NextResponse.json({ ok: true, tally });
+    return NextResponse.json({ ok: true });
   } catch (e) {
     console.error("vote POST", e);
     after(() => alertOps("a vote failed to record (Supabase write)"));

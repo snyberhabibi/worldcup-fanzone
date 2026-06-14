@@ -8,6 +8,13 @@
    ═══════════════════════════════════════════════════════════ */
 
 :root {
+  /* Dark UA surfaces (form controls, scroll gutters, and — critically — the
+     browser's DEFAULT canvas color). Without this, any frame the compositor
+     presents before our dark layers paint (e.g. during a long main-thread
+     stall) falls back to WHITE. This is the root cause of the "top half
+     flashed white under load" incident — neutralized here regardless of trigger. */
+  color-scheme: dark;
+
   /* Brand */
   --yb-red: #ff4444;
   --yb-red-deep: #e03d3d;
@@ -67,6 +74,9 @@ html {
   -moz-osx-font-smoothing: grayscale;
   text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  /* Opaque dark base behind everything (body + the animated .arcade-bg layers),
+     so a dropped/stale frame can never expose white. */
+  background: var(--bg-0);
 }
 body {
   font-family: var(--font-body);
@@ -101,6 +111,10 @@ input {
   user-select: none;
   -webkit-user-select: none;
   touch-action: manipulation;
+  /* Solid dark fill so the screen shell itself is opaque — the dark backdrop no
+     longer depends solely on the animated .arcade-bg::before layer repainting in
+     time (which it can't during a jank stall). */
+  background: var(--bg-0);
 }
 
 /* Warm "stadium light" backdrop with vignette + faint pitch grid. */
