@@ -4,7 +4,6 @@ import {
   getVoteLog,
   tallyFromLog,
   getSession,
-  appendSmsLog,
 } from "@/lib/google-sheets";
 import { cached, VOTELOG_TTL_MS, SESSION_TTL_MS } from "@/lib/cache";
 import {
@@ -22,6 +21,7 @@ import type { VoteRecord, Side } from "@/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30; // headroom for the Sheets call chain + after() SMS under load
 
 export async function POST(req: NextRequest) {
   // No vote-throttling by design: a single venue (100–200 attendees) all share
@@ -100,27 +100,18 @@ export async function POST(req: NextRequest) {
     const firstInSlot = phoneVotes.filter((v) => slotIds.includes(v.matchId)).length === 1;
     if (firstInSlot) {
       after(async () => {
+        // The KioskSms audit-row write was removed from the hot path to protect
+        // the Sheets WRITE quota under load (it competed 1:1 with vote appends
+        // and pushed a burst past ~60 writes/min). SMS still sends; the Slack
+        // CRM ping still fires. Restore appendSmsLog from git if the audit trail
+        // is needed once write throughput is no longer the bottleneck.
         if (firstEver) {
-          const r = await sendSms(phone, welcomeSms());
-          await appendSmsLog({
-            ts: new Date().toISOString(),
-            phone,
-            type: "welcome",
-            status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
-            detail: r.error || "",
-          }).catch(() => {});
+          await sendSms(phone, welcomeSms());
           await notifyCrm(
             signupMessage(firstName, phone, teamName, matchupOf(match))
           ).catch(() => {});
         } else {
-          const r = await sendSms(phone, repeatVoteSms(teamName));
-          await appendSmsLog({
-            ts: new Date().toISOString(),
-            phone,
-            type: "repeat",
-            status: r.ok ? (r.skipped ? "dry-run" : "sent") : "failed",
-            detail: r.error || "",
-          }).catch(() => {});
+          await sendSms(phone, repeatVoteSms(teamName));
         }
       });
     }

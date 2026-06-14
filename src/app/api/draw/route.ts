@@ -19,6 +19,7 @@ import type { DrawResult, Winner } from "@/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 // Barista spins the wheel. Winner is chosen server-side, excluding anyone who
 // already won THIS game (multiple prizes per game → no double-winners), logged
@@ -75,7 +76,8 @@ export async function POST(req: NextRequest) {
       lastDraw: draw,
     });
     bust("session-row");
-    bust("votelog");
+    // NB: do NOT bust "votelog" — a draw doesn't change votes, and busting it
+    // forced the next tally/entrants poll into a cold full-log read mid-spin.
 
     // Winner SMS — once per phone ever (first win delivers the YALLA10 code).
     // Sent synchronously (not in after()) so the barista sees delivery status in

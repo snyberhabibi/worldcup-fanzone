@@ -14,6 +14,7 @@ import type { SessionState, SessionStatus, StoredSession } from "@/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+export const maxDuration = 30;
 
 const EMPTY: StoredSession = {
   pinnedMatchId: null,

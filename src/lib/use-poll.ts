@@ -33,9 +33,12 @@ export function usePoll<T>(
 
   useEffect(() => {
     let alive = true;
+    let busy = false; // in-flight guard: never stack a 2nd request while one is pending
     const tick = async () => {
+      if (busy) return;
       if (typeof document !== "undefined" && document.visibilityState === "hidden")
         return;
+      busy = true;
       try {
         const v = await saved.current();
         if (alive) {
@@ -44,6 +47,8 @@ export function usePoll<T>(
         }
       } catch (e) {
         if (alive) setError(e);
+      } finally {
+        busy = false;
       }
     };
     if (immediate) tick();

@@ -12,17 +12,31 @@ const store = new Map<string, Entry>();
 export const VOTELOG_TTL_MS = 8000;
 export const SESSION_TTL_MS = 5000;
 
+// In-flight loads per key, so concurrent cache misses share ONE underlying
+// call instead of each firing its own (throttled) Sheets read — this stampede
+// is what amplified the live overload at every TTL boundary.
+const inflight = new Map<string, Promise<unknown>>();
+
 export async function cached<T>(
   key: string,
   ttlMs: number,
   fn: () => Promise<T>
 ): Promise<T> {
-  const now = Date.now();
   const hit = store.get(key);
-  if (hit && hit.exp > now) return hit.val as T;
-  const val = await fn();
-  store.set(key, { exp: now + ttlMs, val });
-  return val;
+  if (hit && hit.exp > Date.now()) return hit.val as T;
+  const pending = inflight.get(key);
+  if (pending) return pending as Promise<T>;
+  const p = (async () => {
+    try {
+      const val = await fn();
+      store.set(key, { exp: Date.now() + ttlMs, val });
+      return val;
+    } finally {
+      inflight.delete(key);
+    }
+  })();
+  inflight.set(key, p);
+  return p as Promise<T>;
 }
 
 /** Invalidate everything, or just keys starting with `prefix` (call after writes). */
