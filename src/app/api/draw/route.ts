@@ -9,7 +9,7 @@ import {
 } from "@/lib/db";
 import { bust } from "@/lib/cache";
 import { getMatch, matchup as matchupOf } from "@/lib/games";
-import { maskPhone } from "@/lib/format";
+import { maskPhone, isTestPhone } from "@/lib/format";
 import { checkPin } from "@/lib/auth";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { sendSms, winnerSms } from "@/lib/quo";
@@ -84,7 +84,10 @@ export async function POST(req: NextRequest) {
     // off the session lastDraw written above, so this await never delays the
     // on-screen reveal. Subsequent wins on an already-won phone aren't re-texted.
     let smsStatus: "sent" | "failed" | "dry-run" | "skipped" = "skipped";
-    if (!wonAnything.has(pick.phone)) {
+    // Reserved/fictional 555 numbers never reach a handset → never text a winner
+    // SMS to one (consistent with the vote route; also makes raffle load-testing
+    // with synthetic entrants safe).
+    if (!wonAnything.has(pick.phone) && !isTestPhone(pick.phone)) {
       const r = await sendSms(pick.phone, winnerSms());
       smsStatus = r.ok ? (r.skipped ? "dry-run" : "sent") : "failed";
       after(() =>
