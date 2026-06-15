@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
 import { resolveTeam, type ResolvedTeam } from "@/lib/games";
-import { burstConfetti } from "@/lib/celebrate";
 import { useCountUp } from "@/lib/use-count-up";
 import type { Match } from "@/data/schedule";
 import type { Tally } from "@/types";
@@ -68,16 +66,14 @@ export function VoteBars({ match, tally }: { match: Match; tally: Tally | null }
   // const pct = Math.min(Math.max(h, a), 100);
   // const pctShown = useCountUp(pct, 800, true);
 
-  // Celebrate every 25 votes — but only on genuine forward progress. Track the
-  // running peak (not the last value) so a stale/lower poll dipping then
-  // recovering past a /25 boundary can't re-fire confetti. Resets on game
-  // change via the keyed remount in BoardApp.
-  const peak = useRef(0);
-  useEffect(() => {
-    if (total <= peak.current) return;
-    if (Math.floor(total / 25) > Math.floor(peak.current / 25)) burstConfetti();
-    peak.current = total;
-  }, [total]);
+  // No milestone confetti on the projector board. Under a signup surge the total
+  // crosses several /25 marks within one 5s poll window, so the board fired
+  // overlapping ~160-particle bursts UPWARD into the top third — a dense
+  // near-white/gold cloud that on a projector reads as "a white bar flashing the
+  // top third." (The dark-background fix couldn't help: confetti is drawn pixels,
+  // not an unpainted compositor gap.) Per-vote celebration still fires on the
+  // voter's own phone/kiosk, and the raffle winner reveal still celebrates
+  // (SpinWheel → bigCelebrate). This board is a passive display.
 
   return (
     <div

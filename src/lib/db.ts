@@ -9,6 +9,7 @@
 
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type { VoteRecord, Tally, Side, StoredSession, Winner, DrawResult } from "@/types";
+import { isTestPhone } from "@/lib/format";
 
 const SB_URL = (process.env.SUPABASE_URL || "").replace(/\\n/g, "").trim();
 const SB_KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || "").replace(/\\n/g, "").trim();
@@ -356,6 +357,39 @@ export async function getAllVotes(): Promise<VoteRecord[]> {
     phone: r.phone,
     consent: r.consent,
   }));
+}
+
+// Distinct-voter stats. Real = excluding reserved 555 numbers (load-test) and
+// match 104 (the Final = the throwaway match we load-tested on), so the headline
+// numbers reflect actual customers, not synthetic test data.
+export async function voterStats(): Promise<{
+  totalVoteRows: number;
+  distinctPhonesAll: number;
+  distinctVoters: number; // distinct real phone numbers
+  realVoteRows: number;
+  gamesWithRealVotes: number;
+}> {
+  type Row = { phone: string; match_id: number };
+  const rows = await fetchAllRows<Row>("votes", "phone, match_id", "created_at");
+  const all = new Set<string>();
+  const real = new Set<string>();
+  const games = new Set<number>();
+  let realVoteRows = 0;
+  for (const r of rows) {
+    all.add(r.phone);
+    if (!isTestPhone(r.phone) && r.match_id !== 104) {
+      real.add(r.phone);
+      games.add(r.match_id);
+      realVoteRows++;
+    }
+  }
+  return {
+    totalVoteRows: rows.length,
+    distinctPhonesAll: all.size,
+    distinctVoters: real.size,
+    realVoteRows,
+    gamesWithRealVotes: games.size,
+  };
 }
 
 export async function getAllWinnersFull(): Promise<Winner[]> {

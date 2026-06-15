@@ -2,7 +2,10 @@
 
 import confetti from "canvas-confetti";
 
-const COLORS = ["#FF4444", "#FDB913", "#FAF9F6", "#2f9e8f"];
+// Brand red, gold, teal. The near-white #FAF9F6 was dropped: en masse on a
+// projector it read as a white flash. Keeps confetti festive without a bright-
+// white particle source (also makes the raffle reveal safer on the big screen).
+const COLORS = ["#FF4444", "#FDB913", "#2f9e8f"];
 
 /** Quick celebratory burst (vote confirmed). */
 export function burstConfetti(): void {
