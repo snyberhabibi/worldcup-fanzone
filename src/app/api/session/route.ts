@@ -43,7 +43,12 @@ async function effectiveSession(): Promise<SessionState> {
   let games;
   let manual: SessionStatus | "" = "";
   if (honorPin) {
-    games = slotGamesOf(pinId!);
+    // An explicit (sticky) barista pin features ONLY that one game — even when a
+    // second game kicks off at the same time — so staff can spotlight a single
+    // matchup instead of the whole simultaneous slot. A transient pin (auto-set
+    // when pausing) still scopes to the full slot, and clock auto-progression
+    // below keeps stacked voting for hands-off operation.
+    games = stored!.pinSticky ? [getMatch(pinId!)!] : slotGamesOf(pinId!);
     manual = stored!.manualStatus || "";
   } else {
     games = currentSlotGames(now);
