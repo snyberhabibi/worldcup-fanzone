@@ -1,1 +1,50 @@
-{}
+{
+  "73": {
+    "homeTeam": "RSA",
+    "awayTeam": "CAN"
+  },
+  "74": {
+    "homeTeam": "GER",
+    "awayTeam": "PAR"
+  },
+  "75": {
+    "homeTeam": "NED",
+    "awayTeam": "MAR"
+  },
+  "76": {
+    "homeTeam": "BRA",
+    "awayTeam": "JPN"
+  },
+  "77": {
+    "homeTeam": "FRA",
+    "awayTeam": "SWE"
+  },
+  "78": {
+    "homeTeam": "CIV",
+    "awayTeam": "NOR"
+  },
+  "81": {
+    "homeTeam": "USA",
+    "awayTeam": "BIH"
+  },
+  "82": {
+    "homeTeam": "BEL",
+    "awayTeam": "3AEHIJ"
+  },
+  "84": {
+    "homeTeam": "ESP",
+    "awayTeam": "2J"
+  },
+  "85": {
+    "homeTeam": "SUI",
+    "awayTeam": "3EFGIJ"
+  },
+  "86": {
+    "homeTeam": "ARG",
+    "awayTeam": "CPV"
+  },
+  "88": {
+    "homeTeam": "AUS",
+    "awayTeam": "EGY"
+  }
+}
