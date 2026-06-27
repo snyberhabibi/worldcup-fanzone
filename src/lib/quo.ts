@@ -75,7 +75,9 @@ export function winnerSms(): string {
 export function fifa10PromoSms(): string {
   return `CONGRATS! $10 OFF your first Yalla Bites order. Download Yalla Bites (yallabites.com) and use code FIFA10 at checkout. Plus FREE delivery! Homemade favorites from local cooks. Skip the cooking this week. Let Yalla Bites handle it. Reply STOP to opt out.`;
 }
-// Step 2 — the follow-up nudge, sent a week after step 1. Logged type=drip:step2.
+// Step 2 — referral recruit, sent a week after step 1. Asks fans to refer a home
+// cook (apply.yallabites.com); $50 Zelle bounty once that cook's first order
+// lands. Logged type=drip:step2.
 export function vendorsFollowupSms(): string {
-  return `100+ local cooks near you are making your favorite authentic homemade food. You deserve a break! Get $10 off your first Yalla Bites order with code FIFA10. Download: yallabites.com. Reply STOP to opt out.`;
+  return `Know someone who makes homemade food? Have them apply at apply.yallabites.com and refer you - we'll Zelle you $50 once they get their first order! Reply STOP to opt out.`;
 }
