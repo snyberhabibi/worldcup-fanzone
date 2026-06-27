@@ -311,6 +311,120 @@ export async function appendSmsLog(r: SmsLogRow): Promise<void> {
   if (error) throw new Error(`appendSmsLog: ${error.message}`);
 }
 
+// ── Drip campaign helpers (see /api/cron/drip) ──────────────────────────────
+// Distinct REAL signups: one phone per voter, excluding reserved 555 numbers and
+// the match-104 load-test game (same definition as voterStats' distinctVoters).
+export async function dripAudience(): Promise<string[]> {
+  type Row = { phone: string; match_id: number };
+  const rows = await fetchAllRows<Row>("votes", "phone, match_id", "created_at");
+  const set = new Set<string>();
+  for (const r of rows) if (!isTestPhone(r.phone) && r.match_id !== 104) set.add(r.phone);
+  return [...set];
+}
+
+/** Phones with a status='sent' row for ANY of the given sms_log types. The
+ *  idempotency gate — only 'sent' counts (a 'failed'/'dry-run' row stays
+ *  eligible for retry). */
+export async function phonesSentAnyType(types: string[]): Promise<Set<string>> {
+  if (types.length === 0) return new Set();
+  type Row = { phone: string; status: string };
+  const out = new Set<string>();
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await sb()
+      .from("sms_log")
+      .select("phone, status")
+      .in("type", types)
+      .order("phone", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`phonesSentAnyType: ${error.message}`);
+    const batch = (data ?? []) as Row[];
+    for (const r of batch) if (r.status === "sent") out.add(r.phone);
+    if (batch.length < PAGE) break;
+  }
+  return out;
+}
+
+export async function optedOutPhones(): Promise<Set<string>> {
+  type Row = { phone: string };
+  const out = new Set<string>();
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await sb()
+      .from("sms_log")
+      .select("phone")
+      .eq("type", "opt_out")
+      .order("phone", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`optedOutPhones: ${error.message}`);
+    const batch = (data ?? []) as Row[];
+    for (const r of batch) out.add(r.phone);
+    if (batch.length < PAGE) break;
+  }
+  return out;
+}
+
+/** Earliest 'sent' time (epoch ms) per phone across the given sms_log types —
+ *  used to compute "got step 1 >= N days ago" for the step-2 follow-up. Reads
+ *  sms_log.created_at; returns 0 for a row whose created_at is null/missing so a
+ *  legacy send (e.g. the original promo_fifa10 rows) still counts as "long ago".
+ *  Throws if the created_at column does not exist — call dripTimestampOk() first. */
+export async function step1SentEarliest(types: string[]): Promise<Map<string, number>> {
+  type Row = { phone: string; status: string; created_at: string | null };
+  const m = new Map<string, number>();
+  const PAGE = 1000;
+  for (let from = 0; ; from += PAGE) {
+    const { data, error } = await sb()
+      .from("sms_log")
+      .select("phone, status, created_at")
+      .in("type", types)
+      .order("phone", { ascending: true })
+      .range(from, from + PAGE - 1);
+    if (error) throw new Error(`step1SentEarliest: ${error.message}`);
+    const batch = (data ?? []) as Row[];
+    for (const r of batch) {
+      if (r.status !== "sent") continue;
+      const t = r.created_at ? new Date(r.created_at).getTime() : 0;
+      const prev = m.get(r.phone);
+      if (prev === undefined || t < prev) m.set(r.phone, t);
+    }
+    if (batch.length < PAGE) break;
+  }
+  return m;
+}
+
+/** Verify the sms_log table actually has a queryable created_at timestamp (it is
+ *  managed in Supabase, not in a checked-in migration). Returns true if the
+ *  column exists and is selectable. The step-2 follow-up timing depends on it. */
+export async function dripTimestampOk(): Promise<boolean> {
+  const { error } = await sb().from("sms_log").select("created_at").limit(1);
+  return !error;
+}
+
+/** Durably record a STOP opt-out (idempotent — one row per phone). */
+export async function recordOptOut(phone: string, detail: string): Promise<"recorded" | "exists"> {
+  const { count, error: qerr } = await sb()
+    .from("sms_log")
+    .select("*", { count: "exact", head: true })
+    .eq("phone", phone)
+    .eq("type", "opt_out");
+  if (qerr) throw new Error(`recordOptOut check: ${qerr.message}`);
+  if ((count ?? 0) > 0) return "exists";
+  const { error } = await sb()
+    .from("sms_log")
+    .insert({ phone, type: "opt_out", status: "stop", detail: detail.slice(0, 200) });
+  if (error) throw new Error(`recordOptOut insert: ${error.message}`);
+  return "recorded";
+}
+
+/** Every distinct phone we have ever texted — the universe to scan for new STOP
+ *  replies before a drip send. */
+export async function smsLogPhones(): Promise<string[]> {
+  type Row = { phone: string };
+  const rows = await fetchAllRows<Row>("sms_log", "phone", "phone");
+  return [...new Set(rows.map((r) => r.phone))];
+}
+
 // ── Full exports for the Sheet mirror (paginated past Supabase's 1000 cap) ──
 async function fetchAllRows<R>(table: string, columns: string, orderCol: string): Promise<R[]> {
   const PAGE = 1000;
