@@ -65,3 +65,17 @@ export function repeatVoteSms(teamName: string): string {
 export function winnerSms(): string {
   return `CONGRATS! You won the Fan Zone raffle! Use code YALLA10 at checkout on the Yalla Bites app for $10 off your first order + FREE DELIVERY. Download: yallabites.com. Reply STOP to opt out.`;
 }
+
+// ── Automated drip campaign copy (see /api/cron/drip) ────────────────────────
+// Both are deliberately GSM-7 safe (plain ASCII — no em-dash/curly-quote/emoji)
+// so they stay 2 segments instead of switching to 70-char UCS-2. Both include
+// the STOP opt-out line. Owner-approved.
+// Step 1 — the FIFA10 offer, sent to every unique signup who hasn't gotten it
+// (continues the original blast to new signups). Logged sms_log type=blast:fifa10.
+export function fifa10PromoSms(): string {
+  return `CONGRATS! $10 OFF your first Yalla Bites order. Download Yalla Bites (yallabites.com) and use code FIFA10 at checkout. Plus FREE delivery! Homemade favorites from local cooks. Skip the cooking this week. Let Yalla Bites handle it. Reply STOP to opt out.`;
+}
+// Step 2 — the follow-up nudge, sent a week after step 1. Logged type=drip:step2.
+export function vendorsFollowupSms(): string {
+  return `100+ local cooks near you are making your favorite authentic homemade food. You deserve a break! Get $10 off your first Yalla Bites order with code FIFA10. Download: yallabites.com. Reply STOP to opt out.`;
+}
